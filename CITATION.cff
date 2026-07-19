@@ -1,0 +1,8 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "DeltaFlow: Flow Matching and Anatomy-Invariant Guidance Alignment for Radiograph Generative Pretraining"
+authors:
+  - name: "DeltaFlow Contributors"
+date-released: 2026-07-19
+url: "https://github.com/yourname/deltaflow"
+license: MIT
