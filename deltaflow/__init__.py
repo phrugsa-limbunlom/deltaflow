@@ -29,7 +29,11 @@ Module map:
 from importlib.metadata import PackageNotFoundError, version
 
 try:
-    __version__ = version("deltaflow")
+    # The distribution name on PyPI is ``torchdeltaflow`` (the plain
+    # ``deltaflow`` name is claimed by an unrelated 2020 package). The
+    # *import* name is still ``deltaflow``, which is why we can't just
+    # call ``version(__name__)``.
+    __version__ = version("torchdeltaflow")
 except PackageNotFoundError:  # pragma: no cover - not installed
     __version__ = "0.0.0.dev0"
 
