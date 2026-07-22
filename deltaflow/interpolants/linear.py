@@ -4,14 +4,18 @@ from typing import Optional, Tuple
 
 import torch
 
-from .base import BaseInterpolant
+from ..core.base_interpolant import BaseInterpolant
 
 
 class LinearInterpolant(BaseInterpolant):
     """Straight-line probability path between noise and data.
 
     ``x_t = (1 - t) * x0 + t * x1``, with conditional target velocity
-    ``u_t = x1 - x0`` (constant along the path).
+    ``u_t = x1 - x0`` (constant along the path). This is the "independent
+    coupling" variant: if ``x0`` is not supplied, it is drawn from a
+    standard normal independently of ``x1``. For OT-coupled linear paths
+    see :class:`~deltaflow.interpolants.ot.OTInterpolant` or use
+    :class:`~deltaflow.trainer.coupling.OTCoupling` on the training side.
 
     Reference: Lipman et al., "Flow Matching for Generative Modeling" (2023),
     https://arxiv.org/abs/2210.02747.

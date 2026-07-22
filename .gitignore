@@ -1,20 +1,79 @@
+# --- Python ---
 __pycache__/
 *.py[cod]
-*.egg-info/
-.eggs/
+*.pyo
+*.pyd
+*$py.class
+.Python
+
+# --- Build / packaging ---
 build/
 dist/
-.venv/
+wheels/
+*.egg-info/
+*.egg
+.eggs/
+pip-wheel-metadata/
+MANIFEST
+
+# setuptools_scm writes deltaflow/_version.py; keep it out of git
+deltaflow/_version.py
+
+# --- Virtual environments ---
 venv/
+.venv/
+env/
+.env
+.env.*
+
+# --- Testing / coverage ---
 .pytest_cache/
-.mypy_cache/
 .coverage
+.coverage.*
 htmlcov/
+coverage.xml
+.tox/
+.nox/
+.hypothesis/
+
+# --- Type checkers / linters ---
+.mypy_cache/
+.pyright/
+.ruff_cache/
+.pytype/
+
+# --- Docs ---
 site/
+docs/_build/
+
+# --- Jupyter ---
+.ipynb_checkpoints/
+
+# --- Training artifacts (created by deltaflow.trainer + examples) ---
+checkpoints/
+outputs/
+runs/
+wandb/
+logs/
 *.pt
 *.pth
 *.ckpt
+*.safetensors
+
+# --- Data ---
+data/
+datasets/local/
+*.h5
+*.hdf5
+*.npy
+*.npz
+
+# --- OS / editor ---
 .DS_Store
+Thumbs.db
+Desktop.ini
+*.swp
+*.swo
 .idea/
 .vscode/
 *.log
