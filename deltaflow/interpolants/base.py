@@ -1,23 +1,7 @@
-"""Base class for probability-path interpolants."""
+"""Backward-compatibility shim. Prefer importing :class:`BaseInterpolant`
+from :mod:`deltaflow.core`.
+"""
 
-from abc import ABC, abstractmethod
-from typing import Optional, Tuple
+from ..core.base_interpolant import BaseInterpolant
 
-import torch
-
-
-class BaseInterpolant(ABC):
-    """Base class for a probability path between noise ``x0`` and data ``x1``.
-
-    An interpolant defines, for each ``t in [0, 1]``, an intermediate point
-    ``x_t`` and its conditional target velocity ``u_t`` such that regressing
-    a model onto ``u_t`` (in expectation over the path) yields the marginal
-    velocity field of the flow-matching ODE.
-    """
-
-    @abstractmethod
-    def interpolate(
-        self, x1: torch.Tensor, t: torch.Tensor, x0: Optional[torch.Tensor] = None
-    ) -> Tuple[torch.Tensor, torch.Tensor]:
-        """Return ``(x_t, target_velocity)`` for the given data/time (and optional noise)."""
-        raise NotImplementedError
+__all__ = ["BaseInterpolant"]

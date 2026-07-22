@@ -1,6 +1,13 @@
-"""Probability paths connecting noise x0 to data x1."""
+"""Probability paths connecting noise ``x0`` to data ``x1``."""
 
-from .base import BaseInterpolant
+from ..core.base_interpolant import BaseInterpolant
 from .linear import LinearInterpolant
+from .ot import OTInterpolant
+from .variance_preserving import VariancePreservingInterpolant
 
-__all__ = ["BaseInterpolant", "LinearInterpolant"]
+__all__ = [
+    "BaseInterpolant",
+    "LinearInterpolant",
+    "OTInterpolant",
+    "VariancePreservingInterpolant",
+]
