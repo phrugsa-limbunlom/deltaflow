@@ -1,8 +1,11 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
-title: "DeltaFlow: Flow Matching and Anatomy-Invariant Guidance Alignment for Radiograph Generative Pretraining"
+title: "torchDeltaFlow: Flow Matching, Optimal-Transport Coupling, and Posterior Sampling for Inverse Problems in PyTorch"
 authors:
-  - name: "DeltaFlow Contributors"
-date-released: 2026-07-19
-url: "https://github.com/yourname/deltaflow"
+  - family-names: "Limbunlom"
+    given-names: "Phrugsa"
+    email: "phrugsa.lim@gmail.com"
+date-released: 2026-07-22
+url: "https://github.com/phrugsa-limbunlom/deltaflow"
+repository-code: "https://github.com/phrugsa-limbunlom/deltaflow"
 license: MIT
