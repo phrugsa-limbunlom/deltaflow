@@ -3,37 +3,51 @@ requires = ["setuptools>=64", "wheel", "setuptools_scm[toml]>=8"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "deltaflow"
+name = "torchdeltaflow"
 dynamic = ["version"]
-description = "Flow matching and anatomy-invariant guidance alignment for radiograph generative pretraining"
+description = "Flow matching, mini-batch optimal transport coupling, and posterior sampling for inverse problems in PyTorch"
 readme = "README.md"
 license = { file = "LICENSE" }
-authors = [{ name = "Your Name" }]
+authors = [
+    { name = "Phrugsa Limbunlom", email = "phrugsa.lim@gmail.com" },
+]
+maintainers = [
+    { name = "Phrugsa Limbunlom", email = "phrugsa.lim@gmail.com" },
+]
 requires-python = ">=3.9"
 keywords = [
-    "deep-learning",
-    "flow-matching",
-    "generative-models",
-    "medical-imaging",
-    "radiography",
     "pytorch",
+    "flow-matching",
+    "rectified-flow",
+    "optimal-transport",
+    "diffusion-models",
+    "generative-models",
+    "posterior-sampling",
+    "inverse-problems",
+    "medical-imaging",
+    "deep-learning",
 ]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
     "Topic :: Scientific/Engineering :: Medical Science Apps.",
+    "Topic :: Software Development :: Libraries",
     "Topic :: Software Development :: Libraries :: Python Modules",
-    "Operating System :: OS Independent",
 ]
 
+# Keep the runtime footprint minimal: only torch + a few pure-python utilities.
+# Everything domain-specific (image loading, OT solver, dev tooling, docs) is
+# an optional extra, in the same spirit as torchebm.
 dependencies = [
     "torch>=2.0",
     "numpy",
@@ -42,12 +56,29 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+# Image dataset streaming (deltaflow.trainer.data.ImageFolderStream,
+# deltaflow.datasets.radiograph.RadiographDataset).
+images = [
+    "pillow>=9.0",
+]
+# Exact mini-batch OT coupling via the Hungarian algorithm (falls back to a
+# greedy nearest-neighbour matcher when scipy is absent).
+ot = [
+    "scipy>=1.10",
+]
+# Convenience aggregate for a full install (all optional runtime extras).
+all = [
+    "pillow>=9.0",
+    "scipy>=1.10",
+]
 dev = [
     "pytest>=6.0",
     "pytest-cov>=2.0",
     "black>=24.0",
     "isort>=5.0",
     "mypy>=1.0",
+    "pillow>=9.0",
+    "scipy>=1.10",
 ]
 docs = [
     "mkdocs-material>=9.0.0",
@@ -56,13 +87,18 @@ docs = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/yourname/deltaflow"
-Repository = "https://github.com/yourname/deltaflow"
+Homepage = "https://github.com/phrugsa-limbunlom/deltaflow"
+Repository = "https://github.com/phrugsa-limbunlom/deltaflow"
+Issues = "https://github.com/phrugsa-limbunlom/deltaflow/issues"
+Changelog = "https://github.com/phrugsa-limbunlom/deltaflow/blob/main/CHANGELOG.md"
 
 [tool.setuptools.packages.find]
 include = ["deltaflow*"]
 
 [tool.setuptools_scm]
+# Auto-derive the version from the nearest git tag (e.g. v0.1.0 -> 0.1.0).
+# Falls back to "0.0.0.dev0" only when the tree has no tags at all.
+fallback_version = "0.0.0.dev0"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
