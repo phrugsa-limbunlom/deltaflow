@@ -14,8 +14,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   `deltaflow.trainer.OTCoupling` for a simulation-free approximation of the
   dynamic Schrödinger bridge.
 - Showcase example `05-schrodinger-bridge-viz`: visualises the bridge path
-  at increasing `sigma`, then trains a velocity field against it (with
-  `OTCoupling`) and inspects the resulting sampler on a two-moons target.
+  at increasing `sigma` (`bridge_paths.png` static, `bridge_paths.gif`
+  animated), then trains a velocity field against it (with `OTCoupling`)
+  and inspects the resulting sampler on a two-moons target.
 - Showcase example `06-algorithm-comparison`: trains the same model on the
   same target under all four interpolant/coupling configurations (linear
   independent, OT coupling, variance-preserving, Schrödinger bridge) and

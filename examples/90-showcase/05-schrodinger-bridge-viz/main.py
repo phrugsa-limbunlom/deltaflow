@@ -9,7 +9,8 @@ Two things are shown, because they are easy to conflate:
    different, noisy path ``x_t`` every time it is called - a Brownian bridge
    wiggling around the straight line, with amplitude set by ``sigma``.
    ``bridge_paths.png`` draws many such samples at a few ``sigma`` values,
-   including ``sigma=0`` (the deterministic straight line).
+   including ``sigma=0`` (the deterministic straight line);
+   ``bridge_paths.gif`` animates the same realisations unrolling over ``t``.
 2. **The learned sampler is deterministic.** Training regresses a velocity
    field onto the *conditional* target velocity of that stochastic bridge;
    once trained, generation integrates the resulting (deterministic)
@@ -138,9 +139,80 @@ def _plot_bridge_paths(
     return out_path
 
 
-# --------------------------------------------------------------------------- #
-# 2. Post-training sampling (deterministic ODE on the learned field)
-# --------------------------------------------------------------------------- #
+def _write_bridge_paths_animation(
+    out_path: Path,
+    sigmas: tuple[float, ...] = (0.0, 0.5, 1.5),
+    n_pairs: int = 6,
+    n_draws: int = 12,
+    n_t: int = 60,
+    seed: int = 0,
+    fps: int = 20,
+):
+    """Animate the same bridge realisations as :func:`_plot_bridge_paths`,
+    drawing each path progressively from ``t=0`` to ``t=1`` across the
+    ``sigma`` panels, so the "wiggle vs. sigma" effect plays out over time."""
+    torch.manual_seed(seed)
+    x0 = torch.randn(n_pairs, 1) * 1.5 - 2.0
+    x1 = torch.randn(n_pairs, 1) * 1.5 + 2.0
+    ts = torch.linspace(0.0, 1.0, n_t)
+
+    # Precompute every realisation once per sigma: shape (n_pairs, n_draws, n_t).
+    all_paths = []
+    for sigma in sigmas:
+        interpolant = SchrodingerBridgeInterpolant(sigma=sigma)
+        paths = torch.empty(n_pairs, n_draws, n_t)
+        for p in range(n_pairs):
+            for d in range(n_draws):
+                x0_p = x0[p : p + 1].expand(n_t, -1)
+                x1_p = x1[p : p + 1].expand(n_t, -1)
+                x_t, _ = interpolant.interpolate(x1_p, ts, x0=x0_p)
+                paths[p, d] = x_t[:, 0]
+        all_paths.append(paths.numpy())
+
+    fig, axes = plt.subplots(1, len(sigmas), figsize=(4.2 * len(sigmas), 3.6), dpi=110, sharey=True)
+    if len(sigmas) == 1:
+        axes = [axes]
+
+    lines = []
+    for ax, sigma, paths in zip(axes, sigmas, all_paths):
+        ax.set_title(f"sigma = {sigma:g}", fontsize=11)
+        ax.set_xlabel("t")
+        ax.set_xlim(0.0, 1.0)
+        ax.set_ylim(paths.min() - 0.5, paths.max() + 0.5)
+        panel_lines = [
+            ax.plot([], [], color=C_BRIDGE, alpha=0.35, linewidth=0.9)[0]
+            for _ in range(n_pairs * n_draws)
+        ]
+        lines.append(panel_lines)
+        for p in range(n_pairs):
+            ax.scatter([0.0], x0[p].numpy(), s=18, c=C_START, zorder=3)
+            ax.scatter([1.0], x1[p].numpy(), s=18, c=C_PARTICLE, zorder=3)
+    axes[0].set_ylabel("x")
+    suptitle = fig.suptitle("", fontsize=12)
+    fig.tight_layout()
+
+    def update(frame_idx: int):
+        k = frame_idx + 1
+        for panel_lines, paths in zip(lines, all_paths):
+            idx = 0
+            for p in range(n_pairs):
+                for d in range(n_draws):
+                    panel_lines[idx].set_data(ts.numpy()[:k], paths[p, d, :k])
+                    idx += 1
+        suptitle.set_text(
+            f"Schrödinger-bridge conditional paths at increasing diffusivity  |  t = {ts[frame_idx].item():.2f}"
+        )
+        return tuple(l for panel_lines in lines for l in panel_lines) + (suptitle,)
+
+    anim = animation.FuncAnimation(fig, update, frames=n_t, interval=1000 // fps, blit=False)
+    try:
+        anim.save(out_path, writer=animation.PillowWriter(fps=fps))
+    except Exception as exc:
+        plt.close(fig)
+        print(f"[demo] skipping animation ({exc}); install pillow to enable it")
+        return None
+    plt.close(fig)
+    return out_path
 
 @torch.no_grad()
 def sample_with_trajectory(
@@ -243,6 +315,10 @@ def main() -> None:
     # ---- 1. Visualise the bridge path itself, no training required -------
     bridge_path = _plot_bridge_paths(out_dir / "bridge_paths.png")
     print(f"[demo] wrote {bridge_path}")
+
+    bridge_anim_path = _write_bridge_paths_animation(out_dir / "bridge_paths.gif")
+    if bridge_anim_path is not None:
+        print(f"[demo] wrote {bridge_anim_path}")
 
     # ---- 2. Train a velocity field against the Schrodinger-bridge path,
     #         with mini-batch OT coupling on (x0, x1) as recommended ------
