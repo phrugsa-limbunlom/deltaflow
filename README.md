@@ -253,7 +253,7 @@ The [`examples/`](https://github.com/phrugsa-limbunlom/deltaflow/tree/main/examp
 | [`00-foundations/`](https://github.com/phrugsa-limbunlom/deltaflow/tree/main/examples/00-foundations) | work with interpolants and the linear probability path |
 | [`10-sampling/`](https://github.com/phrugsa-limbunlom/deltaflow/tree/main/examples/10-sampling) | integrate a learned field with the Euler and Heun solvers |
 | [`20-training/`](https://github.com/phrugsa-limbunlom/deltaflow/tree/main/examples/20-training) | fit a field with flow matching, OT coupling, and delta alignment |
-| [`90-showcase/`](https://github.com/phrugsa-limbunlom/deltaflow/tree/main/examples/90-showcase) | study end-to-end demos and the visualizations above |
+| [`90-showcase/`](https://github.com/phrugsa-limbunlom/deltaflow/tree/main/examples/90-showcase) | study end-to-end demos and the visualizations above, including the [Schrödinger-bridge path and trained sampler](https://github.com/phrugsa-limbunlom/deltaflow/tree/main/examples/90-showcase/05-schrodinger-bridge-viz) |
 
 ## Development
 

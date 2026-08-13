@@ -287,3 +287,41 @@ pip install -e ".[dev]" matplotlib
 python examples/90-showcase/04-inverse-posterior-viz/main.py
 # artifacts are written to outputs/inverse_posterior_viz/
 ```
+
+## 90 showcase, Schrödinger bridge
+
+[`examples/90-showcase/05-schrodinger-bridge-viz/main.py`](https://github.com/phrugsa-limbunlom/deltaflow/blob/main/examples/90-showcase/05-schrodinger-bridge-viz/main.py)
+first visualises the `SchrodingerBridgeInterpolant` path itself - the same
+`(x0, x1)` pair sampled repeatedly at increasing diffusivity `sigma` - then
+trains a velocity field against it (paired with `OTCoupling`) on a two-moons
+target and inspects the resulting sampler.
+
+**Why it matters.** It is easy to conflate the stochastic *training-time*
+bridge with the *learned* sampler: training regresses onto the conditional
+velocity of a noisy Brownian bridge, but generation integrates the resulting
+(deterministic) probability-flow ODE, exactly like the other flow-matching
+demos.
+
+![Schrödinger-bridge conditional paths](assets/schrodinger-bridge/bridge_paths.png)
+
+At `sigma=0` the bridge collapses onto the straight line (`LinearInterpolant`
+exactly); larger `sigma` widens the stochastic corridor the model must learn
+to regress against, without changing the deterministic ODE it produces.
+
+![Schrödinger-bridge trained sampler snapshots](assets/schrodinger-bridge/sb_snapshots.png)
+
+![Schrödinger-bridge trained sampler trajectories](assets/schrodinger-bridge/sb_trajectories.png)
+
+**Animated sampling.** The learned field integrates noise onto the two-moons
+target from `t=0` to `t=1`, same as the flow-matching showcase, but the
+underlying field was trained on the bridge path above.
+
+![Animated Schrödinger-bridge sampling](assets/schrodinger-bridge/sb_flow.gif)
+
+### Reproduce
+
+```bash
+pip install -e ".[dev]" matplotlib
+python examples/90-showcase/05-schrodinger-bridge-viz/main.py
+# artifacts are written to outputs/schrodinger_bridge_viz/
+```
