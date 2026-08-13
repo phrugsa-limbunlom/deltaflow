@@ -325,3 +325,31 @@ pip install -e ".[dev]" matplotlib
 python examples/90-showcase/05-schrodinger-bridge-viz/main.py
 # artifacts are written to outputs/schrodinger_bridge_viz/
 ```
+
+## 90 showcase, comparing all four paths
+
+[`examples/90-showcase/06-algorithm-comparison/main.py`](https://github.com/phrugsa-limbunlom/deltaflow/blob/main/examples/90-showcase/06-algorithm-comparison/main.py)
+trains the same MLP velocity field, for the same number of steps, on the same
+two-moons target, under four interpolant/coupling configurations: Linear with
+independent coupling, Linear with `OTCoupling`, `VariancePreservingInterpolant`,
+and `SchrodingerBridgeInterpolant` with `OTCoupling`.
+
+**Why it matters.** Every DeltaFlow algorithm is a configuration of one
+training loop; this demo makes the practical differences between
+configurations visible side by side, on identical data and compute budget.
+
+![Final samples under each configuration](assets/algorithm-comparison/comparison.png)
+
+![Sampled trajectories under each configuration](assets/algorithm-comparison/trajectories_comparison.png)
+
+OT coupling produces visibly straighter trajectories than independent
+coupling, which is the point of minimising batch transport cost before
+regressing (see the `03-minibatch-ot-viz` showcase above for why).
+
+### Reproduce
+
+```bash
+pip install -e ".[dev]" matplotlib
+python examples/90-showcase/06-algorithm-comparison/main.py
+# artifacts are written to outputs/algorithm_comparison/
+```
