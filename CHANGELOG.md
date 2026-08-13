@@ -16,6 +16,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Showcase example `05-schrodinger-bridge-viz`: visualises the bridge path
   at increasing `sigma`, then trains a velocity field against it (with
   `OTCoupling`) and inspects the resulting sampler on a two-moons target.
+- Showcase example `06-algorithm-comparison`: trains the same model on the
+  same target under all four interpolant/coupling configurations (linear
+  independent, OT coupling, variance-preserving, Schrödinger bridge) and
+  compares final samples and sampled trajectories side by side. A README
+  section ("Comparing the paths") links these figures.
 
 ## [0.2.1]
 

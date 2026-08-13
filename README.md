@@ -175,6 +175,23 @@ loss_fn = ConditionalFlowMatchingLoss(
 loss = loss_fn(model, x1)
 ```
 
+### Comparing the paths
+
+Every algorithm above is the *same* training loop; only the `interpolant=` (and optionally `coupling=`) argument to `ConditionalFlowMatchingLoss` changes. Training an identical MLP on a two-moons target with each configuration for the same number of steps makes the differences concrete:
+
+| Path | `interpolant=` | `coupling=` |
+|---|---|---|
+| Linear (independent) | `LinearInterpolant()` | *(none, `x0 ~ N(0,I)`)* |
+| OT coupling | `LinearInterpolant()` | `OTCoupling()` |
+| Variance-preserving | `VariancePreservingInterpolant()` | *(none)* |
+| Schrödinger bridge | `SchrodingerBridgeInterpolant(sigma=0.5)` | `OTCoupling()` |
+
+![Final samples under each configuration](https://raw.githubusercontent.com/phrugsa-limbunlom/deltaflow/main/docs/assets/algorithm-comparison/comparison.png)
+
+![Sampled trajectories under each configuration](https://raw.githubusercontent.com/phrugsa-limbunlom/deltaflow/main/docs/assets/algorithm-comparison/trajectories_comparison.png)
+
+OT coupling produces the straightest source-to-target trajectories of the four (compare the crossing paths on the left to the untangled bundle in the second panel), which is the practical benefit of minimising batch transport cost before regressing. Reproduce this figure with [`examples/90-showcase/06-algorithm-comparison/`](https://github.com/phrugsa-limbunlom/deltaflow/tree/main/examples/90-showcase/06-algorithm-comparison).
+
 ### Delta alignment
 
 The same difference principle powers an optional representation-learning loss. For a conditionally-generated backbone, the guidance-difference feature $\Delta h = h_\text{cond} - h_\text{uncond}$ isolates what the conditioning changed at each hierarchy level, largely cancelling the anatomy both passes share. Aligning $\Delta h$ across two augmented views encourages a guidance representation that is consistent regardless of anatomy. The guidance difference itself follows [Classifier-Free Diffusion Guidance](https://arxiv.org/abs/2207.12598), Ho & Salimans 2022.
@@ -253,7 +270,7 @@ The [`examples/`](https://github.com/phrugsa-limbunlom/deltaflow/tree/main/examp
 | [`00-foundations/`](https://github.com/phrugsa-limbunlom/deltaflow/tree/main/examples/00-foundations) | work with interpolants and the linear probability path |
 | [`10-sampling/`](https://github.com/phrugsa-limbunlom/deltaflow/tree/main/examples/10-sampling) | integrate a learned field with the Euler and Heun solvers |
 | [`20-training/`](https://github.com/phrugsa-limbunlom/deltaflow/tree/main/examples/20-training) | fit a field with flow matching, OT coupling, and delta alignment |
-| [`90-showcase/`](https://github.com/phrugsa-limbunlom/deltaflow/tree/main/examples/90-showcase) | study end-to-end demos and the visualizations above, including the [Schrödinger-bridge path and trained sampler](https://github.com/phrugsa-limbunlom/deltaflow/tree/main/examples/90-showcase/05-schrodinger-bridge-viz) |
+| [`90-showcase/`](https://github.com/phrugsa-limbunlom/deltaflow/tree/main/examples/90-showcase) | study end-to-end demos and the visualizations above, including the [Schrödinger-bridge path and trained sampler](https://github.com/phrugsa-limbunlom/deltaflow/tree/main/examples/90-showcase/05-schrodinger-bridge-viz) and the [four-algorithm comparison](https://github.com/phrugsa-limbunlom/deltaflow/tree/main/examples/90-showcase/06-algorithm-comparison) |
 
 ## Development
 
