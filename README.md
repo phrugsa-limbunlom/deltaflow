@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/assets/logo.svg" alt="DeltaFlow logo" width="180">
+  <img src="https://raw.githubusercontent.com/phrugsa-limbunlom/deltaflow/main/docs/assets/logo.svg" alt="DeltaFlow logo" width="180">
 </p>
 
 <p align="center">
@@ -21,7 +21,7 @@
 <h3 align="center">Composable PyTorch primitives for representation learning and posterior sampling, built around the displacement between two distributions.</h3>
 
 <p align="center">
-  <img src="docs/assets/sampling-flow/flow.gif" alt="A learned velocity field transporting noise onto a two-moons distribution" width="480"/>
+  <img src="https://raw.githubusercontent.com/phrugsa-limbunlom/deltaflow/main/docs/assets/sampling-flow/flow.gif" alt="A learned velocity field transporting noise onto a two-moons distribution" width="480"/>
   <br>
   <em>A learned field integrated from noise onto data with <code>FlowSampler</code>.</em>
 </p>
@@ -110,7 +110,7 @@ Each block below is one method, in as few lines as it takes. Annotated, full-sca
 [Flow Matching for Generative Modeling](https://arxiv.org/abs/2210.02747), Lipman et al. 2023. Regress a velocity field onto the conditional velocity of a probability path. With DeltaFlow's primitives, that is the loop itself.
 
 <p align="center">
-  <img src="docs/assets/sampling-flow/snapshots.png" alt="Noise at t=0 reshaped into a two-moons manifold at t=1" width="760"/>
+  <img src="https://raw.githubusercontent.com/phrugsa-limbunlom/deltaflow/main/docs/assets/sampling-flow/snapshots.png" alt="Noise at t=0 reshaped into a two-moons manifold at t=1" width="760"/>
   <br>
   <em>Noise at <code>t=0</code> reshaped into the two-moons data manifold at <code>t=1</code>. The faint cloud is the target reference.</em>
 </p>
@@ -133,7 +133,7 @@ samples = FlowSampler(model).sample(torch.randn(1000, 2), n_steps=50)
 [Improving and generalizing flow-based generative models with minibatch optimal transport](https://arxiv.org/abs/2302.00482), Tong et al. 2024. Pair each noise sample with the right datum and the paths straighten, so generation needs fewer steps. This hard assignment is the zero-entropy limit of the static Schrödinger bridge.
 
 <p align="center">
-  <img src="docs/assets/minibatch-ot/minibatch_ot.gif" alt="Independent coupling with crossing paths beside a straighter OT coupling" width="760"/>
+  <img src="https://raw.githubusercontent.com/phrugsa-limbunlom/deltaflow/main/docs/assets/minibatch-ot/minibatch_ot.gif" alt="Independent coupling with crossing paths beside a straighter OT coupling" width="760"/>
   <br>
   <em>The same source and target clouds under two couplings. The independent pairing sweeps long crossing paths, the OT pairing stays an orderly bundle at lower transport cost.</em>
 </p>
@@ -181,7 +181,7 @@ total, loss_dict = loss_fn(
 [FlowDPS: Flow-Driven Posterior Sampling for Inverse Problems](https://arxiv.org/abs/2503.08136), Kim et al. 2025, and [Flower: A Flow-Matching Solver for Inverse Problems](https://arxiv.org/abs/2509.26287), Pourya et al. 2025. Reconstruct a masked or degraded measurement with a field trained once, no retraining. `PosteriorSolver` wraps the same Euler solver and injects a measurement-likelihood gradient at every step, so the base integrator is reused rather than re-implemented.
 
 <p align="center">
-  <img src="docs/assets/inverse-posterior/inverse_posterior.gif" alt="A posterior mean forming from noise to fill a masked image centre" width="760"/>
+  <img src="https://raw.githubusercontent.com/phrugsa-limbunlom/deltaflow/main/docs/assets/inverse-posterior/inverse_posterior.gif" alt="A posterior mean forming from noise to fill a masked image centre" width="760"/>
   <br>
   <em>The posterior mean fills a masked centre step by step. The known pixels stay anchored by the likelihood while the flow supplies the rest.</em>
 </p>
@@ -207,13 +207,13 @@ x = solver.sample(torch.randn(16, 1, 16, 16), n_steps=60)     # posterior sample
 Beyond the animations above, [`examples/90-showcase/02-sampling-flow-viz/`](https://github.com/phrugsa-limbunlom/deltaflow/tree/main/examples/90-showcase/02-sampling-flow-viz) records every intermediate state of a small MLP field trained on a 2D two-moons target.
 
 <p align="center">
-  <img src="docs/assets/sampling-flow/trajectories.png" alt="Individual particle trajectories from noise to data" width="620"/>
+  <img src="https://raw.githubusercontent.com/phrugsa-limbunlom/deltaflow/main/docs/assets/sampling-flow/trajectories.png" alt="Individual particle trajectories from noise to data" width="620"/>
   <br>
   <em>Individual sample paths from noise to data, traced as streamlines.</em>
 </p>
 
 <p align="center">
-  <img src="docs/assets/sampling-flow/velocity_field.png" alt="Quiver plots of the learned velocity field at three times" width="620"/>
+  <img src="https://raw.githubusercontent.com/phrugsa-limbunlom/deltaflow/main/docs/assets/sampling-flow/velocity_field.png" alt="Quiver plots of the learned velocity field at three times" width="620"/>
   <br>
   <em>Quiver plots of <code>v(x, t)</code> at three times, pointing broadly inward early on and resolving the two-moons structure by <code>t ≈ 0.9</code>.</em>
 </p>
