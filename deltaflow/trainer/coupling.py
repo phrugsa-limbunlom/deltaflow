@@ -11,9 +11,9 @@ and swappable:
 Reference for OT coupling: Tong et al., "Improving and generalizing
 flow-based generative models with minibatch optimal transport"
 (arXiv:2302.00482). The OT-vs-independent ablation in Flower
-("Flower: Flow-based inverse problems solver", 2024) recommends OT
-coupling as the safer default when the trained model is later reused for
-posterior sampling.
+("Flower: A Flow-Matching Solver for Inverse Problems", 2025,
+arXiv:2509.26287) recommends OT coupling as the safer default when the
+trained model is later reused for posterior sampling.
 """
 
 from abc import ABC, abstractmethod

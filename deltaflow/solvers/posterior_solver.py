@@ -3,10 +3,11 @@
 The :class:`PosteriorSolver` wraps an existing ODE solver (Euler, Heun,
 ...) and injects a measurement-likelihood gradient at every step, so the
 underlying integrator is reused rather than re-implemented. This follows
-the same design as FlowDPS (Chung et al., "FlowDPS: Flow-Driven Posterior
-Sampling for Inverse Problems", 2024) and Flower ("Flower: Flow-based
-inverse problem solver", 2024) - both modify the sampling-time ODE and do
-not touch the pretrained velocity field.
+the same design as FlowDPS (Kim et al., "FlowDPS: Flow-Driven Posterior
+Sampling for Inverse Problems", 2025, arXiv:2503.08136) and Flower
+("Flower: A Flow-Matching Solver for Inverse Problems", 2025,
+arXiv:2509.26287), both modify the sampling-time ODE and do not touch the
+pretrained velocity field.
 
 Per step, given the current state ``x_t`` and the velocity ``v_theta(x_t, t)``,
 the update is::
@@ -27,6 +28,7 @@ from typing import Optional
 import torch
 
 from ..core.base_solver import BaseSolver
+from ..inverse.likelihood import Likelihood
 from ..inverse.tweedie import BaseTweedie, LinearTweedie
 
 
@@ -55,7 +57,7 @@ class PosteriorSolver(BaseSolver):
     def __init__(
         self,
         base_solver: BaseSolver,
-        likelihood,
+        likelihood: Likelihood,
         tweedie: Optional[BaseTweedie] = None,
         guidance_scale: float = 1.0,
         grad_normalize: bool = False,

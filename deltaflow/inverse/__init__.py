@@ -19,7 +19,7 @@ Modules:
   :class:`~deltaflow.solvers.posterior_solver.PosteriorSolver`.
 """
 
-from .likelihood import GaussianLikelihood
+from .likelihood import GaussianLikelihood, Likelihood
 from .operators import BlurOperator, DownsampleOperator, IdentityOperator, MaskOperator
 from .tweedie import BaseTweedie, LinearTweedie, VPTweedie
 
@@ -29,6 +29,7 @@ __all__ = [
     "DownsampleOperator",
     "GaussianLikelihood",
     "IdentityOperator",
+    "Likelihood",
     "LinearTweedie",
     "MaskOperator",
     "VPTweedie",
