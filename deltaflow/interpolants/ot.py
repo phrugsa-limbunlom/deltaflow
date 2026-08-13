@@ -62,19 +62,43 @@ def _batch_ot_permutation(x0: torch.Tensor, x1: torch.Tensor) -> torch.Tensor:
 
 
 class OTInterpolant(BaseInterpolant):
-    """Linear probability path with mini-batch OT coupling of ``(x0, x1)``.
+    r"""Linear probability path with mini-batch optimal-transport coupling.
 
-    Concretely, on each call this interpolant
+    This reuses the straight-line path of
+    :class:`~deltaflow.interpolants.linear.LinearInterpolant`, but instead of
+    pairing noise and data independently it re-orders \(x_0\) within the batch
+    to approximately solve the discrete optimal-transport assignment. Given a
+    batch of noise \(\{x_0^{(i)}\}\) and data \(\{x_1^{(j)}\}\), it seeks a
+    permutation \(\pi\) minimising the total squared-\(L_2\) transport cost
 
-    1. draws (or receives) a batch of noise samples ``x0``,
-    2. computes a permutation of ``x0`` that pairs each sample with a data
-       sample ``x1`` so as to minimise the batch's total squared-L2
-       transport cost,
+    \[
+    \pi^\star = \arg\min_{\pi \in S_B}
+        \sum_{i=1}^{B} \bigl\| x_0^{(i)} - x_1^{(\pi(i))} \bigr\|_2^2,
+    \]
+
+    then applies the linear interpolant to the matched pairs
+    \(\bigl(x_0^{(\pi^\star(i))}, x_1^{(i)}\bigr)\). Concretely, each call
+
+    1. draws (or receives) a batch of noise samples \(x_0\),
+    2. computes \(\pi^\star\) so each noise sample is paired with the data
+       sample that minimises the batch transport cost,
     3. applies :class:`LinearInterpolant` on the permuted pair.
 
-    Because the coupling is purely a re-ordering of ``x0``, the training
-    objective is identical to standard conditional flow matching and no
-    other component (loss, solver, model) needs to change.
+    In the large-batch limit this converges to a coupling drawn from the true
+    OT plan and yields straighter learned trajectories that sample in fewer
+    steps. It is the zero-entropy limit of the static Schrödinger bridge.
+    Because the coupling is purely a re-ordering of \(x_0\), the training
+    objective is identical to standard conditional flow matching and no other
+    component (loss, solver, model) needs to change.
+
+    **Solver.** The exact assignment (Hungarian algorithm) is used when
+    ``scipy`` is installed; otherwise a deterministic greedy nearest-neighbour
+    fallback is used.
+
+    References: Tong et al., "Improving and generalizing flow-based generative
+    models with minibatch optimal transport" (2023),
+    https://arxiv.org/abs/2302.00482; "Flower: A Flow-Matching Solver for
+    Inverse Problems" (2025), https://arxiv.org/abs/2509.26287.
     """
 
     def __init__(self):

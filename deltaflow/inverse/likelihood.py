@@ -33,17 +33,31 @@ class Likelihood(Protocol):
 
 
 class GaussianLikelihood:
-    """``-log p(y | x_clean_hat) = (1 / (2 sigma^2)) * || y - A(D(x_clean_hat)) ||^2``.
+    r"""Gaussian measurement likelihood for posterior sampling.
+
+    For a measurement \(y = A(x) + n\) with \(n \sim \mathcal{N}(0, \sigma^2
+    I)\), the negative log-likelihood of the clean-signal estimate is
+
+    \[
+    -\log p(y \mid \hat{x}_1)
+        = \frac{1}{2\sigma^2}\,\bigl\| y - A\bigl(D(\hat{x}_1)\bigr) \bigr\|^2
+        \;+\; \text{const},
+    \]
+
+    where \(A\) is the measurement operator and \(D\) an optional decoder
+    (\(D = \mathrm{id}\) when the field and operator share a space). The
+    constant is dropped, and \(\sigma\) only scales the gradient magnitude, not
+    its direction.
 
     Args:
-        y: measured tensor, shape matches ``A``'s output.
-        operator: linear measurement operator ``A`` (any callable, e.g.
+        y: measured tensor, shape matches \(A\)'s output.
+        operator: linear measurement operator \(A\) (any callable, e.g.
             an instance from :mod:`deltaflow.inverse.operators`).
-        sigma: measurement-noise standard deviation. Only affects the
-            *scale* of the likelihood gradient - the direction is
-            independent of ``sigma``.
-        decoder: optional ``latent -> pixel`` callable, used when the
-            velocity field is trained in a latent space but ``A`` is
+        sigma: measurement-noise standard deviation \(\sigma\). Only affects
+            the *scale* of the likelihood gradient; the direction is
+            independent of \(\sigma\).
+        decoder: optional decoder \(D\) (latent to pixel), used when the
+            velocity field is trained in a latent space but \(A\) is
             defined on pixels. Autograd flows through it automatically.
         reduction: ``"sum"`` (default, matches the log-density scaling) or
             ``"mean"``. The :class:`PosteriorSolver` sums per-sample
