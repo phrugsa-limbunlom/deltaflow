@@ -42,8 +42,8 @@ data.**
 
 ### `BaseSolver`
 
-Holds a `model` reference and a `time_scale`. `step()` is the per-step rule;
-`sample()` loops it from `t_start` to `t_end`. `_eval_velocity` multiplies `t`
+Holds a `model` reference and a `time_scale`. `step()` is the per-step rule,
+while `sample()` loops it from `t_start` to `t_end`. `_eval_velocity` multiplies `t`
 by `time_scale` before calling the model, so a backbone trained with a
 different numeric time convention still integrates correctly.
 

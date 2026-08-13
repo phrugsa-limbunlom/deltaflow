@@ -13,8 +13,8 @@ just sample synthesis).
 
 - :material-book-open-variant: **[Guides](guides/flow-matching.md)**
 
-    Task-oriented walkthroughs: flow matching, delta alignment, training, and
-    inverse problems.
+    Task-oriented walkthroughs covering flow matching, delta alignment,
+    training, and inverse problems.
 
 - :material-sitemap: **[Architecture](concepts/architecture.md)**
 
@@ -67,8 +67,8 @@ distribution (\(t=1\)). The panels below come from the
 
 ## Probability paths
 
-The `interpolant=` argument selects the path noise and data connect along;
-the *same* training loop, loss, and solver are reused across all of them.
+The `interpolant=` argument selects the path noise and data connect along.
+The *same* training loop, loss, and solver are reused across all of them.
 
 | Interpolant | Path |
 |---|---|
@@ -85,14 +85,14 @@ onto its conditional velocity trains a stochastic interpolant that recovers the
 entropic optimal-transport bridge as the coupling of \((x_0, x_1)\) approaches
 the true OT plan. Pairing endpoints with `OTCoupling` (rather than drawing them
 independently) is what makes this approximation tight in practice
-([De Bortoli et al., 2021](https://arxiv.org/abs/2106.01357);
+([De Bortoli et al., 2021](https://arxiv.org/abs/2106.01357) and
 [SF2M, Tong et al., 2024](https://arxiv.org/abs/2307.03672)).
 
 ![Schrödinger-bridge conditional paths](assets/schrodinger-bridge/bridge_paths.gif)
 
 ### Comparing the paths
 
-Every algorithm is the *same* training loop; only the `interpolant=` (and
+Every algorithm is the *same* training loop. Only the `interpolant=` (and
 optionally `coupling=`) argument changes. Training an identical MLP on a
 two-moons target with each configuration for the same number of steps makes the
 differences concrete. All four samplers below are integrated from the *same*

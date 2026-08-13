@@ -1,6 +1,6 @@
 # Delta Alignment
 
-Delta alignment is the **"Delta"** in DeltaFlow: a multi-scale,
+Delta alignment is the **"Delta"** in DeltaFlow, a multi-scale,
 anatomy-cancelling loss for guidance-representation pretraining.
 
 ## The idea

@@ -36,7 +36,7 @@ The probability path is pluggable via
 
 | Interpolant | Path | Use it for |
 |---|---|---|
-| `LinearInterpolant` | Straight line \(x_t = (1-t)x_0 + t\,x_1\) (rectified flow) | Default; fast, straight trajectories |
+| `LinearInterpolant` | Straight line \(x_t = (1-t)x_0 + t\,x_1\) (rectified flow) | Default, fast and straight trajectories |
 | `OTInterpolant` | Mini-batch optimal-transport coupling of \((x_0, x_1)\) | Straighter marginal flows, fewer sampling steps |
 | `VariancePreservingInterpolant` | Variance-preserving (diffusion-style) schedule | Matching diffusion training conventions |
 
@@ -51,12 +51,12 @@ from deltaflow.samplers import FlowSampler
 samples = FlowSampler(model).sample(torch.randn(1000, 2), n_steps=50)
 ```
 
-For higher-order integration use `HeunSolver`; for measurement-conditioned
+For higher-order integration use `HeunSolver`. For measurement-conditioned
 generation see [Inverse Problems](inverse-problems.md).
 
 ## What the flow looks like
 
 ![Learned velocity field over time](../assets/sampling-flow/velocity_field.png)
 
-Early on the field points broadly inward; by \(t \approx 0.9\) it resolves the
+Early on the field points broadly inward, and by \(t \approx 0.9\) it resolves the
 target structure. See the [Examples](../examples.md) page to reproduce this.

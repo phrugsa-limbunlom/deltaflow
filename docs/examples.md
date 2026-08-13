@@ -297,7 +297,7 @@ trains a velocity field against it (paired with `OTCoupling`) on a two-moons
 target and inspects the resulting sampler.
 
 **Why it matters.** It is easy to conflate the stochastic *training-time*
-bridge with the *learned* sampler: training regresses onto the conditional
+bridge with the *learned* sampler. Training regresses onto the conditional
 velocity of a noisy Brownian bridge, but generation integrates the resulting
 (deterministic) probability-flow ODE, exactly like the other flow-matching
 demos.
@@ -305,7 +305,7 @@ demos.
 ![Schrödinger-bridge conditional paths](assets/schrodinger-bridge/bridge_paths.gif)
 
 At `sigma=0` the bridge collapses onto the straight line (`LinearInterpolant`
-exactly); larger `sigma` widens the stochastic corridor the model must learn
+exactly). Larger `sigma` widens the stochastic corridor the model must learn
 to regress against, without changing the deterministic ODE it produces.
 
 ![Schrödinger-bridge trained sampler snapshots](assets/schrodinger-bridge/sb_snapshots.png)
@@ -330,12 +330,12 @@ python examples/90-showcase/05-schrodinger-bridge-viz/main.py
 
 [`examples/90-showcase/06-algorithm-comparison/main.py`](https://github.com/phrugsa-limbunlom/deltaflow/blob/main/examples/90-showcase/06-algorithm-comparison/main.py)
 trains the same MLP velocity field, for the same number of steps, on the same
-two-moons target, under four interpolant/coupling configurations: Linear with
+two-moons target, under four interpolant/coupling configurations, namely Linear with
 independent coupling, Linear with `OTCoupling`, `VariancePreservingInterpolant`,
 and `SchrodingerBridgeInterpolant` with `OTCoupling`.
 
 **Why it matters.** Every DeltaFlow algorithm is a configuration of one
-training loop; this demo makes the practical differences between
+training loop, and this demo makes the practical differences between
 configurations visible side by side, on identical data and compute budget.
 
 **Animated sampling, side by side.** All four samplers integrate the same
