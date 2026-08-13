@@ -44,6 +44,14 @@ from deltaflow.core.base import BaseVelocityField
 from deltaflow.losses import FlowMatchingLoss
 from deltaflow.solvers import EulerSolver
 
+# Figure palette: deliberately NOT the docs theme primary (purple).
+# Reuses the logo's non-primary teal/coral so figures stay on-brand.
+C_TARGET = "#d6dbe6"     # faint target reference (cool neutral)
+C_PARTICLE = "#0f9bab"   # particles / samples: teal (blue-green, non-primary)
+C_TRAJ = "#3f9e73"       # trajectories: green
+C_START = "#155e63"      # start markers: deep teal
+CMAP = "viridis"         # velocity-field quiver (purple-blue-green-yellow)
+
 
 # --------------------------------------------------------------------------- #
 # Model + target
@@ -137,11 +145,11 @@ def _plot_snapshots(
         # Faint target reference (helps the eye see where we are heading).
         ax.scatter(
             target[:, 0], target[:, 1],
-            s=4, c="lightgray", alpha=0.6, edgecolors="none", label="target",
+            s=4, c=C_TARGET, alpha=0.6, edgecolors="none", label="target",
         )
         ax.scatter(
             traj[i, :, 0], traj[i, :, 1],
-            s=6, c="crimson", alpha=0.75, edgecolors="none",
+            s=6, c=C_PARTICLE, alpha=0.75, edgecolors="none",
         )
         ax.set_xlim(_XLIM)
         ax.set_ylim(_YLIM)
@@ -174,17 +182,17 @@ def _plot_trajectories(
 
     ax.scatter(
         target[:, 0], target[:, 1],
-        s=4, c="lightgray", alpha=0.6, edgecolors="none", label="target",
+        s=4, c=C_TARGET, alpha=0.6, edgecolors="none", label="target",
     )
     # Paths.
     for k in range(traj_np.shape[1]):
         ax.plot(traj_np[:, k, 0], traj_np[:, k, 1],
-                color="steelblue", alpha=0.35, linewidth=0.6)
+                color=C_TRAJ, alpha=0.35, linewidth=0.6)
     # Start and end markers.
     ax.scatter(traj_np[0, :, 0], traj_np[0, :, 1],
-               s=10, c="black", alpha=0.7, edgecolors="none", label="start (t=0)")
+               s=10, c=C_START, alpha=0.7, edgecolors="none", label="start (t=0)")
     ax.scatter(traj_np[-1, :, 0], traj_np[-1, :, 1],
-               s=12, c="crimson", alpha=0.9, edgecolors="none", label="end (t=1)")
+               s=12, c=C_PARTICLE, alpha=0.9, edgecolors="none", label="end (t=1)")
 
     ax.set_xlim(_XLIM)
     ax.set_ylim(_YLIM)
@@ -230,12 +238,12 @@ def _plot_velocity_field(
 
         ax.quiver(
             xx, yy, u, w, speed,
-            cmap="viridis", pivot="mid",
+            cmap=CMAP, pivot="mid",
             scale=None, width=0.004, alpha=0.9,
         )
         ax.scatter(
             traj[i, :, 0], traj[i, :, 1],
-            s=6, c="crimson", alpha=0.7, edgecolors="none",
+            s=6, c=C_PARTICLE, alpha=0.7, edgecolors="none",
         )
         ax.set_xlim(_XLIM)
         ax.set_ylim(_YLIM)
@@ -267,8 +275,8 @@ def _write_animation(
 
     fig, ax = plt.subplots(figsize=(5.0, 4.8), dpi=110)
     ax.scatter(target_np[:, 0], target_np[:, 1],
-               s=4, c="lightgray", alpha=0.6, edgecolors="none")
-    scat = ax.scatter([], [], s=8, c="crimson", alpha=0.85, edgecolors="none")
+               s=4, c=C_TARGET, alpha=0.6, edgecolors="none")
+    scat = ax.scatter([], [], s=8, c=C_PARTICLE, alpha=0.85, edgecolors="none")
     title = ax.set_title("")
     ax.set_xlim(_XLIM)
     ax.set_ylim(_YLIM)
