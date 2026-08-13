@@ -5,6 +5,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.2.1]
+
+### Fixed
+
+- README images used relative paths (`docs/assets/...`), which don't resolve
+  on PyPI's standalone README renderer. Switched to absolute
+  `raw.githubusercontent.com` URLs so images load correctly on PyPI.
+
 ## [0.2.0]
 
 ### Added
