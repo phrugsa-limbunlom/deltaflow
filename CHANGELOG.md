@@ -5,6 +5,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+
+- `deltaflow.interpolants.SchrodingerBridgeInterpolant`: an entropic
+  Schrödinger-bridge probability path (a Brownian bridge with tunable
+  diffusivity `sigma` around the straight-line mean). `sigma=0` recovers
+  `LinearInterpolant` exactly. Intended to be paired with
+  `deltaflow.trainer.OTCoupling` for a simulation-free approximation of the
+  dynamic Schrödinger bridge.
+
 ## [0.2.1]
 
 ### Fixed

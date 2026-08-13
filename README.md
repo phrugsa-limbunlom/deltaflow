@@ -62,6 +62,7 @@ The path decides how noise becomes data. Every path returns the interpolated sta
 | `LinearInterpolant` | straight-line rectified-flow path, $x_t = (1-t)x_0 + t x_1$, $u_t = x_1 - x_0$ |
 | `VariancePreservingInterpolant` | trigonometric diffusion path, $\alpha_t = \sin(\tfrac{\pi}{2}t)$, $\sigma_t = \cos(\tfrac{\pi}{2}t)$ |
 | `OTInterpolant` | the linear path applied after a mini-batch OT re-ordering of $x_0$ |
+| `SchrodingerBridgeInterpolant` | entropic Schrödinger-bridge path, a Brownian bridge $x_t = (1-t)x_0 + t x_1 + \sigma\sqrt{t(1-t)}\,z$ around the straight line, diffusivity $\sigma$ |
 
 ### Couplings (`deltaflow.trainer`)
 
@@ -155,6 +156,22 @@ from deltaflow.interpolants import VariancePreservingInterpolant
 from deltaflow.losses import FlowMatchingLoss
 
 loss_fn = FlowMatchingLoss(interpolant=VariancePreservingInterpolant())
+loss = loss_fn(model, x1)
+```
+
+### Schrödinger bridge
+
+[Diffusion Schrödinger Bridge with Applications to Score-Based Generative Modeling](https://arxiv.org/abs/2106.01357), De Bortoli et al. 2021; [Simulation-Free Schrödinger Bridges via Score and Flow Matching](https://arxiv.org/abs/2307.03672) (SF2M), Tong et al. 2024. The dynamic Schrödinger bridge between noise and data, conditioned on an endpoint pair, is a Brownian bridge around the straight-line path; regressing onto its conditional velocity trains a stochastic interpolant that recovers the entropic optimal-transport bridge as the coupling of `(x0, x1)` approaches the true OT plan. Pairing endpoints with `OTCoupling` (rather than drawing them independently) is what makes this approximation tight in practice.
+
+```python
+from deltaflow.interpolants import SchrodingerBridgeInterpolant
+from deltaflow.losses import ConditionalFlowMatchingLoss
+from deltaflow.trainer import OTCoupling
+
+loss_fn = ConditionalFlowMatchingLoss(
+    interpolant=SchrodingerBridgeInterpolant(sigma=1.0),
+    coupling=OTCoupling(),
+)
 loss = loss_fn(model, x1)
 ```
 
@@ -354,6 +371,16 @@ DeltaFlow builds on the following work.
   year   = {2021},
   eprint = {2106.01357},
   url    = {https://arxiv.org/abs/2106.01357},
+}
+```
+
+```bibtex
+@article{tong2024simulationfree,
+  title   = {Simulation-Free Schr{\"o}dinger Bridges via Score and Flow Matching},
+  author  = {Tong, Alexander and Malkin, Nikolay and Fatras, Kilian and Atanackovic, Lazar and Zhang, Yanlei and Huguet, Guillaume and Wolf, Guy and Bengio, Yoshua},
+  year    = {2024},
+  eprint  = {2307.03672},
+  url     = {https://arxiv.org/abs/2307.03672},
 }
 ```
 
