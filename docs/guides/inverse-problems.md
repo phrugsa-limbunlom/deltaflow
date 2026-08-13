@@ -5,11 +5,11 @@ DeltaFlow can turn a pretrained *unconditional* velocity field into a
 a noisy measurement \(y = A(x) + \varepsilon\)) without retraining the
 backbone.
 
-## Design: wrap, don't rewrite
+## Design, wrap don't rewrite
 
 `PosteriorSolver` **wraps** an existing ODE solver (Euler, Heun, ...) and
 injects a measurement-likelihood gradient at every step, so the base
-integrator is reused. This follows FlowDPS and Flower: both modify the
+integrator is reused. This follows FlowDPS and Flower, which both modify the
 sampling-time ODE and never touch the pretrained field.
 
 Per step, given state \(x_t\) and velocity \(v_t = v_\theta(x_t, t)\):
@@ -55,7 +55,7 @@ recon = solver.sample(torch.randn_like(x_init), n_steps=100)
 ## Latent-space problems
 
 If the velocity field operates on VAE latents while the measurement operator is
-defined on pixels, pass a decoder to the likelihood object: the gradient is
+defined on pixels, pass a decoder to the likelihood object, and the gradient is
 pulled back through the decoder automatically, no extra bookkeeping.
 
 ## Tweedie decomposition

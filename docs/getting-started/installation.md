@@ -1,7 +1,7 @@
 # Installation
 
 DeltaFlow requires **Python ≥ 3.9** and **PyTorch ≥ 2.0**. The PyPI
-distribution name is `torchdeltaflow`; the import name is `deltaflow`.
+distribution name is `torchdeltaflow`, and the import name is `deltaflow`.
 
 ## From PyPI
 
@@ -43,4 +43,4 @@ import deltaflow
 print(deltaflow.__version__)
 ```
 
-Next: the [Quickstart](quickstart.md).
+Next, see the [Quickstart](quickstart.md).
