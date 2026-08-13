@@ -17,16 +17,24 @@ w.r.t. ``t`` at fixed ``z``) is
 As ``sigma -> 0`` this collapses onto the straight-line path of
 :class:`~deltaflow.interpolants.linear.LinearInterpolant`. The
 ``(1 - 2t) / sqrt(t(1-t))`` term is unbounded as ``t`` approaches the
-endpoints; it is stabilised here with a small denominator floor (``eps``),
-which is the standard simulation-free training treatment near the
-boundary (see references below).
+endpoints (the conditional target is unbiased but its variance diverges at
+the boundary); it is stabilised here with a small denominator floor
+(``eps``). Note this floor is a pragmatic numerical safeguard, not the
+exact SF2M treatment - SF2M instead learns a joint score/flow
+parametrisation and does not clip the drift.
 
 This interpolant only defines the *path*; it is agnostic to how ``(x0,
 x1)`` pairs are formed. Pairing ``x0``/``x1`` via mini-batch optimal
 transport (:class:`~deltaflow.trainer.coupling.OTCoupling`) rather than
-drawing them independently is what makes the discretised process converge
-to the actual Schrödinger bridge rather than an arbitrary diffusion mixture
-- see Tong et al. (2024) - and is the recommended way to combine the two.
+drawing them independently pushes the discretised process toward the
+Schrödinger bridge instead of an arbitrary diffusion mixture. Note the
+correspondence is approximate: the true SB (Tong et al., 2024) couples the
+Brownian bridges with the *entropy-regularised* OT plan whose
+regularisation strength is tied to the diffusivity (reg = 2 * sigma^2),
+whereas :class:`OTCoupling` solves the *unregularised* squared-L2 OT
+problem. Exact OT therefore corresponds to the small-``sigma`` limit of the
+true bridge; for larger ``sigma`` this is a rectified-flow-style
+approximation rather than the exact entropic Schrödinger bridge.
 
 References:
     De Bortoli et al., "Diffusion Schrödinger Bridge with Applications to
