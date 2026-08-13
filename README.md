@@ -175,7 +175,7 @@ loss_fn = ConditionalFlowMatchingLoss(
 loss = loss_fn(model, x1)
 ```
 
-![Schrödinger-bridge conditional paths](https://raw.githubusercontent.com/phrugsa-limbunlom/deltaflow/main/docs/assets/schrodinger-bridge/bridge_paths.png)
+![Schrödinger-bridge conditional paths](https://raw.githubusercontent.com/phrugsa-limbunlom/deltaflow/main/docs/assets/schrodinger-bridge/bridge_paths.gif)
 
 ### Comparing the paths
 

@@ -302,7 +302,7 @@ velocity of a noisy Brownian bridge, but generation integrates the resulting
 (deterministic) probability-flow ODE, exactly like the other flow-matching
 demos.
 
-![Schrödinger-bridge conditional paths](assets/schrodinger-bridge/bridge_paths.png)
+![Schrödinger-bridge conditional paths](assets/schrodinger-bridge/bridge_paths.gif)
 
 At `sigma=0` the bridge collapses onto the straight line (`LinearInterpolant`
 exactly); larger `sigma` widens the stochastic corridor the model must learn
