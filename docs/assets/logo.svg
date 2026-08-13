@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="DeltaFlow">
+  <defs>
+    <linearGradient id="df-transport" x1="120" y1="0" x2="392" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#3f9e73"/>
+      <stop offset="0.5" stop-color="#3f6fd0"/>
+      <stop offset="1" stop-color="#7a5cc0"/>
+    </linearGradient>
+    <linearGradient id="df-edge" x1="256" y1="120" x2="256" y2="392" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2e2a52"/>
+      <stop offset="1" stop-color="#2a4ea3"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Delta: the two upper edges as a thin, refined monoline. The apex is the
+       point of departure; the base carries the change between two distributions. -->
+  <path d="M256 116 L128 396"
+        fill="none" stroke="url(#df-edge)" stroke-width="16"
+        stroke-linecap="round"/>
+  <path d="M256 116 L384 396"
+        fill="none" stroke="url(#df-edge)" stroke-width="16"
+        stroke-linecap="round"/>
+
+  <!-- Interior optimal-transport coupling: faint geodesics pairing source->target.
+       Dashes drift left to right to suggest transport along the coupling. -->
+  <g fill="none" stroke="url(#df-transport)" stroke-width="6" opacity="0.28"
+     stroke-linecap="round" stroke-dasharray="10 14">
+    <path d="M132 388 C 210 300, 306 300, 380 388">
+      <animate attributeName="stroke-dashoffset" values="48;0" dur="2.4s" repeatCount="indefinite"/>
+    </path>
+    <path d="M150 392 C 214 336, 302 336, 366 392">
+      <animate attributeName="stroke-dashoffset" values="48;0" dur="2.8s" repeatCount="indefinite"/>
+    </path>
+    <path d="M118 372 C 205 250, 311 250, 398 372">
+      <animate attributeName="stroke-dashoffset" values="48;0" dur="3.2s" repeatCount="indefinite"/>
+    </path>
+  </g>
+
+  <!-- The base = the flow: a transport streamline from source to target. -->
+  <path id="df-base" d="M128 396 C 200 356, 312 356, 384 396"
+        fill="none" stroke="url(#df-transport)" stroke-width="16"
+        stroke-linecap="round"/>
+
+  <!-- A particle riding the flow, source -> target, then repeating. -->
+  <circle r="9" fill="#e0b13c">
+    <animateMotion dur="2.6s" repeatCount="indefinite" keyPoints="0;1" keyTimes="0;1" calcMode="linear">
+      <mpath href="#df-base"/>
+    </animateMotion>
+    <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.12;0.88;1" dur="2.6s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- direction chevron along the flow -->
+  <g fill="none" stroke="#e0b13c" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" opacity="0.95">
+    <polyline points="246,368 262,374 246,380"/>
+  </g>
+
+  <!-- Source distribution (green) at the left foot. -->
+  <g fill="#3f9e73">
+    <circle cx="128" cy="396" r="20">
+      <animate attributeName="r" values="20;22.5;20" dur="3s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="99"  cy="372" r="8"/>
+    <circle cx="108" cy="418" r="6.5"/>
+  </g>
+  <!-- Target distribution (purple) at the right foot. -->
+  <g fill="#7a5cc0">
+    <circle cx="384" cy="396" r="20">
+      <animate attributeName="r" values="20;22.5;20" dur="3s" begin="1.3s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="413" cy="372" r="8"/>
+    <circle cx="404" cy="418" r="6.5"/>
+  </g>
+
+  <!-- Apex node: the shared origin of the path. -->
+  <circle cx="256" cy="116" r="11" fill="#2a4ea3">
+    <animate attributeName="opacity" values="0.6;1;0.6" dur="2.6s" repeatCount="indefinite"/>
+  </circle>
+</svg>

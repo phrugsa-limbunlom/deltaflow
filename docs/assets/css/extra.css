@@ -1,0 +1,139 @@
+/* DeltaFlow — green / blue / purple / yellow identity.
+   The theme *primary* is a vivid blue. Per project rule, accents that are NOT
+   the site chrome (logo, plot particles) deliberately avoid the primary color
+   and draw from the green / purple / yellow companions of the same family. */
+
+:root {
+  /* Primary: vivid blue. */
+  --df-blue: #3f6fd0;
+  --df-blue-light: #6a92e0;
+  --df-blue-dark: #2a4ea3;
+
+  /* Cool neutrals for backgrounds and hero text. */
+  --df-mist: #eef1f7;
+  --df-slate: #dbe0ec;
+  --df-ink: #23223f;
+
+  /* Vibrant non-primary accents reserved for figures / logo (never the blue).
+     Green, purple, and yellow, kept soft enough to stay easy to read. */
+  --df-green: #3f9e73;
+  --df-purple: #7a5cc0;
+  --df-yellow: #e0b13c;
+  --df-indigo: #2e2a52;
+}
+
+/* Light scheme */
+[data-md-color-scheme="default"] {
+  --md-primary-fg-color: var(--df-blue);
+  --md-primary-fg-color--light: var(--df-blue-light);
+  --md-primary-fg-color--dark: var(--df-blue-dark);
+  --md-primary-bg-color: #ffffff;
+  --md-primary-bg-color--light: #ffffffb3;
+
+  --md-accent-fg-color: var(--df-purple);
+  --md-accent-fg-color--transparent: #7a5cc01a;
+}
+
+/* Dark (slate) scheme */
+[data-md-color-scheme="slate"] {
+  --md-primary-fg-color: #5580dc;
+  --md-primary-fg-color--light: #7d9fe8;
+  --md-primary-fg-color--dark: #34579f;
+  --md-primary-bg-color: #eef1f7;
+  --md-primary-bg-color--light: #eef1f7b3;
+
+  --md-accent-fg-color: var(--df-green);
+  --md-accent-fg-color--transparent: #3f9e731a;
+
+  --md-typeset-a-color: #9fb6ef;
+}
+
+/* ------------------------------------------------------------------ *
+ * Material-style landing hero                                         *
+ * ------------------------------------------------------------------ */
+
+.tx-container {
+  padding-top: 1rem;
+  background:
+    linear-gradient(
+      130deg,
+      var(--df-indigo) 0%,
+      var(--df-blue-dark) 30%,
+      var(--df-blue) 55%,
+      var(--df-green) 100%
+    );
+}
+
+.tx-hero {
+  margin: 0 0.8rem;
+  color: var(--md-primary-bg-color);
+  justify-content: center;
+}
+
+.tx-hero h1 {
+  margin-bottom: 1rem;
+  color: currentColor;
+  font-weight: 700;
+}
+
+.tx-hero__content {
+  padding-bottom: 5rem;
+  margin: 0 auto;
+}
+
+.tx-hero__image {
+  width: 14rem;
+  order: 1;
+  padding-right: 1.5rem;
+}
+
+.tx-hero .md-button {
+  margin-top: 0.5rem;
+  margin-right: 0.5rem;
+  color: var(--md-primary-bg-color);
+}
+
+.tx-hero .md-button--primary {
+  background-color: var(--md-primary-bg-color);
+  color: var(--df-blue-dark);
+  border-color: var(--md-primary-bg-color);
+}
+
+.tx-hero .md-button:focus,
+.tx-hero .md-button:hover {
+  background-color: var(--df-yellow);
+  color: var(--df-ink);
+  border-color: var(--df-yellow);
+}
+
+@media screen and (min-width: 60em) {
+  .tx-container {
+    padding-bottom: 1rem;
+  }
+  .tx-hero {
+    display: flex;
+    align-items: center;
+  }
+  .tx-hero__content {
+    max-width: 28rem;
+    margin-top: 3.5rem;
+    margin-bottom: 3.5rem;
+    padding-bottom: 0;
+  }
+}
+
+@media screen and (max-width: 29.9375em) {
+  .tx-hero__image {
+    width: 10rem;
+  }
+}
+
+/* Landing-page inline hero mark (kept for non-JS fallbacks) */
+.df-hero {
+  text-align: center;
+  margin: 0.5rem 0 1.25rem;
+}
+.df-hero img {
+  width: 148px;
+  height: auto;
+}
