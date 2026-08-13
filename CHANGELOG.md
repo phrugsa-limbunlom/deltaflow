@@ -5,6 +5,40 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.2.0]
+
+### Added
+
+- `deltaflow.interpolants.OTInterpolant`: the linear path applied after a
+  mini-batch optimal-transport re-ordering of `x0`.
+- `deltaflow.trainer` couplings: `IndependentCoupling` and `OTCoupling`
+  (Hungarian assignment, greedy fallback) plus `ConditionalFlowMatchingLoss`.
+- `deltaflow.solvers`: `EulerSolver`, `HeunSolver` (second-order integration),
+  and `PosteriorSolver`, which wraps a base solver with a per-step
+  measurement-likelihood gradient.
+- `deltaflow.inverse`: measurement operators (`MaskOperator`, `BlurOperator`,
+  `DownsampleOperator`, `IdentityOperator`), Tweedie estimators
+  (`LinearTweedie`, `VPTweedie`), and `GaussianLikelihood` with an optional
+  decoder pullback for the latent-space case.
+- `deltaflow.interpolants.VariancePreservingInterpolant` (trigonometric
+  diffusion path).
+- Showcase examples: `01-landmark-viz`, `02-sampling-flow-viz`,
+  `03-minibatch-ot-viz`, `04-inverse-posterior-viz`, reproducing the README
+  figures and animations.
+- MkDocs Material documentation site (`docs/`), published via
+  `.github/workflows/docs.yml`.
+- Animated logo, favicon, and algorithm figures under `docs/assets/`.
+
+### Changed
+
+- Rewrote `README.md` in a component-table style with paper references,
+  visuals, and per-method usage snippets (flow matching, OT couplings,
+  variance-preserving path, delta alignment, posterior sampling).
+- Fixed paper attributions and introduced a `Likelihood` protocol in
+  `deltaflow.inverse`.
+
+## [0.1.0]
+
 ### Added
 
 - Initial scaffold: `core`, `interpolants` (`LinearInterpolant`), `samplers`
