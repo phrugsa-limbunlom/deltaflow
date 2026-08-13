@@ -65,12 +65,54 @@ distribution (\(t=1\)). The panels below come from the
 
 ![Animated sampling flow](assets/sampling-flow/flow.gif)
 
+## Probability paths
+
+The `interpolant=` argument selects the path noise and data connect along;
+the *same* training loop, loss, and solver are reused across all of them.
+
+| Interpolant | Path |
+|---|---|
+| `LinearInterpolant` | straight-line rectified-flow path, \(x_t = (1-t)x_0 + t x_1\) |
+| `VariancePreservingInterpolant` | trigonometric diffusion path, \(\alpha_t = \sin(\tfrac{\pi}{2}t)\), \(\sigma_t = \cos(\tfrac{\pi}{2}t)\) |
+| `OTInterpolant` | the linear path applied after a mini-batch OT re-ordering of \(x_0\) |
+| `SchrodingerBridgeInterpolant` | entropic Schrödinger-bridge path, a Brownian bridge \(x_t = (1-t)x_0 + t x_1 + \sigma\sqrt{t(1-t)}\,z\) around the straight line, diffusivity \(\sigma\) |
+
+### Schrödinger bridge
+
+The dynamic Schrödinger bridge between noise and data, conditioned on an
+endpoint pair, is a Brownian bridge around the straight-line path. Regressing
+onto its conditional velocity trains a stochastic interpolant that recovers the
+entropic optimal-transport bridge as the coupling of \((x_0, x_1)\) approaches
+the true OT plan. Pairing endpoints with `OTCoupling` (rather than drawing them
+independently) is what makes this approximation tight in practice
+([De Bortoli et al., 2021](https://arxiv.org/abs/2106.01357);
+[SF2M, Tong et al., 2024](https://arxiv.org/abs/2307.03672)).
+
+![Schrödinger-bridge conditional paths](assets/schrodinger-bridge/bridge_paths.gif)
+
+### Comparing the paths
+
+Every algorithm is the *same* training loop; only the `interpolant=` (and
+optionally `coupling=`) argument changes. Training an identical MLP on a
+two-moons target with each configuration for the same number of steps makes the
+differences concrete. All four samplers below are integrated from the *same*
+noise batch at the *same* number of steps.
+
+![Animated comparison of all four configurations sampling](assets/algorithm-comparison/comparison.gif)
+
+![Sampled trajectories under each configuration](assets/algorithm-comparison/trajectories_comparison.png)
+
+OT coupling produces the straightest source-to-target trajectories of the four,
+the practical benefit of minimising batch transport cost before regressing.
+Reproduce these figures from the
+[algorithm-comparison showcase](examples.md).
+
 ## What's inside
 
 | Module | Role |
 |---|---|
 | `deltaflow.core` | Abstract base classes every component subclasses |
-| `deltaflow.interpolants` | Probability paths (linear, mini-batch OT, variance-preserving) |
+| `deltaflow.interpolants` | Probability paths (linear, mini-batch OT, variance-preserving, Schrödinger bridge) |
 | `deltaflow.samplers` / `deltaflow.solvers` | Euler & Heun integration, posterior sampling |
 | `deltaflow.losses` | Flow matching + delta alignment |
 | `deltaflow.models` | Backbones, EMA, multi-scale projector heads |
