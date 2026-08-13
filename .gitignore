@@ -68,6 +68,9 @@ datasets/local/
 *.npy
 *.npz
 
+# --- Local agent instructions (not shared) ---
+.github/copilot-instructions.md
+
 # --- OS / editor ---
 .DS_Store
 Thumbs.db
