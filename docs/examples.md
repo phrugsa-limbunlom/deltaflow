@@ -338,6 +338,12 @@ and `SchrodingerBridgeInterpolant` with `OTCoupling`.
 training loop; this demo makes the practical differences between
 configurations visible side by side, on identical data and compute budget.
 
+**Animated sampling, side by side.** All four samplers integrate the same
+noise batch over the same number of steps, so the only variable on screen is
+the training configuration.
+
+![Animated comparison of all four configurations sampling](assets/algorithm-comparison/comparison.gif)
+
 ![Final samples under each configuration](assets/algorithm-comparison/comparison.png)
 
 ![Sampled trajectories under each configuration](assets/algorithm-comparison/trajectories_comparison.png)

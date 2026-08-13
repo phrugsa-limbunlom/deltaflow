@@ -175,6 +175,8 @@ loss_fn = ConditionalFlowMatchingLoss(
 loss = loss_fn(model, x1)
 ```
 
+![Animated Schrödinger-bridge sampling](https://raw.githubusercontent.com/phrugsa-limbunlom/deltaflow/main/docs/assets/schrodinger-bridge/sb_flow.gif)
+
 ### Comparing the paths
 
 Every algorithm above is the *same* training loop; only the `interpolant=` (and optionally `coupling=`) argument to `ConditionalFlowMatchingLoss` changes. Training an identical MLP on a two-moons target with each configuration for the same number of steps makes the differences concrete:
@@ -185,6 +187,10 @@ Every algorithm above is the *same* training loop; only the `interpolant=` (and 
 | OT coupling | `LinearInterpolant()` | `OTCoupling()` |
 | Variance-preserving | `VariancePreservingInterpolant()` | *(none)* |
 | Schrödinger bridge | `SchrodingerBridgeInterpolant(sigma=0.5)` | `OTCoupling()` |
+
+**Side by side, animated.** All four samplers integrated from the *same* noise batch, at the *same* number of steps, so the only difference on screen is the training configuration:
+
+![Animated comparison of all four configurations sampling](https://raw.githubusercontent.com/phrugsa-limbunlom/deltaflow/main/docs/assets/algorithm-comparison/comparison.gif)
 
 ![Final samples under each configuration](https://raw.githubusercontent.com/phrugsa-limbunlom/deltaflow/main/docs/assets/algorithm-comparison/comparison.png)
 

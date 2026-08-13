@@ -19,8 +19,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Showcase example `06-algorithm-comparison`: trains the same model on the
   same target under all four interpolant/coupling configurations (linear
   independent, OT coupling, variance-preserving, Schrödinger bridge) and
-  compares final samples and sampled trajectories side by side. A README
-  section ("Comparing the paths") links these figures.
+  compares final samples, sampled trajectories, and an animated side-by-side
+  sampling GIF. A README section ("Comparing the paths") links these
+  figures, alongside the Schrödinger-bridge sampling animation.
 
 ## [0.2.1]
 
