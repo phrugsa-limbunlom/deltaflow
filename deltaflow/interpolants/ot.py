@@ -7,7 +7,8 @@ limit of large batches this converges to a coupling from an OT plan and
 generally produces straighter learned trajectories - see Tong et al.,
 "Improving and generalizing flow-based generative models with minibatch
 optimal transport" (arXiv:2302.00482), and the OT-vs-independent ablation
-in "Flower: Flow-based inverse problems solver" for the sampling side.
+in "Flower: A Flow-Matching Solver for Inverse Problems" (arXiv:2509.26287)
+for the sampling side.
 
 Exact optimal assignment (Hungarian algorithm) is used when ``scipy`` is
 installed; otherwise a deterministic greedy nearest-neighbour fallback is

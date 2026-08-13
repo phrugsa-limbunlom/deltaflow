@@ -1,6 +1,6 @@
 """Euler ODE solver for flow-matching generation."""
 
-from typing import Optional
+from typing import Any, Optional
 
 import torch
 
@@ -28,7 +28,7 @@ class EulerSolver(BaseSolver):
         t_start: float = 0.0,
         t_end: float = 1.0,
         show_progress: bool = True,
-        **cond,
+        **cond: Any,
     ) -> torch.Tensor:
         """Generate samples by integrating the velocity field.
 

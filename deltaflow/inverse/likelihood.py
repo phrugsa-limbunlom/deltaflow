@@ -14,9 +14,22 @@ solver needs it. The decoder is *not* wrapped or trained here; it is just
 a callable the user supplies (e.g. a frozen ``StableDiffusion`` VAE).
 """
 
-from typing import Callable, Optional
+from typing import Callable, Optional, Protocol, runtime_checkable
 
 import torch
+
+
+@runtime_checkable
+class Likelihood(Protocol):
+    """Structural type for measurement-likelihood objects.
+
+    Any object exposing a differentiable ``neg_log_prob(x_clean_hat)`` method
+    (returning a scalar or per-sample tensor that stays in ``x_clean_hat``'s
+    autograd graph) satisfies this protocol and can be passed to
+    :class:`~deltaflow.solvers.posterior_solver.PosteriorSolver`.
+    """
+
+    def neg_log_prob(self, x_clean_hat: torch.Tensor) -> torch.Tensor: ...
 
 
 class GaussianLikelihood:
@@ -70,4 +83,4 @@ class GaussianLikelihood:
         return 0.5 * sq / (self.sigma * self.sigma)
 
 
-__all__ = ["GaussianLikelihood"]
+__all__ = ["GaussianLikelihood", "Likelihood"]
