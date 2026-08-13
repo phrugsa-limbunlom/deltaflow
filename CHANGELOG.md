@@ -7,6 +7,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- API-reference docstrings now include the underlying mathematics in
+  LaTeX (rendered via MathJax/arithmatex): probability paths and target
+  velocities for the interpolants (`Linear`, `VariancePreserving`, `OT`,
+  `SchrodingerBridge`), the Euler/Heun update rules, the DPS posterior-solver
+  step, the conditional-flow-matching and delta-alignment objectives, the
+  `LinearTweedie`/`VPTweedie` inversions, and the Gaussian likelihood.
+
 - `deltaflow.interpolants.SchrodingerBridgeInterpolant`: an entropic
   Schrödinger-bridge probability path (a Brownian bridge with tunable
   diffusivity `sigma` around the straight-line mean). `sigma=0` recovers

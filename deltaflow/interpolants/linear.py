@@ -8,13 +8,29 @@ from ..core.base_interpolant import BaseInterpolant
 
 
 class LinearInterpolant(BaseInterpolant):
-    """Straight-line probability path between noise and data.
+    r"""Straight-line (rectified-flow) probability path between noise and data.
 
-    ``x_t = (1 - t) * x0 + t * x1``, with conditional target velocity
-    ``u_t = x1 - x0`` (constant along the path). This is the "independent
-    coupling" variant: if ``x0`` is not supplied, it is drawn from a
-    standard normal independently of ``x1``. For OT-coupled linear paths
-    see :class:`~deltaflow.interpolants.ot.OTInterpolant` or use
+    The path linearly interpolates a noise sample \(x_0\) and a data sample
+    \(x_1\),
+
+    \[
+    x_t = (1 - t)\,x_0 + t\,x_1, \qquad t \in [0, 1],
+    \]
+
+    whose conditional target velocity is the constant displacement
+
+    \[
+    u_t = \frac{\mathrm{d} x_t}{\mathrm{d} t} = x_1 - x_0.
+    \]
+
+    Because \(u_t\) does not depend on \(t\), the learned field regresses onto
+    a single displacement vector per pair, which is what makes rectified-flow
+    trajectories straight and cheap to integrate.
+
+    **Coupling.** This is the *independent-coupling* variant: if \(x_0\) is not
+    supplied it is drawn from a standard normal \(\mathcal{N}(0, I)\)
+    independently of \(x_1\). For OT-coupled linear paths see
+    :class:`~deltaflow.interpolants.ot.OTInterpolant` or use
     :class:`~deltaflow.trainer.coupling.OTCoupling` on the training side.
 
     Reference: Lipman et al., "Flow Matching for Generative Modeling" (2023),

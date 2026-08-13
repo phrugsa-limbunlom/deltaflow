@@ -6,17 +6,24 @@ from ..core.base_solver import BaseSolver
 
 
 class HeunSolver(BaseSolver):
-    """Second-order predictor-corrector integrator.
+    r"""Heun (improved-Euler) second-order predictor-corrector integrator.
 
-    ::
+    Each step takes an Euler predictor and averages the velocity at the
+    current and predicted states,
 
-        k1 = v(x_n,        t_n)
-        k2 = v(x_n + dt*k1, t_n + dt)
-        x_{n+1} = x_n + (dt/2) * (k1 + k2)
+    \[
+    \begin{aligned}
+    k_1 &= v_\theta(x_n, t_n), \\
+    k_2 &= v_\theta\bigl(x_n + \Delta t\,k_1,\; t_n + \Delta t\bigr), \\
+    x_{n+1} &= x_n + \tfrac{\Delta t}{2}\,(k_1 + k_2).
+    \end{aligned}
+    \]
 
-    Two velocity evaluations per step, but ``O(dt^3)`` local truncation
-    error - typically matches Euler quality at half the number of steps.
-    Widely used in EDM-style samplers.
+    This costs two velocity evaluations per step but has
+    \(\mathcal{O}(\Delta t^3)\) local truncation error (\(\mathcal{O}(\Delta
+    t^2)\) global), so it typically matches Euler's quality at half the number
+    of steps. It is the trapezoidal-rule integrator widely used in EDM-style
+    samplers.
     """
 
     @torch.no_grad()

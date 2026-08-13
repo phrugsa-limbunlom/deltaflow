@@ -87,14 +87,32 @@ def flow_matching_velocity_loss(v_pred: torch.Tensor, v_target: torch.Tensor) ->
 
 
 class DeltaAlignmentLoss(nn.Module):
-    """Combined flow-matching + delta-alignment loss.
+    r"""Combined flow-matching and delta-alignment loss.
 
-    ``L = lambda_flow * L_flow + lambda_align * L_align``
+    The total objective linearly combines the velocity-regression term with
+    the multi-scale guidance-alignment term,
 
-    During the alignment phase, ``L_flow`` is computed over all four
-    velocity predictions (two views x two conditioning modes) to preserve
-    both the guided and unguided generative pathways while the alignment
-    term shapes the guidance representation.
+    \[
+    \mathcal{L} = \lambda_\text{flow}\,\mathcal{L}_\text{flow}
+                + \lambda_\text{align}\,\mathcal{L}_\text{align},
+    \]
+
+    where, at each hierarchy level \(l\), the alignment term compares the
+    guidance-difference embeddings \(z^{(i)}_l = g_l\bigl(\text{GAP}(\Delta
+    h^{(i)}_l)\bigr)\) of two augmented views \(i \in \{1, 2\}\) via a cosine
+    dissimilarity,
+
+    \[
+    \mathcal{L}_\text{align} = \frac{1}{L}\sum_{l=1}^{L}
+        \Bigl(1 - \cos\bigl(z^{(1)}_l, z^{(2)}_l\bigr)\Bigr),
+    \qquad
+    \Delta h_l = h^\text{cond}_l - h^\text{uncond}_l.
+    \]
+
+    During the alignment phase, \(\mathcal{L}_\text{flow}\) is computed over
+    all four velocity predictions (two views by two conditioning modes) to
+    preserve both the guided and unguided generative pathways while the
+    alignment term shapes the guidance representation.
     """
 
     def __init__(

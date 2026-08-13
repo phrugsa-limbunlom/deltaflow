@@ -14,10 +14,21 @@ if TYPE_CHECKING:
 
 
 class ConditionalFlowMatchingLoss(BaseLoss):
-    """Regress a model's predicted velocity onto the conditional target
-    velocity of a probability path.
+    r"""Regress a velocity field onto the conditional target velocity of a path.
 
-    ``L = E_{t, x0, x1}[ || v_theta(x_t, t) - u_t ||^2 ]``
+    Conditional flow matching trains \(v_\theta\) to match the per-pair target
+    velocity \(u_t\) of a probability path by minimising
+
+    \[
+    \mathcal{L} = \mathbb{E}_{t \sim \mathcal{U}[0,1],\, x_0,\, x_1}
+        \bigl\| v_\theta(x_t, t) - u_t \bigr\|^2,
+    \]
+
+    where \((x_t, u_t)\) are produced by the chosen ``interpolant`` (for the
+    linear path, \(x_t = (1-t)x_0 + t x_1\) and \(u_t = x_1 - x_0\)). Although
+    the target is only defined *conditionally* on \((x_0, x_1)\), its
+    regression minimiser is the marginal velocity field that transports noise
+    onto data, which is exactly the field the sampler integrates.
 
     Reference: Lipman et al., "Flow Matching for Generative Modeling" (2023),
     https://arxiv.org/abs/2210.02747.
@@ -25,14 +36,14 @@ class ConditionalFlowMatchingLoss(BaseLoss):
     Args:
         interpolant: the probability path to regress against. Defaults to
             :class:`~deltaflow.interpolants.linear.LinearInterpolant`.
-        coupling: optional train-time coupling that produces ``(x0, x1)``
-            pairs from a batch of ``x1``. See
+        coupling: optional train-time coupling that produces \((x_0, x_1)\)
+            pairs from a batch of \(x_1\). See
             :mod:`deltaflow.trainer.coupling`. Kept separate from
-            ``interpolant`` on purpose - the two decisions (which path to
+            ``interpolant`` on purpose, since the two decisions (which path to
             use, and how to pair noise with data) are independent and
             swappable.
         loss_type: one of ``"l2"``, ``"l1"``, ``"huber"``.
-        time_scale: scales the continuous ``t in [0, 1]`` before it reaches
+        time_scale: scales the continuous \(t \in [0, 1]\) before it reaches
             the model, e.g. to match a diffusion-style time embedding.
     """
 

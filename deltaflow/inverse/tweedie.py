@@ -43,12 +43,19 @@ class BaseTweedie(ABC):
 
 
 class LinearTweedie(BaseTweedie):
-    """Tweedie decomposition for the linear (rectified-flow) path.
+    r"""Tweedie decomposition for the linear (rectified-flow) path.
 
-    Path: ``x_t = (1 - t) * x0 + t * x1``, ``v_t = x1 - x0``. Solving::
+    On the linear path \(x_t = (1-t)x_0 + t x_1\) with velocity \(v_t = x_1 -
+    x_0\), the two endpoints are recovered in closed form by solving the
+    \(2\times 2\) linear system:
 
-        x_clean = x1_hat = x_t + (1 - t) * v_t
-        x_noise = x0_hat = x_t - t * v_t
+    \[
+    \hat{x}_1 = x_t + (1 - t)\,v_t, \qquad
+    \hat{x}_0 = x_t - t\,v_t,
+    \]
+
+    where \(\hat{x}_1\) is the clean-data estimate and \(\hat{x}_0\) the noise
+    estimate.
     """
 
     def decompose(self, x_t, v_t, t):
@@ -59,14 +66,18 @@ class LinearTweedie(BaseTweedie):
 
 
 class VPTweedie(BaseTweedie):
-    """Tweedie decomposition for the trigonometric variance-preserving path.
+    r"""Tweedie decomposition for the trigonometric variance-preserving path.
 
-    Path: ``alpha = sin(pi/2 * t)``, ``sigma = cos(pi/2 * t)``,
-    ``x_t = alpha * x1 + sigma * x0``, ``v_t = (pi/2)(cos * x1 - sin * x0)``.
-    Inverting the 2x2 system yields::
+    With \(\alpha_t = \sin(\tfrac{\pi}{2}t)\), \(\sigma_t =
+    \cos(\tfrac{\pi}{2}t)\), the path is \(x_t = \alpha_t x_1 + \sigma_t x_0\)
+    and its velocity \(v_t = \tfrac{\pi}{2}(\sigma_t x_1 - \alpha_t x_0)\).
+    Inverting this \(2\times 2\) system (using \(\alpha_t^2 + \sigma_t^2 = 1\))
+    gives
 
-        x_clean = alpha * x_t + (2/pi) * sigma * v_t
-        x_noise = sigma * x_t - (2/pi) * alpha * v_t
+    \[
+    \hat{x}_1 = \alpha_t\,x_t + \frac{2}{\pi}\,\sigma_t\,v_t, \qquad
+    \hat{x}_0 = \sigma_t\,x_t - \frac{2}{\pi}\,\alpha_t\,v_t.
+    \]
     """
 
     def decompose(self, x_t, v_t, t):

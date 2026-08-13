@@ -24,7 +24,34 @@ from ..core.base_interpolant import BaseInterpolant
 
 
 class VariancePreservingInterpolant(BaseInterpolant):
-    """Trigonometric variance-preserving probability path."""
+    r"""Trigonometric variance-preserving (VP) probability path.
+
+    Noise \(x_0\) and data \(x_1\) are mixed with a trigonometric schedule
+
+    \[
+    x_t = \alpha_t\,x_1 + \sigma_t\,x_0, \qquad
+    \alpha_t = \sin\!\left(\tfrac{\pi}{2}t\right), \quad
+    \sigma_t = \cos\!\left(\tfrac{\pi}{2}t\right),
+    \]
+
+    so that \(\alpha_t^2 + \sigma_t^2 = 1\) for every \(t\): the marginal
+    variance is preserved along the path (hence *variance-preserving*),
+    matching the geometry of a VP diffusion. Differentiating the path at fixed
+    endpoints gives the conditional target velocity
+
+    \[
+    u_t = \alpha_t'\,x_1 + \sigma_t'\,x_0
+        = \frac{\pi}{2}\left[
+            \cos\!\left(\tfrac{\pi}{2}t\right) x_1
+          - \sin\!\left(\tfrac{\pi}{2}t\right) x_0
+          \right].
+    \]
+
+    References: Lipman et al., "Flow Matching for Generative Modeling" (2023),
+    Sec. 3.2, https://arxiv.org/abs/2210.02747; Ma et al., "SiT: Exploring
+    Flow and Diffusion-Based Generative Models" (2024),
+    https://arxiv.org/abs/2401.08740.
+    """
 
     def interpolate(
         self, x1: torch.Tensor, t: torch.Tensor, x0: Optional[torch.Tensor] = None

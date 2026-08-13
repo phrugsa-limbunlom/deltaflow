@@ -33,7 +33,32 @@ from ..inverse.tweedie import BaseTweedie, LinearTweedie
 
 
 class PosteriorSolver(BaseSolver):
-    """Base-solver wrapper that adds a per-step measurement-likelihood gradient.
+    r"""Base-solver wrapper that adds a per-step measurement-likelihood gradient.
+
+    For an inverse problem with measurement \(y = A(x) + n\), this samples from
+    the posterior \(p(x \mid y)\) by nudging an unconditional flow-matching
+    solver toward the data-consistency term at every step. Given the current
+    state \(x_t\) and velocity \(v_\theta(x_t, t)\), one step is
+
+    \[
+    \hat{x}_1 = \mathcal{T}(x_t, v_\theta(x_t, t), t), \qquad
+    x_{t+\Delta t} = \underbrace{\text{Base}(x_t, t, \Delta t)}_{\text{unconditional step}}
+        \;-\; \eta\,\nabla_{x_t}\bigl[-\log p(y \mid \hat{x}_1)\bigr],
+    \]
+
+    where \(\mathcal{T}\) is the flow-matching Tweedie decomposition that maps
+    \((x_t, v_t, t)\) to the clean-signal estimate \(\hat{x}_1\) (see
+    :mod:`deltaflow.inverse.tweedie`), and \(\eta\) is the ``guidance_scale``.
+    The likelihood gradient is obtained by autograd, so if the velocity field
+    operates on VAE latents while \(A\) is defined on pixels, passing a decoder
+    to the likelihood object pulls the gradient back into latent space
+    automatically. Only the sampling-time ODE is modified; the pretrained
+    velocity field is untouched.
+
+    References: Kim et al., "FlowDPS: Flow-Driven Posterior Sampling for
+    Inverse Problems" (2025), https://arxiv.org/abs/2503.08136; "Flower: A
+    Flow-Matching Solver for Inverse Problems" (2025),
+    https://arxiv.org/abs/2509.26287.
 
     Args:
         base_solver: any :class:`~deltaflow.core.base_solver.BaseSolver` that
@@ -42,12 +67,12 @@ class PosteriorSolver(BaseSolver):
             returns a per-sample (or reducible) scalar tensor with
             ``requires_grad=True`` support. See
             :mod:`deltaflow.inverse.likelihood`.
-        tweedie: flow-matching Tweedie decomposition to derive
-            ``x_clean_hat`` from ``(x_t, v_t, t)``. Defaults to
+        tweedie: flow-matching Tweedie decomposition \(\mathcal{T}\) to derive
+            \(\hat{x}_1\) from \((x_t, v_t, t)\). Defaults to
             :class:`~deltaflow.inverse.tweedie.LinearTweedie`, matching a
             :class:`~deltaflow.interpolants.linear.LinearInterpolant`
             training path.
-        guidance_scale: step size ``eta`` on the likelihood gradient. Larger
+        guidance_scale: step size \(\eta\) on the likelihood gradient. Larger
             values snap harder to the measurement but risk over-shooting.
         grad_normalize: if ``True``, the injected gradient is rescaled to
             match the norm of the base step; this is a stability trick used

@@ -8,11 +8,19 @@ from ..core.base_solver import BaseSolver
 
 
 class EulerSolver(BaseSolver):
-    """Explicit-Euler integrator: ``x_{n+1} = x_n + dt * v(x_n, t_n)``.
+    r"""Explicit (forward) Euler integrator for the flow-matching ODE.
 
-    First-order, one velocity evaluation per step. Cheap but with ``O(dt^2)``
-    local truncation error - prefer :class:`~deltaflow.solvers.heun.HeunSolver`
-    when accuracy at low step counts matters.
+    Integrates \(\mathrm{d}x/\mathrm{d}t = v_\theta(x, t)\) with the
+    first-order update
+
+    \[
+    x_{n+1} = x_n + \Delta t\; v_\theta(x_n, t_n),
+    \]
+
+    using a single velocity evaluation per step. It is cheap but incurs
+    \(\mathcal{O}(\Delta t^2)\) local truncation error (\(\mathcal{O}(\Delta
+    t)\) global), so prefer :class:`~deltaflow.solvers.heun.HeunSolver` when
+    accuracy at low step counts matters.
     """
 
     def step(self, x: torch.Tensor, t: float, dt: float, **cond) -> torch.Tensor:
