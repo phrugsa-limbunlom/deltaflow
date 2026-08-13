@@ -13,6 +13,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   `LinearInterpolant` exactly. Intended to be paired with
   `deltaflow.trainer.OTCoupling` for a simulation-free approximation of the
   dynamic Schrödinger bridge.
+- Showcase example `05-schrodinger-bridge-viz`: visualises the bridge path
+  at increasing `sigma`, then trains a velocity field against it (with
+  `OTCoupling`) and inspects the resulting sampler on a two-moons target.
 
 ## [0.2.1]
 
