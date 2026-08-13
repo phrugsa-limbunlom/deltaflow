@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+<!--
+  Material-style landing hero, shown only on the homepage. The regular
+  index.md content renders below the hero.
+-->
+{% block tabs %}
+  {{ super() }}
+  {% if page and page.is_homepage %}
+  <section class="tx-container">
+    <div class="md-grid md-typeset">
+      <div class="tx-hero">
+        <div class="tx-hero__image">
+          <img src="{{ 'assets/logo.svg' | url }}" alt="DeltaFlow" draggable="false">
+        </div>
+        <div class="tx-hero__content">
+          <h1>DeltaFlow</h1>
+          <p>
+            Optimal-transport flow matching in PyTorch — build generative flows
+            from the <em>displacement between two distributions</em>.
+          </p>
+          <a
+            href="{{ 'getting-started/installation/' | url }}"
+            class="md-button md-button--primary"
+          >
+            Get started
+          </a>
+          <a
+            href="{{ config.repo_url }}"
+            class="md-button"
+          >
+            Go to GitHub
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+  {% endif %}
+{% endblock %}
