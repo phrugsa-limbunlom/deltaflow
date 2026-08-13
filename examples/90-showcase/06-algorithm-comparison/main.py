@@ -20,7 +20,8 @@ Run::
 
     python examples/90-showcase/06-algorithm-comparison/main.py
 
-Outputs are written to ``outputs/algorithm_comparison/``.
+Outputs are written to ``outputs/algorithm_comparison/``, including an
+animated ``comparison.gif`` showing all four samplers running side by side.
 """
 
 from __future__ import annotations
@@ -38,6 +39,8 @@ except ImportError as exc:  # pragma: no cover - install hint only
         "This example needs matplotlib. Install it with:\n"
         "    pip install matplotlib"
     ) from exc
+
+from matplotlib import animation
 
 from deltaflow.core.base import BaseVelocityField
 from deltaflow.interpolants import (
@@ -201,6 +204,50 @@ def main() -> None:
     fig.savefig(traj_comparison_path, bbox_inches="tight")
     plt.close(fig)
     print(f"[demo] wrote {traj_comparison_path}")
+
+    # ---- Animated comparison: sampling side by side ------------------------
+    anim_path = _write_comparison_animation(results, target, out_dir / "comparison.gif")
+    if anim_path is not None:
+        print(f"[demo] wrote {anim_path}")
+
+
+def _write_comparison_animation(results, target, out_path, fps: int = 20):
+    """Animate every algorithm's sampling process side by side, so the noise
+    -> two-moons transport can be compared frame by frame."""
+    target_np = target.cpu().numpy()
+    names = list(results.keys())
+    n_frames = next(iter(results.values()))[0].shape[0]
+
+    fig, axes = plt.subplots(1, len(names), figsize=(3.0 * len(names), 3.2), dpi=80)
+    scats = []
+    for ax, name in zip(axes, names):
+        ax.scatter(target_np[:, 0], target_np[:, 1], s=4, c=C_TARGET, alpha=0.6, edgecolors="none")
+        scat = ax.scatter([], [], s=6, c=C_PARTICLE, alpha=0.8, edgecolors="none")
+        scats.append(scat)
+        ax.set_xlim(_XLIM); ax.set_ylim(_YLIM)
+        ax.set_aspect("equal")
+        ax.set_title(name, fontsize=10)
+        ax.set_xticks([]); ax.set_yticks([])
+    suptitle = fig.suptitle("", fontsize=12)
+    fig.tight_layout()
+
+    def update(frame_idx: int):
+        t_val = frame_idx / (n_frames - 1)
+        for scat, name in zip(scats, names):
+            traj = results[name][0]
+            scat.set_offsets(traj[frame_idx].cpu().numpy())
+        suptitle.set_text(f"Sampling under each configuration  |  t = {t_val:.2f}")
+        return (*scats, suptitle)
+
+    anim = animation.FuncAnimation(fig, update, frames=n_frames, interval=1000 // fps, blit=False)
+    try:
+        anim.save(out_path, writer=animation.PillowWriter(fps=fps))
+    except Exception as exc:
+        plt.close(fig)
+        print(f"[demo] skipping animation ({exc}); install pillow to enable it")
+        return None
+    plt.close(fig)
+    return out_path
 
 
 if __name__ == "__main__":
