@@ -49,7 +49,7 @@ So DeltaFlow implements each component once and lets the method be a configurati
 
 Compose them one way and you have flow matching with an independent coupling. Another way and you have OT-coupled rectified flow. Another and you have posterior sampling for an inverse problem, reusing the very same pretrained field.
 
-Full documentation lives on the [**DeltaFlow website**](https://phrugsa-limbunlom.github.io/deltaflow/latest/).
+Full documentation lives on the [**DeltaFlow website**](https://phrugsa-limbunlom.github.io/deltaflow).
 
 ## What's inside
 
