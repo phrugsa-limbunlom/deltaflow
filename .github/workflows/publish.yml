@@ -7,10 +7,10 @@ name: publish
 #     git tag v0.2.2
 #     git push origin v0.2.2
 #
-# Authentication uses PyPI Trusted Publishing (OIDC), so no API token is stored
-# in the repository. Before the first release, configure a trusted publisher on
-# PyPI (project torchdeltaflow) pointing at this repository and the "publish"
-# workflow. See https://docs.pypi.org/trusted-publishers/adding-a-publisher/.
+# Authentication uses a PyPI API token stored as the repository secret
+# PYPI_API_TOKEN. Create the token at https://pypi.org/manage/account/token/
+# (scope it to the torchdeltaflow project), then add it under
+# Settings > Secrets and variables > Actions as PYPI_API_TOKEN.
 
 on:
   push:
@@ -51,9 +51,6 @@ jobs:
     environment:
       name: pypi
       url: https://pypi.org/project/torchdeltaflow/
-    permissions:
-      # Required for PyPI Trusted Publishing (OIDC).
-      id-token: write
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -61,3 +58,5 @@ jobs:
           path: dist/
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          password: ${{ secrets.PYPI_API_TOKEN }}
