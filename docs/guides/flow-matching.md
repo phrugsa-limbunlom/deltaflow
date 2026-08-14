@@ -39,6 +39,15 @@ The probability path is pluggable via
 | `LinearInterpolant` | Straight line \(x_t = (1-t)x_0 + t\,x_1\) (rectified flow) | Default, fast and straight trajectories |
 | `OTInterpolant` | Mini-batch optimal-transport coupling of \((x_0, x_1)\) | Straighter marginal flows, fewer sampling steps |
 | `VariancePreservingInterpolant` | Variance-preserving (diffusion-style) schedule | Matching diffusion training conventions |
+| `SchrodingerBridgeInterpolant` | Brownian bridge \(x_t = (1-t)x_0 + t\,x_1 + \sigma\sqrt{t(1-t)}\,z\) around the straight line, diffusivity \(\sigma\) | Diffusion-style stochastic transport, entropic optimal-transport bridge |
+
+`SchrodingerBridgeInterpolant` defines only the path, so pair endpoints with
+`OTCoupling` (see [Training](training.md)) to push the discretised process
+toward the Schrödinger bridge rather than an arbitrary diffusion mixture. The
+correspondence is exact only in the small-\(\sigma\) limit (the true bridge
+couples with the entropy-regularised OT plan, \(\text{reg} = 2\sigma^2\), while
+`OTCoupling` solves the unregularised squared-L2 problem). At \(\sigma \to 0\)
+the path collapses onto `LinearInterpolant`.
 
 ## Sampling
 
