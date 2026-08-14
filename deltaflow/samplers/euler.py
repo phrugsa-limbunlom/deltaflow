@@ -1,5 +1,5 @@
-"""Backward-compatibility shim: :class:`FlowSampler` now lives at
-:mod:`deltaflow.solvers.euler` as :class:`EulerSolver` (with the
+"""Backward-compatibility shim: `FlowSampler` now lives at
+`deltaflow.solvers.euler` as `EulerSolver` (with the
 ``FlowSampler`` alias preserved).
 """
 

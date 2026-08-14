@@ -10,9 +10,10 @@ conditional target velocity is
     u_t = alpha'_t * x1 + sigma'_t * x0
         = (pi/2) * [cos(pi/2 * t) * x1 - sin(pi/2 * t) * x0].
 
-Reference: Lipman et al., "Flow Matching for Generative Modeling" (2023),
-Sec. 3.2; Ma et al., "SiT: Exploring Flow and Diffusion-Based Generative
-Models" (2024).
+References:
+    Lipman et al., "Flow Matching for Generative Modeling" (2023),
+    Sec. 3.2. Ma et al., "SiT: Exploring Flow and Diffusion-Based Generative
+    Models" (2024).
 """
 
 import math
@@ -34,7 +35,7 @@ class VariancePreservingInterpolant(BaseInterpolant):
     \sigma_t = \cos\!\left(\tfrac{\pi}{2}t\right),
     \]
 
-    so that \(\alpha_t^2 + \sigma_t^2 = 1\) for every \(t\): the marginal
+    so that \(\alpha_t^2 + \sigma_t^2 = 1\) for every \(t\), the marginal
     variance is preserved along the path (hence *variance-preserving*),
     matching the geometry of a VP diffusion. Differentiating the path at fixed
     endpoints gives the conditional target velocity
@@ -47,10 +48,11 @@ class VariancePreservingInterpolant(BaseInterpolant):
           \right].
     \]
 
-    References: Lipman et al., "Flow Matching for Generative Modeling" (2023),
-    Sec. 3.2, https://arxiv.org/abs/2210.02747; Ma et al., "SiT: Exploring
-    Flow and Diffusion-Based Generative Models" (2024),
-    https://arxiv.org/abs/2401.08740.
+    References:
+        Lipman et al., "Flow Matching for Generative Modeling" (2023),
+        Sec. 3.2, https://arxiv.org/abs/2210.02747. Ma et al., "SiT: Exploring
+        Flow and Diffusion-Based Generative Models" (2024),
+        https://arxiv.org/abs/2401.08740.
     """
 
     def interpolate(

@@ -4,25 +4,25 @@ coupling, and posterior sampling for inverse problems.
 
 Module map:
 
-- :mod:`deltaflow.core`         -- abstract base classes every component
-  subclasses (:class:`BaseVelocityField`, :class:`BaseInterpolant`,
-  :class:`BaseSolver`, :class:`BaseLoss`).
-- :mod:`deltaflow.interpolants` -- probability paths (linear, mini-batch OT,
+- `deltaflow.core`, abstract base classes every component
+  subclasses (`BaseVelocityField`, `BaseInterpolant`,
+  `BaseSolver`, `BaseLoss`).
+- `deltaflow.interpolants`, probability paths (linear, mini-batch OT,
   variance-preserving).
-- :mod:`deltaflow.losses`       -- conditional flow matching, plus the
+- `deltaflow.losses`, conditional flow matching, plus the
   optional delta-alignment loss for guidance-representation pretraining.
-- :mod:`deltaflow.solvers`      -- Euler, Heun, and the
-  :class:`~deltaflow.solvers.PosteriorSolver` which *wraps* a base solver
+- `deltaflow.solvers`, Euler, Heun, and the
+  `PosteriorSolver` which *wraps* a base solver
   and injects the measurement-likelihood gradient per step (FlowDPS /
   Flower style).
-- :mod:`deltaflow.trainer`      -- streaming image dataset, mixed-precision
+- `deltaflow.trainer`, streaming image dataset, mixed-precision
   training loop with grad accumulation and checkpoint/resume, and
   train-time coupling strategies (independent vs OT).
-- :mod:`deltaflow.inverse`      -- measurement operators, Tweedie
+- `deltaflow.inverse`, measurement operators, Tweedie
   decomposition, and Gaussian likelihood. v1 targets pixel space with an
   optional decoder pullback for the latent-space case (see
   ``deltaflow.inverse.__init__`` docstring).
-- :mod:`deltaflow.models`       -- backbone wrappers, EMA, and projector
+- `deltaflow.models`, backbone wrappers, EMA, and projector
   heads used by the delta-alignment loss.
 """
 

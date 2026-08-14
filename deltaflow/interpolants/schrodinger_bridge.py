@@ -2,8 +2,8 @@
 
 The static Schrödinger bridge between two marginals (here, the empirical
 noise and data distributions) is the entropy-regularised optimal-transport
-plan. Its dynamic counterpart is a diffusion process pinned at both ends;
-conditioned on an endpoint pair ``(x0, x1)`` the bridge reduces to a
+plan. Its dynamic counterpart is a diffusion process pinned at both ends.
+Conditioned on an endpoint pair ``(x0, x1)`` the bridge reduces to a
 Brownian bridge
 
     x_t = (1 - t) * x0 + t * x1 + sigma * sqrt(t * (1 - t)) * z,   z ~ N(0, I)
@@ -15,25 +15,25 @@ w.r.t. ``t`` at fixed ``z``) is
     u_t = (x1 - x0) + sigma * (1 - 2t) / (2 * sqrt(t * (1 - t))) * z.
 
 As ``sigma -> 0`` this collapses onto the straight-line path of
-:class:`~deltaflow.interpolants.linear.LinearInterpolant`. The
+`LinearInterpolant`. The
 ``(1 - 2t) / sqrt(t(1-t))`` term is unbounded as ``t`` approaches the
 endpoints (the conditional target is unbiased but its variance diverges at
-the boundary); it is stabilised here with a small denominator floor
+the boundary). It is stabilised here with a small denominator floor
 (``eps``). Note this floor is a pragmatic numerical safeguard, not the
-exact SF2M treatment - SF2M instead learns a joint score/flow
+exact SF2M treatment. SF2M instead learns a joint score/flow
 parametrisation and does not clip the drift.
 
-This interpolant only defines the *path*; it is agnostic to how ``(x0,
+This interpolant only defines the *path*. It is agnostic to how ``(x0,
 x1)`` pairs are formed. Pairing ``x0``/``x1`` via mini-batch optimal
-transport (:class:`~deltaflow.trainer.coupling.OTCoupling`) rather than
+transport (`OTCoupling`) rather than
 drawing them independently pushes the discretised process toward the
 Schrödinger bridge instead of an arbitrary diffusion mixture. Note the
 correspondence is approximate: the true SB (Tong et al., 2024) couples the
 Brownian bridges with the *entropy-regularised* OT plan whose
 regularisation strength is tied to the diffusivity (reg = 2 * sigma^2),
-whereas :class:`OTCoupling` solves the *unregularised* squared-L2 OT
+whereas `OTCoupling` solves the *unregularised* squared-L2 OT
 problem. Exact OT therefore corresponds to the small-``sigma`` limit of the
-true bridge; for larger ``sigma`` this is a rectified-flow-style
+true bridge. For larger ``sigma`` this is a rectified-flow-style
 approximation rather than the exact entropic Schrödinger bridge.
 
 References:
@@ -71,31 +71,31 @@ class SchrodingerBridgeInterpolant(BaseInterpolant):
     \]
 
     As \(\sigma \to 0\) the bridge collapses onto the straight line of
-    :class:`~deltaflow.interpolants.linear.LinearInterpolant`. The
+    `LinearInterpolant`. The
     \((1 - 2t)/\sqrt{t(1 - t)}\) factor is unbounded as \(t \to 0, 1\) (the
-    conditional target is unbiased but its variance diverges at the boundary);
-    it is stabilised here by flooring the denominator at ``eps``. Note this
+    conditional target is unbiased but its variance diverges at the boundary).
+    It is stabilised here by flooring the denominator at ``eps``. Note this
     floor is a pragmatic numerical safeguard, not the exact SF2M treatment,
     which instead learns a joint score/flow parametrisation and does not clip
     the drift.
 
-    **Coupling.** This interpolant defines only the *path*; it is agnostic to
+    **Coupling.** This interpolant defines only the *path*. It is agnostic to
     how \((x_0, x_1)\) pairs are formed. Pairing endpoints with
-    :class:`~deltaflow.trainer.coupling.OTCoupling` (rather than drawing them
+    `OTCoupling` (rather than drawing them
     independently) pushes the discretised process toward the Schrödinger
     bridge instead of an arbitrary diffusion mixture. The correspondence is
     approximate: the true SB (Tong et al., 2024) couples the Brownian bridges
     with the *entropy-regularised* OT plan \(\pi^\star_{2\sigma^2}\), whose
     regularisation strength is tied to the diffusivity (\(\text{reg} =
-    2\sigma^2\)), whereas :class:`OTCoupling` solves the *unregularised*
+    2\sigma^2\)), whereas `OTCoupling` solves the *unregularised*
     squared-\(L_2\) OT problem. Exact OT therefore corresponds to the
-    small-\(\sigma\) limit of the true bridge; for larger \(\sigma\) this is a
+    small-\(\sigma\) limit of the true bridge. For larger \(\sigma\) this is a
     rectified-flow-style approximation rather than the exact entropic
     Schrödinger bridge.
 
     Args:
         sigma: bridge diffusivity. \(\sigma = 0\) recovers the deterministic
-            straight-line path (equivalent to :class:`LinearInterpolant`).
+            straight-line path (equivalent to `LinearInterpolant`).
             Larger values inject more stochastic "wiggle" around the
             straight-line mean, matching the entropic-OT interpretation of
             the Schrödinger bridge (higher entropy regularisation gives a more
@@ -107,7 +107,7 @@ class SchrodingerBridgeInterpolant(BaseInterpolant):
     References:
         De Bortoli et al., "Diffusion Schrödinger Bridge with Applications to
         Score-Based Generative Modeling" (2021),
-        https://arxiv.org/abs/2106.01357; Tong et al., "Simulation-Free
+        https://arxiv.org/abs/2106.01357. Tong et al., "Simulation-Free
         Schrödinger Bridges via Score and Flow Matching" (SF2M, 2024),
         https://arxiv.org/abs/2307.03672.
     """

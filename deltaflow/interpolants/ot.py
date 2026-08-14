@@ -1,6 +1,6 @@
 """Mini-batch optimal transport coupling for linear flow-matching paths.
 
-This interpolant reuses the straight-line path from :mod:`.linear`, but
+This interpolant reuses the straight-line path from `linear`, but
 permutes ``x0`` within the current batch so that each ``(x0, x1)`` pair
 approximately minimises the batch's total squared-L2 transport cost. In the
 limit of large batches this converges to a coupling from an OT plan and
@@ -11,8 +11,8 @@ in "Flower: A Flow-Matching Solver for Inverse Problems" (arXiv:2509.26287)
 for the sampling side.
 
 Exact optimal assignment (Hungarian algorithm) is used when ``scipy`` is
-installed; otherwise a deterministic greedy nearest-neighbour fallback is
-used. This is a coupling strategy, not a new probability path - the same
+installed, otherwise a deterministic greedy nearest-neighbour fallback is
+used. This is a coupling strategy, not a new probability path, the same
 straight-line ``x_t = (1-t) x0 + t x1`` interpolation is applied after
 permuting.
 """
@@ -65,7 +65,7 @@ class OTInterpolant(BaseInterpolant):
     r"""Linear probability path with mini-batch optimal-transport coupling.
 
     This reuses the straight-line path of
-    :class:`~deltaflow.interpolants.linear.LinearInterpolant`, but instead of
+    `LinearInterpolant`, but instead of
     pairing noise and data independently it re-orders \(x_0\) within the batch
     to approximately solve the discrete optimal-transport assignment. Given a
     batch of noise \(\{x_0^{(i)}\}\) and data \(\{x_1^{(j)}\}\), it seeks a
@@ -82,7 +82,7 @@ class OTInterpolant(BaseInterpolant):
     1. draws (or receives) a batch of noise samples \(x_0\),
     2. computes \(\pi^\star\) so each noise sample is paired with the data
        sample that minimises the batch transport cost,
-    3. applies :class:`LinearInterpolant` on the permuted pair.
+    3. applies `LinearInterpolant` on the permuted pair.
 
     In the large-batch limit this converges to a coupling drawn from the true
     OT plan and yields straighter learned trajectories that sample in fewer
@@ -92,13 +92,14 @@ class OTInterpolant(BaseInterpolant):
     component (loss, solver, model) needs to change.
 
     **Solver.** The exact assignment (Hungarian algorithm) is used when
-    ``scipy`` is installed; otherwise a deterministic greedy nearest-neighbour
+    ``scipy`` is installed, otherwise a deterministic greedy nearest-neighbour
     fallback is used.
 
-    References: Tong et al., "Improving and generalizing flow-based generative
-    models with minibatch optimal transport" (2023),
-    https://arxiv.org/abs/2302.00482; "Flower: A Flow-Matching Solver for
-    Inverse Problems" (2025), https://arxiv.org/abs/2509.26287.
+    References:
+        Tong et al., "Improving and generalizing flow-based generative
+        models with minibatch optimal transport" (2023),
+        https://arxiv.org/abs/2302.00482. "Flower: A Flow-Matching Solver for
+        Inverse Problems" (2025), https://arxiv.org/abs/2509.26287.
     """
 
     def __init__(self):

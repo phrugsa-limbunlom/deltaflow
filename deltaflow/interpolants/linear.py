@@ -30,11 +30,12 @@ class LinearInterpolant(BaseInterpolant):
     **Coupling.** This is the *independent-coupling* variant: if \(x_0\) is not
     supplied it is drawn from a standard normal \(\mathcal{N}(0, I)\)
     independently of \(x_1\). For OT-coupled linear paths see
-    :class:`~deltaflow.interpolants.ot.OTInterpolant` or use
-    :class:`~deltaflow.trainer.coupling.OTCoupling` on the training side.
+    `OTInterpolant` or use
+    `OTCoupling` on the training side.
 
-    Reference: Lipman et al., "Flow Matching for Generative Modeling" (2023),
-    https://arxiv.org/abs/2210.02747.
+    References:
+        Lipman et al., "Flow Matching for Generative Modeling" (2023),
+        https://arxiv.org/abs/2210.02747.
     """
 
     def interpolate(

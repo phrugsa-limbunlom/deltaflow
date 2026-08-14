@@ -7,7 +7,7 @@ Features required by the design constraints:
 - Checkpoint + resume (model, optimizer, scaler, EMA, step counter).
 - Optional EMA of the velocity field weights.
 - Pluggable train-time coupling via
-  :class:`~deltaflow.trainer.coupling.BaseCoupling`.
+  `BaseCoupling`.
 
 The loop is intentionally framework-light - no Trainer/Fabric/etc. - so it
 can be dropped into any script and still handle image-scale workloads.
@@ -32,7 +32,7 @@ from ..models.ema import EMA
 
 @dataclass
 class TrainConfig:
-    """Configuration for :func:`train`.
+    """Configuration for `train`.
 
     Attributes:
         max_steps: total optimizer steps to run (after ``resume_from``).
@@ -40,18 +40,18 @@ class TrainConfig:
             before each optimizer step.
         mixed_precision: if ``True``, run forward+backward under
             ``torch.amp.autocast`` and scale the loss with
-            :class:`torch.amp.GradScaler`. On CUDA uses ``bfloat16`` if
-            supported, else ``float16``; on CPU it is a no-op.
+            `torch.amp.GradScaler`. On CUDA uses ``bfloat16`` if
+            supported, else ``float16``. On CPU it is a no-op.
         amp_dtype: override the autocast dtype. If ``None``, chosen from
             the runtime.
-        grad_clip: max L2 norm for gradient clipping; ``None`` to disable.
+        grad_clip: max L2 norm for gradient clipping, ``None`` to disable.
         log_every: print a training-metric line every N optimizer steps.
         checkpoint_every: write a checkpoint every N optimizer steps.
         checkpoint_dir: directory to write checkpoints into. Created if
             missing.
         ema_beta: if not ``None``, maintain an EMA copy of the model with
             this decay rate.
-        device: torch device string; defaults to CUDA if available.
+        device: torch device string, defaults to CUDA if available.
         resume_from: optional path to a checkpoint saved by this loop.
     """
 
@@ -133,7 +133,7 @@ def load_checkpoint(
     scaler: Optional[torch.amp.GradScaler] = None,
     map_location: Optional[Union[str, torch.device]] = None,
 ) -> int:
-    """Load a checkpoint written by :func:`save_checkpoint`. Returns the step."""
+    """Load a checkpoint written by `save_checkpoint`. Returns the step."""
     ckpt = torch.load(path, map_location=map_location, weights_only=False)
     model.load_state_dict(ckpt["model"])
     if optimizer is not None and "optimizer" in ckpt:
@@ -155,7 +155,7 @@ def train(
     """Train ``model`` in-place under ``loss_fn`` for ``config.max_steps`` steps.
 
     Returns the (possibly EMA-shadowed) model that was trained. The original
-    ``model`` is always updated in place; if EMA is enabled, an EMA copy is
+    ``model`` is always updated in place. If EMA is enabled, an EMA copy is
     also kept and written into checkpoints, and can be retrieved from the
     latest checkpoint's ``"ema_model"`` key.
     """

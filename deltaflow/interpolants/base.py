@@ -1,5 +1,5 @@
-"""Backward-compatibility shim. Prefer importing :class:`BaseInterpolant`
-from :mod:`deltaflow.core`.
+"""Backward-compatibility shim. Prefer importing `BaseInterpolant`
+from `deltaflow.core`.
 """
 
 from ..core.base_interpolant import BaseInterpolant

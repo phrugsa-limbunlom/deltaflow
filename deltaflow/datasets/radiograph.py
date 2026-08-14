@@ -2,8 +2,8 @@
 Generic radiograph dataset base class, plus thin subclasses for the three
 common modalities (chest, cephalometric, hand). These wrap a flat directory
 of grayscale images (optionally with a landmark annotation file) and are
-intentionally minimal -- bring your own annotation parser for a specific
-benchmark by subclassing and overriding :meth:`_load_landmarks`.
+intentionally minimal, bring your own annotation parser for a specific
+benchmark by subclassing and overriding `_load_landmarks`.
 """
 
 from pathlib import Path
@@ -28,8 +28,8 @@ class RadiographDataset(Dataset):
         image_size: if given, images are resized to ``(image_size, image_size)``.
         transform: optional callable applied to the loaded PIL image before
             conversion to a tensor. Receives and must return a PIL image.
-        landmarks_file: optional path to a landmark annotation file; parsed
-            by :meth:`_load_landmarks`, which subclasses may override for a
+        landmarks_file: optional path to a landmark annotation file, parsed
+            by `_load_landmarks`, which subclasses may override for a
             specific benchmark's file format. Landmarks must be returned in
             the *original* image's pixel coordinates (row/col or x/y as the
             subclass defines, consistently), the base class rescales them to
@@ -162,7 +162,7 @@ class ISBI2015CephalometricDataset(CephalometricDataset):
         landmarks_file: a directory of per-image ``.txt`` annotations, or a
             single ``.csv`` split file (see above).
         landmarks_file_2: optional second rater's ``.txt`` directory (e.g.
-            ``400_junior``); if given, the two raters' points are averaged
+            ``400_junior``). If given, the two raters' points are averaged
             per landmark. Only applies to the per-image text layout.
         n_landmarks: landmarks per image (19 for the ISBI2015 challenge).
     """

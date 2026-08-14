@@ -4,7 +4,7 @@ The design constraint from the build prompt is to *wrap* an existing image
 backbone (UNet, DiT, ...) rather than ship one from scratch. This module
 provides a thin adapter that
 
-- adopts the :class:`~deltaflow.core.BaseVelocityField` interface,
+- adopts the `BaseVelocityField` interface,
 - normalises the time signature (float / 0-d tensor / (B,) tensor) and
   applies an optional ``time_scale``,
 - forwards extra keyword conditioning unchanged.
@@ -22,7 +22,7 @@ Example - wrap a HuggingFace ``diffusers`` UNet::
     )
 
 For quick tests without pulling in a full UNet dependency, use
-:class:`TinyVelocityField` at the bottom of this module.
+`TinyVelocityField` at the bottom of this module.
 """
 
 from typing import Callable, Optional
@@ -74,7 +74,7 @@ class TinyVelocityField(BaseVelocityField):
     """A tiny convolutional velocity field for tests and toy runs.
 
     Not a real backbone - just enough capacity to keep unit tests
-    self-contained. For real training use :class:`WrappedBackbone` around a
+    self-contained. For real training use `WrappedBackbone` around a
     proper UNet / DiT implementation.
     """
 

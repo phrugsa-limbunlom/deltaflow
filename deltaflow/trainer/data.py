@@ -1,11 +1,11 @@
 """Streaming image-dataset loaders for image-scale flow-matching training.
 
-The primary class is :class:`ImageFolderStream`, a thin
-:class:`torch.utils.data.Dataset` over a directory of image files that
+The primary class is `ImageFolderStream`, a thin
+`torch.utils.data.Dataset` over a directory of image files that
 opens each file on demand rather than pre-loading everything into memory.
 It is intentionally minimal - if you already have a dataset (HF datasets,
 WebDataset, an in-house one) just plug it into
-:func:`deltaflow.trainer.loop.train` directly.
+`deltaflow.trainer.loop.train` directly.
 """
 
 from pathlib import Path
@@ -31,7 +31,7 @@ class ImageFolderStream(Dataset):
         mode: PIL mode to convert to (``"L"`` for grayscale, ``"RGB"`` for
             colour, ``"F"`` for float).
         transform: optional PIL-image transform applied *before* tensor
-            conversion. If it returns a :class:`torch.Tensor`, that tensor
+            conversion. If it returns a `torch.Tensor`, that tensor
             is returned as-is (i.e. no default rescaling is applied).
         extensions: file extensions to include.
     """
@@ -88,7 +88,7 @@ def build_loader(
     pin_memory: bool = True,
     drop_last: bool = True,
 ) -> DataLoader:
-    """Convenience wrapper around :class:`torch.utils.data.DataLoader` with
+    """Convenience wrapper around `torch.utils.data.DataLoader` with
     sensible defaults for image-scale flow-matching training."""
     return DataLoader(
         dataset,

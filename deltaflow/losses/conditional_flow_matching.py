@@ -30,15 +30,16 @@ class ConditionalFlowMatchingLoss(BaseLoss):
     regression minimiser is the marginal velocity field that transports noise
     onto data, which is exactly the field the sampler integrates.
 
-    Reference: Lipman et al., "Flow Matching for Generative Modeling" (2023),
-    https://arxiv.org/abs/2210.02747.
+    References:
+        Lipman et al., "Flow Matching for Generative Modeling" (2023),
+        https://arxiv.org/abs/2210.02747.
 
     Args:
         interpolant: the probability path to regress against. Defaults to
-            :class:`~deltaflow.interpolants.linear.LinearInterpolant`.
+            `LinearInterpolant`.
         coupling: optional train-time coupling that produces \((x_0, x_1)\)
             pairs from a batch of \(x_1\). See
-            :mod:`deltaflow.trainer.coupling`. Kept separate from
+            `deltaflow.trainer.coupling`. Kept separate from
             ``interpolant`` on purpose, since the two decisions (which path to
             use, and how to pair noise with data) are independent and
             swappable.

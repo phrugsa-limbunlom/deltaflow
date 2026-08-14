@@ -3,7 +3,7 @@ Multi-scale projection heads for DeltaFlow's guidance-alignment loss.
 
 Each backbone hierarchy level gets its own projector: global-average-pool ->
 MLP -> L2-normalize. The projected, normalized embeddings are what
-:class:`~deltaflow.losses.delta_alignment.DeltaAlignmentLoss` compares.
+`DeltaAlignmentLoss` compares.
 """
 
 from typing import Dict, Sequence
@@ -40,7 +40,7 @@ class MultiScaleProjector(nn.Module):
             projector.
         hidden_dim: hidden width shared by every per-level projector.
         out_dim: shared output embedding dimension.
-        layer_set: which layer names to project; defaults to
+        layer_set: which layer names to project, defaults to
             ``["enc_1_4", "enc_1_8", "bottleneck", "dec_1_8"]``.
     """
 

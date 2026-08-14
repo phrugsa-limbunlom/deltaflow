@@ -2,7 +2,7 @@
 
 Given a measurement ``y = A(x_clean) + n`` with Gaussian noise ``n``, this
 module supplies differentiable ``-log p(y | x_clean_hat)`` objects that
-:class:`~deltaflow.solvers.posterior_solver.PosteriorSolver` differentiates
+`PosteriorSolver` differentiates
 through to inject a likelihood gradient at every step.
 
 **Latent-space case.** If the velocity field acts on VAE latents but the
@@ -10,7 +10,7 @@ measurement operator ``A`` is defined on pixels, pass a ``decoder``
 callable (``latent -> pixel``). The likelihood becomes
 ``||y - A(decoder(x_clean_hat))||^2``, autograd walks back through the
 decoder, and the resulting gradient lives in latent space where the
-solver needs it. The decoder is *not* wrapped or trained here; it is just
+solver needs it. The decoder is *not* wrapped or trained here. It is just
 a callable the user supplies (e.g. a frozen ``StableDiffusion`` VAE).
 """
 
@@ -26,7 +26,7 @@ class Likelihood(Protocol):
     Any object exposing a differentiable ``neg_log_prob(x_clean_hat)`` method
     (returning a scalar or per-sample tensor that stays in ``x_clean_hat``'s
     autograd graph) satisfies this protocol and can be passed to
-    :class:`~deltaflow.solvers.posterior_solver.PosteriorSolver`.
+    `PosteriorSolver`.
     """
 
     def neg_log_prob(self, x_clean_hat: torch.Tensor) -> torch.Tensor: ...
@@ -52,15 +52,15 @@ class GaussianLikelihood:
     Args:
         y: measured tensor, shape matches \(A\)'s output.
         operator: linear measurement operator \(A\) (any callable, e.g.
-            an instance from :mod:`deltaflow.inverse.operators`).
+            an instance from `deltaflow.inverse.operators`).
         sigma: measurement-noise standard deviation \(\sigma\). Only affects
-            the *scale* of the likelihood gradient; the direction is
+            the *scale* of the likelihood gradient. The direction is
             independent of \(\sigma\).
         decoder: optional decoder \(D\) (latent to pixel), used when the
             velocity field is trained in a latent space but \(A\) is
             defined on pixels. Autograd flows through it automatically.
         reduction: ``"sum"`` (default, matches the log-density scaling) or
-            ``"mean"``. The :class:`PosteriorSolver` sums per-sample
+            ``"mean"``. The `PosteriorSolver` sums per-sample
             values, so ``"sum"`` is usually what you want.
     """
 
