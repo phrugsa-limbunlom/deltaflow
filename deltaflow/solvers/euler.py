@@ -19,7 +19,7 @@ class EulerSolver(BaseSolver):
 
     using a single velocity evaluation per step. It is cheap but incurs
     \(\mathcal{O}(\Delta t^2)\) local truncation error (\(\mathcal{O}(\Delta
-    t)\) global), so prefer :class:`~deltaflow.solvers.heun.HeunSolver` when
+    t)\) global), so prefer `HeunSolver` when
     accuracy at low step counts matters.
     """
 
@@ -43,10 +43,10 @@ class EulerSolver(BaseSolver):
         Args:
             x: initial state (shape/device/dtype template if ``x_cond`` is set).
             n_steps: number of Euler integration steps.
-            x_cond: optional partially-noised starting point; if given the
+            x_cond: optional partially-noised starting point, if given the
                 initial state becomes ``(1 - t_start) * noise + t_start * x_cond``.
-            t_start: starting time; used together with ``x_cond``.
-            t_end: end time; defaults to ``1.0``.
+            t_start: starting time, used together with ``x_cond``.
+            t_end: end time, defaults to ``1.0``.
             **cond: extra keyword arguments forwarded to the velocity model.
         """
         if x_cond is not None:

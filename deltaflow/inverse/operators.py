@@ -1,8 +1,8 @@
 """Linear measurement operators ``A: x -> y`` for inverse problems.
 
-All operators are plain :class:`torch.nn.Module` (or callable) objects with
+All operators are plain `torch.nn.Module` (or callable) objects with
 differentiable ``forward``. They can be composed with a VAE decoder for
-the latent-space case - see :mod:`deltaflow.inverse.likelihood`.
+the latent-space case - see `deltaflow.inverse.likelihood`.
 """
 
 from typing import Optional, Union
@@ -24,8 +24,8 @@ class MaskOperator(nn.Module):
 
     Args:
         mask: broadcastable to ``x``. Values of 1 keep, values of 0 drop.
-            Passed either as a :class:`torch.Tensor` or, at call time, via
-            the ``mask`` keyword argument to :meth:`forward`.
+            Passed either as a `torch.Tensor` or, at call time, via
+            the ``mask`` keyword argument to `forward`.
     """
 
     def __init__(self, mask: Optional[torch.Tensor] = None):

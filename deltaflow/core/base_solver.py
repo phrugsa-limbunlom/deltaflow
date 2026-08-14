@@ -11,20 +11,20 @@ class BaseSolver(ABC):
 
     A solver holds a reference to a velocity model and exposes two methods:
 
-    - :meth:`step` performs a single integration step from ``(x, t)`` to
+    - `step` performs a single integration step from ``(x, t)`` to
       ``(x', t + dt)``. Subclasses implement the actual stepping rule.
-    - :meth:`sample` drives :meth:`step` in a loop from ``t_start`` to
+    - `sample` drives `step` in a loop from ``t_start`` to
       ``t_end`` and returns the final state.
 
-    Design note: :class:`~deltaflow.solvers.posterior_solver.PosteriorSolver`
-    wraps a :class:`BaseSolver` and hooks the likelihood gradient into every
-    call to :meth:`step`, so the base stepping logic is never duplicated.
+    Design note: `PosteriorSolver`
+    wraps a `BaseSolver` and hooks the likelihood gradient into every
+    call to `step`, so the base stepping logic is never duplicated.
 
     Args:
         model: callable ``model(x, t, **cond) -> velocity`` with the same
-            signature as :class:`~deltaflow.core.BaseVelocityField`.
+            signature as `BaseVelocityField`.
         time_scale: multiplies the continuous ``t in [0, 1]`` before it is
-            passed to the model; useful when the backbone was trained with a
+            passed to the model, useful when the backbone was trained with a
             different numeric time convention (e.g. diffusion timesteps).
     """
 

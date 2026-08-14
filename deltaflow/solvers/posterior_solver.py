@@ -1,6 +1,6 @@
 """Posterior sampler for inverse problems.
 
-The :class:`PosteriorSolver` wraps an existing ODE solver (Euler, Heun,
+The `PosteriorSolver` wraps an existing ODE solver (Euler, Heun,
 ...) and injects a measurement-likelihood gradient at every step, so the
 underlying integrator is reused rather than re-implemented. This follows
 the same design as FlowDPS (Kim et al., "FlowDPS: Flow-Driven Posterior
@@ -48,34 +48,35 @@ class PosteriorSolver(BaseSolver):
 
     where \(\mathcal{T}\) is the flow-matching Tweedie decomposition that maps
     \((x_t, v_t, t)\) to the clean-signal estimate \(\hat{x}_1\) (see
-    :mod:`deltaflow.inverse.tweedie`), and \(\eta\) is the ``guidance_scale``.
+    `deltaflow.inverse.tweedie`), and \(\eta\) is the ``guidance_scale``.
     The likelihood gradient is obtained by autograd, so if the velocity field
     operates on VAE latents while \(A\) is defined on pixels, passing a decoder
     to the likelihood object pulls the gradient back into latent space
-    automatically. Only the sampling-time ODE is modified; the pretrained
+    automatically. Only the sampling-time ODE is modified. The pretrained
     velocity field is untouched.
 
-    References: Kim et al., "FlowDPS: Flow-Driven Posterior Sampling for
-    Inverse Problems" (2025), https://arxiv.org/abs/2503.08136; "Flower: A
-    Flow-Matching Solver for Inverse Problems" (2025),
-    https://arxiv.org/abs/2509.26287.
+    References:
+        Kim et al., "FlowDPS: Flow-Driven Posterior Sampling for
+        Inverse Problems" (2025), https://arxiv.org/abs/2503.08136. "Flower: A
+        Flow-Matching Solver for Inverse Problems" (2025),
+        https://arxiv.org/abs/2509.26287.
 
     Args:
-        base_solver: any :class:`~deltaflow.core.base_solver.BaseSolver` that
+        base_solver: any `BaseSolver` that
             already integrates the unconditional flow (Euler, Heun, ...).
         likelihood: object with a ``.neg_log_prob(x_clean)`` method that
             returns a per-sample (or reducible) scalar tensor with
             ``requires_grad=True`` support. See
-            :mod:`deltaflow.inverse.likelihood`.
+            `deltaflow.inverse.likelihood`.
         tweedie: flow-matching Tweedie decomposition \(\mathcal{T}\) to derive
             \(\hat{x}_1\) from \((x_t, v_t, t)\). Defaults to
-            :class:`~deltaflow.inverse.tweedie.LinearTweedie`, matching a
-            :class:`~deltaflow.interpolants.linear.LinearInterpolant`
+            `LinearTweedie`, matching a
+            `LinearInterpolant`
             training path.
         guidance_scale: step size \(\eta\) on the likelihood gradient. Larger
             values snap harder to the measurement but risk over-shooting.
         grad_normalize: if ``True``, the injected gradient is rescaled to
-            match the norm of the base step; this is a stability trick used
+            match the norm of the base step. This is a stability trick used
             in some DPS variants when likelihood magnitudes vary wildly.
     """
 

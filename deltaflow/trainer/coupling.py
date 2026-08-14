@@ -1,7 +1,7 @@
 """Train-time coupling strategies between source noise ``x0`` and data ``x1``.
 
 Coupling is intentionally kept separate from the choice of probability
-path (:mod:`deltaflow.interpolants`). The two decisions are independent
+path (`deltaflow.interpolants`). The two decisions are independent
 and swappable:
 
 - Path choice (linear vs VP) is what the model regresses against.
@@ -44,7 +44,7 @@ class OTCoupling(BaseCoupling):
 
     Draws ``x0 ~ N(0, I)`` and then permutes it within the batch so that
     each ``(x0, x1)`` pair minimises the batch's total transport cost. Uses
-    ``scipy.optimize.linear_sum_assignment`` if available; otherwise falls
+    ``scipy.optimize.linear_sum_assignment`` if available, otherwise falls
     back to a deterministic greedy nearest-neighbour matching.
     """
 

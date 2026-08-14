@@ -1,4 +1,4 @@
-"""Backward-compatibility shim: samplers moved to :mod:`deltaflow.solvers`."""
+"""Backward-compatibility shim: samplers moved to `deltaflow.solvers`."""
 
 from ..solvers.euler import EulerSolver, FlowSampler
 from ..solvers.heun import HeunSolver

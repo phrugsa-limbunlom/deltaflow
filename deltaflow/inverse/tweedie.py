@@ -4,9 +4,9 @@ Given a state ``x_t`` on a probability path and the corresponding velocity
 ``v_t = v_theta(x_t, t)``, invert the path definition to recover
 estimates of the two endpoints:
 
-- ``x_clean_hat`` -- an estimate of the data endpoint (``t = 1`` in
+- ``x_clean_hat``, an estimate of the data endpoint (``t = 1`` in
   DeltaFlow's convention).
-- ``x_noise_hat`` -- an estimate of the noise endpoint (``t = 0``).
+- ``x_noise_hat``, an estimate of the noise endpoint (``t = 0``).
 
 This is the flow-matching analogue of Tweedie's formula for diffusion
 models, and is what FlowDPS uses to compute a differentiable measurement
