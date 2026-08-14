@@ -1,0 +1,63 @@
+name: publish
+
+# Publishes torchdeltaflow to PyPI whenever a version tag (e.g. v0.2.2) is
+# pushed. The version is derived from the tag by setuptools_scm, so the tag is
+# the single source of truth. To cut a release, run:
+#
+#     git tag v0.2.2
+#     git push origin v0.2.2
+#
+# Authentication uses PyPI Trusted Publishing (OIDC), so no API token is stored
+# in the repository. Before the first release, configure a trusted publisher on
+# PyPI (project torchdeltaflow) pointing at this repository and the "publish"
+# workflow. See https://docs.pypi.org/trusted-publishers/adding-a-publisher/.
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # setuptools_scm needs the full history and tags to derive the version.
+          fetch-depth: 0
+          fetch-tags: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Build sdist and wheel
+        run: |
+          python -m pip install --upgrade pip build
+          python -m build
+      - name: Check distributions
+        run: |
+          python -m pip install --upgrade twine
+          python -m twine check dist/*
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/torchdeltaflow/
+    permissions:
+      # Required for PyPI Trusted Publishing (OIDC).
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
