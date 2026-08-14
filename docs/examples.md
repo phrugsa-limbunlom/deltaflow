@@ -310,7 +310,7 @@ to regress against, without changing the deterministic ODE it produces.
 
 ![Schrödinger-bridge trained sampler snapshots](assets/schrodinger-bridge/sb_snapshots.png)
 
-![Schrödinger-bridge trained sampler trajectories](assets/schrodinger-bridge/sb_trajectories.png)
+![Learned probability-flow ODE trajectories, deterministic sampler](assets/schrodinger-bridge/sb_trajectories.png)
 
 **Animated sampling.** The learned field integrates noise onto the two-moons
 target from `t=0` to `t=1`, same as the flow-matching showcase, but the
