@@ -265,7 +265,25 @@ pip install -e ".[dev]" matplotlib
 python examples/90-showcase/02-sampling-flow-viz/main.py     # sampling flow figures and gif
 python examples/90-showcase/03-minibatch-ot-viz/main.py      # OT vs independent coupling
 python examples/90-showcase/04-inverse-posterior-viz/main.py # posterior reconstruction
+python examples/90-showcase/07-landmark-detection/main.py    # landmark detection as conditional flow
+python examples/90-showcase/08-guidance-alignment-pretraining/main.py # guidance-aligned pretraining
 ```
+
+### Landmark detection and representation learning
+
+Two paired showcases cover the anatomical-landmark story. [`07-landmark-detection/`](https://github.com/phrugsa-limbunlom/deltaflow/tree/main/examples/90-showcase/07-landmark-detection) frames detection as a conditional flow `p(landmarks | image)`, so sampling at inference time is detection (synthetic by default, with real ISBI2015 cephalometric support). [`08-guidance-alignment-pretraining/`](https://github.com/phrugsa-limbunlom/deltaflow/tree/main/examples/90-showcase/08-guidance-alignment-pretraining) is the representation-learning counterpart, the CDPM-Align pretraining phase, where a class-conditioned image flow plus the `DeltaAlignmentLoss` over `Δh = h_cond − h_uncond` yields an anatomy-discriminative backbone.
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/phrugsa-limbunlom/deltaflow/main/docs/assets/landmark-detection/landmark_detection.png" alt="Landmark detection on held-out cephalometric X-rays" width="900"/>
+  <br>
+  <em>Detection as posterior sampling. Orange crosses are ground truth, teal dots are samples from <code>p(landmarks | image)</code>, and teal pluses are the predicted means. Sample spread is a built-in uncertainty estimate.</em>
+</p>
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/phrugsa-limbunlom/deltaflow/main/docs/assets/guidance-alignment/features.png" alt="PCA of frozen pretrained-backbone features, coloured by dataset" width="520"/>
+  <br>
+  <em>PCA of the frozen backbone features on held-out images. The four synthetic datasets separate cleanly, so a linear probe recovers dataset identity trivially, evidence that guided generative pretraining learned an anatomy-discriminative representation.</em>
+</p>
 
 ## Examples
 
@@ -276,7 +294,7 @@ The [`examples/`](https://github.com/phrugsa-limbunlom/deltaflow/tree/main/examp
 | [`00-foundations/`](https://github.com/phrugsa-limbunlom/deltaflow/tree/main/examples/00-foundations) | work with interpolants and the linear probability path |
 | [`10-sampling/`](https://github.com/phrugsa-limbunlom/deltaflow/tree/main/examples/10-sampling) | integrate a learned field with the Euler and Heun solvers |
 | [`20-training/`](https://github.com/phrugsa-limbunlom/deltaflow/tree/main/examples/20-training) | fit a field with flow matching, OT coupling, and delta alignment |
-| [`90-showcase/`](https://github.com/phrugsa-limbunlom/deltaflow/tree/main/examples/90-showcase) | study end-to-end demos and the visualizations above, including the [Schrödinger-bridge path and trained sampler](https://github.com/phrugsa-limbunlom/deltaflow/tree/main/examples/90-showcase/05-schrodinger-bridge-viz) and the [four-algorithm comparison](https://github.com/phrugsa-limbunlom/deltaflow/tree/main/examples/90-showcase/06-algorithm-comparison) |
+| [`90-showcase/`](https://github.com/phrugsa-limbunlom/deltaflow/tree/main/examples/90-showcase) | study end-to-end demos and the visualizations above, including the [Schrödinger-bridge path and trained sampler](https://github.com/phrugsa-limbunlom/deltaflow/tree/main/examples/90-showcase/05-schrodinger-bridge-viz), the [four-algorithm comparison](https://github.com/phrugsa-limbunlom/deltaflow/tree/main/examples/90-showcase/06-algorithm-comparison), [landmark detection as conditional flow](https://github.com/phrugsa-limbunlom/deltaflow/tree/main/examples/90-showcase/07-landmark-detection), and [guidance-aligned representation pretraining](https://github.com/phrugsa-limbunlom/deltaflow/tree/main/examples/90-showcase/08-guidance-alignment-pretraining) |
 
 ## Development
 
