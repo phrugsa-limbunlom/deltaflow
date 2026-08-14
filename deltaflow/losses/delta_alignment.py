@@ -113,6 +113,11 @@ class DeltaAlignmentLoss(nn.Module):
     all four velocity predictions (two views by two conditioning modes) to
     preserve both the guided and unguided generative pathways while the
     alignment term shapes the guidance representation.
+
+    References:
+        Di Via et al., "CDPM-Align: Multi-Scale Guidance-Aligned Diffusion
+        Pretraining for Robust Few-Shot Anatomical Landmark Detection" (2026),
+        https://arxiv.org/abs/2606.04898.
     """
 
     def __init__(
