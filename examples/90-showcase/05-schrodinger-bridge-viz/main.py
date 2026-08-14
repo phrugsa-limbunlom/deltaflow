@@ -268,10 +268,21 @@ def _plot_trajectories(
     ax.scatter(traj_np[-1, :, 0], traj_np[-1, :, 1], s=12, c=C_PARTICLE, alpha=0.9, edgecolors="none", label="end (t=1)")
     ax.set_xlim(_XLIM); ax.set_ylim(_YLIM)
     ax.set_aspect("equal")
-    ax.set_title(f"Learned Schrödinger-bridge sampler trajectories ({traj_np.shape[1]} paths)")
+    ax.set_title(f"Learned probability-flow ODE trajectories, deterministic sampler ({traj_np.shape[1]} paths)")
     ax.set_xticks([]); ax.set_yticks([])
     ax.legend(loc="upper right", fontsize=8, framealpha=0.9)
-    fig.tight_layout()
+    fig.tight_layout(rect=(0, 0.04, 1, 1))
+    fig.text(
+        0.5,
+        0.01,
+        "Smooth arcs are expected. This integrates the trained velocity with the deterministic PF-ODE.\n"
+        "The Schrödinger bridge's stochasticity lives at training time (see bridge_paths.png). A faithful\n"
+        "SDE sampler would also need a learned score (SF2M, Tong et al. 2024).",
+        ha="center",
+        va="bottom",
+        fontsize=7,
+        color="#444444",
+    )
     fig.savefig(out_path, bbox_inches="tight")
     plt.close(fig)
     return out_path
