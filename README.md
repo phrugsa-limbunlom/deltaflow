@@ -12,8 +12,20 @@
     <a href="https://github.com/phrugsa-limbunlom/deltaflow" target="_blank" title="GitHub Repo Stars">
         <img alt="GitHub Stars" src="https://img.shields.io/github/stars/phrugsa-limbunlom/deltaflow?style=social">
     </a>
+    <a href="https://deepwiki.com/phrugsa-limbunlom/deltaflow" target="_blank" title="Ask DeepWiki">
+        <img alt="Ask DeepWiki" src="https://deepwiki.com/badge.svg">
+    </a>
+    <a href="https://github.com/phrugsa-limbunlom/deltaflow/actions/workflows/ci.yml" target="_blank" title="Build Status">
+        <img alt="Build Status" src="https://img.shields.io/github/actions/workflow/status/phrugsa-limbunlom/deltaflow/ci.yml?branch=main&style=flat-square&label=build&color=3f9e73">
+    </a>
+    <a href="https://github.com/phrugsa-limbunlom/deltaflow/actions/workflows/docs.yml" target="_blank" title="Documentation">
+        <img alt="Docs" src="https://img.shields.io/github/actions/workflow/status/phrugsa-limbunlom/deltaflow/docs.yml?branch=main&style=flat-square&label=docs&color=0f9bab">
+    </a>
+    <a href="https://pepy.tech/project/torchdeltaflow" target="_blank" title="Downloads">
+        <img alt="Downloads" src="https://static.pepy.tech/badge/torchdeltaflow?style=flat-square">
+    </a>
     <a href="https://pypi.org/project/torchdeltaflow/" target="_blank" title="Python Versions">
-        <img alt="Python Versions" src="https://img.shields.io/pypi/pyversions/torchdeltaflow?style=flat-square&color=3f6fd0">
+        <img alt="Python Versions" src="https://img.shields.io/pypi/pyversions/torchdeltaflow?style=flat-square&color=e0b13c">
     </a>
 </p>
 
