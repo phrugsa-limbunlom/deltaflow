@@ -359,3 +359,81 @@ pip install -e ".[dev]" matplotlib
 python examples/90-showcase/06-algorithm-comparison/main.py
 # artifacts are written to outputs/algorithm_comparison/
 ```
+
+## 90 showcase, landmark detection as conditional flow
+
+[`examples/90-showcase/07-landmark-detection/main.py`](https://github.com/phrugsa-limbunlom/deltaflow/blob/main/examples/90-showcase/07-landmark-detection/main.py)
+frames anatomical landmark detection as a conditional flow-matching problem,
+namely `p(landmarks | image)`. The velocity field transports noise onto the
+stacked landmark coordinates while conditioning on the X-ray image, so sampling
+at inference time *is* detection.
+
+**Why it matters.** It shows the discriminative use of a flow model, the image
+is the condition and the landmark coordinates are the generative target. This
+is the downstream counterpart to the representation-learning pretraining below.
+
+The example runs on synthetic data by default and on the real ISBI2015
+cephalometric set when pointed at it (both the per-image `.txt` layout and the
+Kaggle wide-CSV layout are auto-detected). It reports held-out flow-matching
+loss alongside mean pixel error.
+
+![Landmark detection on held-out cephalometric X-rays](assets/landmark-detection/landmark_detection.png)
+
+For each test image the model draws many samples from `p(landmarks | image)`.
+The orange crosses are ground truth, the teal dots are posterior samples, and
+the teal plus marks are the per-landmark predicted mean. Tight sample clouds
+mean confident detections, wider spreads flag genuine positional uncertainty.
+
+### Reproduce
+
+```bash
+pip install -e ".[dev]" matplotlib
+# synthetic default
+python examples/90-showcase/07-landmark-detection/main.py
+# real data (Kaggle ISBI2015 CSV layout)
+python examples/90-showcase/07-landmark-detection/main.py \
+    --data-root data/cephalometric/cepha400/cepha400 \
+    --landmarks-root data/cephalometric/train_senior.csv \
+    --test-landmarks-root data/cephalometric/test1_senior.csv \
+    --n-landmarks 19 --image-size 64
+# artifacts are written to outputs/landmark_detection/
+```
+
+## 90 showcase, guidance-aligned representation pretraining
+
+[`examples/90-showcase/08-guidance-alignment-pretraining/main.py`](https://github.com/phrugsa-limbunlom/deltaflow/blob/main/examples/90-showcase/08-guidance-alignment-pretraining/main.py)
+is the representation-learning half of the story, the CDPM-Align pretraining
+phase at toy scale. A small conditional UNet velocity field learns
+`p(image | y)`, where `y` is a dataset/class label (not a landmark), with a
+learned null class for classifier-free guidance. At every hierarchy level the
+guidance difference `delta_h = h_cond - h_uncond` is projected by a
+`MultiScaleProjector` and aligned across two noise-level views with
+`DeltaAlignmentLoss` (the "Delta" in DeltaFlow).
+
+**Why it matters.** It answers "condition on the image or on the landmark?".
+Pretraining conditions on the image and generates the image, landmarks are
+never used here. The claim is that guided generative pretraining yields an
+anatomy-discriminative representation. We check this by freezing the backbone
+and fitting a linear probe on its features, comparing against a random-init
+backbone.
+
+On the synthetic four-dataset task the probe reaches near-perfect accuracy on
+held-out images (chance is 0.25) while the random-init baseline sits far lower,
+and a PCA of the frozen features separates cleanly by dataset. The alignment
+term is a light consistency regularizer on `delta_h` and stays small on this
+easy task, its role grows on harder heterogeneous data.
+
+![PCA of frozen pretrained-backbone features, coloured by dataset](assets/guidance-alignment/features.png)
+
+Each dot is a held-out image placed by its frozen bottleneck feature, reduced
+to 2D with PCA. Tight, well-separated colours mean the representation encodes
+dataset/anatomy identity, which is why the linear probe is trivially accurate.
+A random-init backbone would show the colours largely mixed.
+
+### Reproduce
+
+```bash
+pip install -e ".[dev]" matplotlib
+python examples/90-showcase/08-guidance-alignment-pretraining/main.py
+# artifacts are written to outputs/guidance_alignment_pretraining/
+```
