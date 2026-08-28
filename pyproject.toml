@@ -45,14 +45,19 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 
-# Keep the runtime footprint minimal: only torch + a few pure-python utilities.
-# Everything domain-specific (image loading, OT solver, dev tooling, docs) is
-# an optional extra, in the same spirit as torchebm.
+# Keep the runtime footprint minimal: torch + a few pure-python utilities,
+# plus scipy for the exact Hungarian-algorithm mini-batch OT assignment
+# (deltaflow.interpolants.OTInterpolant, deltaflow.trainer.OTCoupling). A
+# greedy nearest-neighbour matcher remains as a defensive fallback if scipy
+# is ever missing from the environment. Everything else domain-specific
+# (image loading, dev tooling, docs) is an optional extra, in the same
+# spirit as torchebm.
 dependencies = [
     "torch>=2.0",
     "numpy",
     "einops",
     "tqdm",
+    "scipy>=1.10",
 ]
 
 [project.optional-dependencies]
@@ -61,8 +66,7 @@ dependencies = [
 images = [
     "pillow>=9.0",
 ]
-# Exact mini-batch OT coupling via the Hungarian algorithm (falls back to a
-# greedy nearest-neighbour matcher when scipy is absent).
+# Kept for backwards compatibility, scipy is now a core dependency.
 ot = [
     "scipy>=1.10",
 ]

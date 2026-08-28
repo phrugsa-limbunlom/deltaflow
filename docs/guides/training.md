@@ -38,9 +38,10 @@ The pairing is pluggable:
 | `IndependentCoupling` | Pairs noise and data independently (standard flow matching) |
 | `OTCoupling` | Solves a mini-batch OT assignment so paired \((x_0, x_1)\) are close, yielding straighter flows |
 
-`OTCoupling` uses the Hungarian algorithm when `scipy` is available (install
-the [`ot` extra](../getting-started/installation.md)) and a greedy
-nearest-neighbour matcher otherwise.
+`OTCoupling` uses the Hungarian algorithm by default (`scipy` is a core
+dependency), falling back to a greedy nearest-neighbour matcher only if
+`scipy` is somehow missing from the environment (see
+[installation](../getting-started/installation.md)).
 
 ## Checkpointing
 

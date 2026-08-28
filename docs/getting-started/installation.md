@@ -20,12 +20,16 @@ pip install -e .
 ## Optional extras
 
 The core runtime is intentionally minimal (`torch`, `numpy`, `einops`,
-`tqdm`). Domain-specific functionality lives behind optional extras:
+`tqdm`, `scipy`). `scipy` ships by default so mini-batch OT coupling
+(`OTInterpolant`, `OTCoupling`) uses the exact Hungarian assignment out of
+the box, a greedy nearest-neighbour matcher remains only as a defensive
+fallback if `scipy` is somehow missing from the environment. Everything else
+domain-specific lives behind optional extras:
 
 | Extra | Enables | Pulls in |
 |---|---|---|
 | `images` | Image dataset streaming (`ImageFolderStream`, `RadiographDataset`) | `pillow` |
-| `ot` | Exact mini-batch OT coupling (Hungarian); falls back to a greedy matcher when absent | `scipy` |
+| `ot` | Kept for backwards compatibility, `scipy` is now a core dependency | `scipy` |
 | `all` | All optional runtime extras | `pillow`, `scipy` |
 | `dev` | Test/lint/type tooling + all runtime extras | `pytest`, `black`, `isort`, `mypy`, ... |
 | `docs` | Build this documentation site | `mkdocs-material`, `mkdocstrings`, ... |
