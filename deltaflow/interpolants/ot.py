@@ -10,9 +10,10 @@ optimal transport" (arXiv:2302.00482), and the OT-vs-independent ablation
 in "Flower: A Flow-Matching Solver for Inverse Problems" (arXiv:2509.26287)
 for the sampling side.
 
-Exact optimal assignment (Hungarian algorithm) is used when ``scipy`` is
-installed, otherwise a deterministic greedy nearest-neighbour fallback is
-used. This is a coupling strategy, not a new probability path, the same
+Exact optimal assignment (Hungarian algorithm) is used by default, since
+``scipy`` is a core dependency. A deterministic greedy nearest-neighbour
+fallback is used only if ``scipy`` is unavailable in the environment. This
+is a coupling strategy, not a new probability path, the same
 straight-line ``x_t = (1-t) x0 + t x1`` interpolation is applied after
 permuting.
 """
@@ -91,9 +92,9 @@ class OTInterpolant(BaseInterpolant):
     objective is identical to standard conditional flow matching and no other
     component (loss, solver, model) needs to change.
 
-    **Solver.** The exact assignment (Hungarian algorithm) is used when
-    ``scipy`` is installed, otherwise a deterministic greedy nearest-neighbour
-    fallback is used.
+    **Solver.** The exact assignment (Hungarian algorithm) is used by
+    default, since ``scipy`` is a core dependency. A deterministic greedy
+    nearest-neighbour fallback is used only if ``scipy`` is unavailable.
 
     References:
         Tong et al., "Improving and generalizing flow-based generative

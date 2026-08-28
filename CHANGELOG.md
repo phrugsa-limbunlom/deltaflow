@@ -3,6 +3,15 @@
 All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased]
+
+### Changed
+
+- `scipy` is now a core dependency (previously gated behind the `ot`
+  extra), so `OTInterpolant`/`OTCoupling` use the exact Hungarian-algorithm
+  mini-batch OT assignment by default. The `ot` extra is kept as a
+  backwards-compatible no-op, and the greedy nearest-neighbour matcher
+  remains as a defensive fallback if `scipy` is ever missing.
 
 ## [0.2.2]
 
