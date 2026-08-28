@@ -82,9 +82,10 @@ class BlurOperator(nn.Module):
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         pad = self.kernel_size // 2
+        kernel: torch.Tensor = self.get_buffer("kernel")
         return F.conv2d(
             x,
-            self.kernel.to(dtype=x.dtype, device=x.device),
+            kernel.to(dtype=x.dtype, device=x.device),
             padding=pad,
             groups=self.channels,
         )
