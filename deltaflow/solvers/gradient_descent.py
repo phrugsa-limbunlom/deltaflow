@@ -1,6 +1,6 @@
 """Optimization-based sampler for Equilibrium Matching fields."""
 
-from typing import Any, Optional
+from typing import Any, Callable, Optional
 
 import torch
 
@@ -61,7 +61,7 @@ class EquilibriumSolver(BaseSolver):
 
     def __init__(
         self,
-        model,
+        model: Callable,
         step_size: float = 0.05,
         momentum: float = 0.0,
         eval_time: float = 1.0,
