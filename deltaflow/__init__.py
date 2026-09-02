@@ -8,10 +8,13 @@ Module map:
   subclasses (`BaseVelocityField`, `BaseInterpolant`,
   `BaseSolver`, `BaseLoss`).
 - `deltaflow.interpolants`, probability paths (linear, mini-batch OT,
-  variance-preserving).
+  variance-preserving, Schrödinger bridge, and the Equilibrium Matching
+  energy-compatible target).
 - `deltaflow.losses`, conditional flow matching, plus the
   optional delta-alignment loss for guidance-representation pretraining.
-- `deltaflow.solvers`, Euler, Heun, and the
+- `deltaflow.solvers`, Euler, Heun, the `EquilibriumSolver` which samples an
+  Equilibrium Matching field by gradient descent on its implicit energy
+  landscape, and the
   `PosteriorSolver` which *wraps* a base solver
   and injects the measurement-likelihood gradient per step (FlowDPS /
   Flower style).
