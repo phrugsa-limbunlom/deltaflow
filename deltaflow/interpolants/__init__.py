@@ -1,5 +1,6 @@
 """Probability paths connecting noise ``x0`` to data ``x1``."""
 
+from ..core.base_equilibrium_interpolant import BaseEquilibriumInterpolant
 from ..core.base_interpolant import BaseInterpolant
 from .equilibrium import EquilibriumInterpolant
 from .linear import LinearInterpolant
@@ -8,6 +9,7 @@ from .schrodinger_bridge import SchrodingerBridgeInterpolant
 from .variance_preserving import VariancePreservingInterpolant
 
 __all__ = [
+    "BaseEquilibriumInterpolant",
     "BaseInterpolant",
     "EquilibriumInterpolant",
     "LinearInterpolant",

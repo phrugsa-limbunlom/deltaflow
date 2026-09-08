@@ -3,21 +3,25 @@ gradient-descent sampler."""
 
 import torch
 
+from deltaflow.core import (
+    BaseEquilibriumField,
+    BaseEquilibriumInterpolant,
+    BaseInterpolant,
+)
 from deltaflow.interpolants import EquilibriumInterpolant, LinearInterpolant
-from deltaflow.losses import ConditionalFlowMatchingLoss
+from deltaflow.losses import EquilibriumMatchingLoss
 from deltaflow.solvers import EquilibriumSolver, GradientDescentSolver
-from tests.conftest import DummyVelocityField
 
 
 def test_equilibrium_coefficient_plateau_and_vanishes_at_data():
-    """Defaults give a plateau of 4 up to t=0.8, then a linear ramp to 0 at t=1."""
+    """Defaults give a plateau of 4 up to gamma=0.8, then a linear ramp to 0 at gamma=1."""
     interp = EquilibriumInterpolant()  # plateau=0.8, scale=4, start=1
-    t = torch.tensor([0.0, 0.4, 0.8, 0.9, 1.0])
-    c = interp.equilibrium_coefficient(t)
+    gamma = torch.tensor([0.0, 0.4, 0.8, 0.9, 1.0])
+    c = interp.equilibrium_coefficient(gamma)
 
     # Plateau region: constant scale.
     assert torch.allclose(c[:3], torch.full((3,), 4.0), atol=1e-6)
-    # Ramp region: 4 * 5 * (1 - t).
+    # Ramp region: 4 * 5 * (1 - gamma).
     assert torch.allclose(c[3], torch.tensor(2.0), atol=1e-6)
     # Target must vanish at data so ground truths are stationary points.
     assert torch.allclose(c[4], torch.tensor(0.0), atol=1e-6)
@@ -28,14 +32,14 @@ def test_equilibrium_target_is_scaled_displacement():
     interp = EquilibriumInterpolant()
     x1 = torch.randn(5, 3, 4, 4)
     x0 = torch.randn(5, 3, 4, 4)
-    t = torch.rand(5)
+    gamma = torch.rand(5)
 
-    x_t, target = interp.interpolate(x1, t, x0=x0.clone())
-    c = interp.equilibrium_coefficient(t).view(-1, 1, 1, 1)
+    x_gamma, target = interp.interpolate(x1, gamma, x0=x0.clone())
+    c = interp.equilibrium_coefficient(gamma).view(-1, 1, 1, 1)
 
-    # Path is the plain straight line, target is c(t) * (x1 - x0).
-    t_ = t.view(-1, 1, 1, 1)
-    assert torch.allclose(x_t, (1 - t_) * x0 + t_ * x1, atol=1e-6)
+    # Path is the plain straight line, target is c(gamma) * (x1 - x0).
+    g_ = gamma.view(-1, 1, 1, 1)
+    assert torch.allclose(x_gamma, (1 - g_) * x0 + g_ * x1, atol=1e-6)
     assert torch.allclose(target, c * (x1 - x0), atol=1e-6)
 
 
@@ -54,20 +58,71 @@ def test_equilibrium_matches_scaled_linear_on_plateau():
     torch.manual_seed(0)
     x1 = torch.randn(6, 4)
     x0 = torch.randn(6, 4)
-    t = torch.full((6,), 0.3)  # inside the plateau
+    gamma = torch.full((6,), 0.3)  # inside the plateau
 
     eqm = EquilibriumInterpolant(scale=4.0)
     linear = LinearInterpolant()
-    _, u_eqm = eqm.interpolate(x1, t, x0=x0.clone())
-    _, u_lin = linear.interpolate(x1, t, x0=x0.clone())
+    _, u_eqm = eqm.interpolate(x1, gamma, x0=x0.clone())
+    _, u_lin = linear.interpolate(x1, gamma, x0=x0.clone())
 
     assert torch.allclose(u_eqm, 4.0 * u_lin, atol=1e-6)
 
 
-def test_equilibrium_interpolant_plugs_into_flow_matching_loss():
+def test_equilibrium_interpolant_is_gamma_based_and_decoupled():
+    """EqM uses the gamma-based base, decoupled from the t-based BaseInterpolant."""
+    interp = EquilibriumInterpolant()
+    assert isinstance(interp, BaseEquilibriumInterpolant)
+    assert not isinstance(interp, BaseInterpolant)
+
+    # The interpolate signature exposes gamma, not t.
+    x1 = torch.randn(4, 2)
+    x_gamma, target = interp.interpolate(x1, gamma=torch.ones(4))
+    assert x_gamma.shape == x1.shape
+    assert torch.allclose(target, torch.zeros_like(target), atol=1e-6)
+
+
+def test_equilibrium_matching_loss_calls_model_without_time():
+    """The EqM loss must query the field as f(x): no time, no gamma."""
+
+    seen_calls = []
+
+    class RecordingField:
+        def __init__(self):
+            self.model = self
+
+        def __call__(self, x, *args, **cond):
+            seen_calls.append((args, cond))
+            return torch.zeros_like(x)
+
     torch.manual_seed(0)
-    model = DummyVelocityField(dim=4)
-    loss_fn = ConditionalFlowMatchingLoss(interpolant=EquilibriumInterpolant())
+    field = RecordingField()
+    loss_fn = EquilibriumMatchingLoss()
+    x1 = torch.randn(16, 3)
+
+    loss_fn(field, x1)
+
+    assert len(seen_calls) == 1
+    args, cond = seen_calls[0]
+    # No time (or gamma) is passed positionally, and no extra conditioning.
+    assert args == ()
+    assert cond == {}
+
+
+def test_equilibrium_matching_loss_trains_a_time_invariant_field():
+    """A time-free field should receive gradients from the loss."""
+
+    torch.manual_seed(0)
+
+    class TinyField(BaseEquilibriumField):
+        def __init__(self, dim: int):
+            super().__init__()
+            self.net = torch.nn.Linear(dim, dim)
+
+        def forward(self, x, **cond):
+            return self.net(x)
+
+    model = TinyField(dim=4)
+    loss_fn = EquilibriumMatchingLoss(interpolant=EquilibriumInterpolant())
     x1 = torch.randn(8, 4)
 
     loss = loss_fn(model, x1)
@@ -79,7 +134,16 @@ def test_equilibrium_interpolant_plugs_into_flow_matching_loss():
 
 def test_equilibrium_solver_shape_and_finite():
     torch.manual_seed(0)
-    model = DummyVelocityField(dim=4)
+
+    class TinyField(BaseEquilibriumField):
+        def __init__(self, dim: int):
+            super().__init__()
+            self.net = torch.nn.Linear(dim, dim)
+
+        def forward(self, x, **cond):
+            return self.net(x)
+
+    model = TinyField(dim=4)
     x = torch.randn(3, 4)
 
     out = EquilibriumSolver(model, step_size=0.02).sample(x, n_steps=10, show_progress=False)
@@ -96,9 +160,8 @@ def test_equilibrium_solver_descends_toward_data_fixed_point():
         def __init__(self, target):
             self.target = target
             self.model = self
-            self.time_scale = 1.0
 
-        def __call__(self, x, t, **cond):
+        def __call__(self, x, **cond):
             return self.target - x
 
     target = torch.tensor([[3.0, -2.0]])
@@ -118,9 +181,8 @@ def test_nag_gd_converges_to_fixed_point():
         def __init__(self, target):
             self.target = target
             self.model = self
-            self.time_scale = 1.0
 
-        def __call__(self, x, t, **cond):
+        def __call__(self, x, **cond):
             return self.target - x
 
     target = torch.tensor([[5.0]])
@@ -138,9 +200,8 @@ def test_momentum_changes_trajectory():
         def __init__(self, target):
             self.target = target
             self.model = self
-            self.time_scale = 1.0
 
-        def __call__(self, x, t, **cond):
+        def __call__(self, x, **cond):
             return self.target - x
 
     target = torch.tensor([[5.0]])
