@@ -437,3 +437,47 @@ pip install -e ".[dev]" matplotlib
 python examples/90-showcase/08-guidance-alignment-pretraining/main.py
 # artifacts are written to outputs/guidance_alignment_pretraining/
 ```
+
+## 90 showcase, Equilibrium Matching landscape and sampling
+
+[`examples/90-showcase/09-equilibrium-matching-viz/main.py`](https://github.com/phrugsa-limbunlom/deltaflow/blob/main/examples/90-showcase/09-equilibrium-matching-viz/main.py)
+trains a noise-unconditional field with `EquilibriumMatchingLoss` on the same
+2D *two-moons* target as the flow-matching showcase above, then samples it by
+gradient descent on the learned landscape (no ODE integration). Reusing the
+dataset makes the contrast with flow matching direct. Equilibrium Matching
+drops the time-conditional dynamics of flow models, so the field \(f(x)\) is
+time-invariant and a single picture of it describes the whole sampler. The
+interpolation coefficient \(\gamma\) is implicit and never seen by the model.
+
+**Time-invariant landscape.** Arrows are the field \(f(x)\), the heatmap is the
+gradient norm \(|f(x)|\). The norm collapses toward zero along the two moons, so
+those points are the equilibria (minima) of the implicit energy the field
+descends. One panel replaces the per-time quiver the flow-matching showcase
+needs.
+
+![EqM energy landscape](assets/equilibrium-matching/energy_landscape.png)
+
+**Gradient-descent sampling.** Pure noise settles onto the two moons as the
+optimisation-based sampler iterates. Compare the final panel with the
+flow-matching snapshots above, both recover the same target by very different
+mechanics (gradient descent on a static landscape versus ODE integration of a
+time-varying velocity).
+
+![Gradient-descent snapshots](assets/equilibrium-matching/gd_snapshots.png)
+
+**Animated sampling.** The full gradient-descent run.
+
+![Animated EqM sampling](assets/equilibrium-matching/eqm_sampling.gif)
+
+**Particle trajectories.** Individual paths from noise (deep teal) to the
+samples (teal), traced by green streamlines.
+
+![EqM sampling trajectories](assets/equilibrium-matching/gd_trajectories.png)
+
+### Reproduce
+
+```bash
+pip install -e ".[dev]" matplotlib
+python examples/90-showcase/09-equilibrium-matching-viz/main.py
+# artifacts are written to outputs/equilibrium_matching_viz/
+```
