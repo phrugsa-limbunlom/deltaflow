@@ -21,7 +21,7 @@ from typing import Tuple
 
 import torch
 
-from ..interpolants.ot import _batch_ot_permutation
+from ..utils.ot import batch_ot_permutation
 
 
 class BaseCoupling(ABC):
@@ -51,7 +51,7 @@ class OTCoupling(BaseCoupling):
 
     def sample_pair(self, x1: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
         x0 = torch.randn_like(x1)
-        perm = _batch_ot_permutation(x0, x1)
+        perm = batch_ot_permutation(x0, x1)
         return x0[perm], x1
 
 

@@ -17,7 +17,7 @@ import matplotlib.animation as animation
 import matplotlib.pyplot as plt
 import torch
 
-from deltaflow.interpolants.ot import _batch_ot_permutation
+from deltaflow.utils.ot import batch_ot_permutation
 
 # Non-primary palette (theme primary is blue; these deliberately avoid it).
 C_SOURCE = "#0f9bab"     # source samples: teal
@@ -59,7 +59,7 @@ def main():
     cost_indep = transport_cost(x0, x1)
 
     # OT coupling permutes x0 so total squared-L2 cost is minimised.
-    perm = _batch_ot_permutation(x0, x1)
+    perm = batch_ot_permutation(x0, x1)
     x0_ot = x0[perm]
     cost_ot = transport_cost(x0_ot, x1)
 
