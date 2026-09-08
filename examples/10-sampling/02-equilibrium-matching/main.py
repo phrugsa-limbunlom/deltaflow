@@ -3,11 +3,12 @@
 Equilibrium Matching and sample it by gradient descent, no ODE integration.
 
 EqM keeps the straight-line path but regresses onto the energy-compatible
-target ``c(t) * (x1 - x0)`` (via `EquilibriumInterpolant`), whose coefficient
-vanishes at data so ground truths become minima of the learned landscape. The
-field is noise-unconditional (it ignores ``t``), so sampling is plain gradient
-descent ``x <- x + eta * f(x)`` with `EquilibriumSolver` (NAG-GD when
-``momentum > 0``).
+target ``c(gamma) * (x1 - x0)`` (via `EquilibriumInterpolant`), whose
+coefficient vanishes at data so ground truths become minima of the learned
+landscape. Here ``gamma`` is the interpolation coefficient (a noise level, not
+a time). The field is noise-unconditional ``f(x)`` (it takes no time or gamma
+at all), so sampling is plain gradient descent ``x <- x + eta * f(x)`` with
+`EquilibriumSolver` (NAG-GD when ``momentum > 0``).
 
 Run: python examples/10-sampling/02-equilibrium-matching/main.py
 """
@@ -15,14 +16,14 @@ Run: python examples/10-sampling/02-equilibrium-matching/main.py
 import torch
 import torch.nn as nn
 
-from deltaflow.core.base import BaseVelocityField
+from deltaflow.core import BaseEquilibriumField
 from deltaflow.interpolants import EquilibriumInterpolant
-from deltaflow.losses import ConditionalFlowMatchingLoss
+from deltaflow.losses import EquilibriumMatchingLoss
 from deltaflow.solvers import EquilibriumSolver
 
 
-class EquilibriumField(BaseVelocityField):
-    """Noise-unconditional gradient field ``f(x)`` (the time input is ignored)."""
+class EquilibriumField(BaseEquilibriumField):
+    """Noise-unconditional gradient field ``f(x)`` (no time, gamma is implicit)."""
 
     def __init__(self, dim: int = 2, hidden: int = 128):
         super().__init__()
@@ -34,7 +35,7 @@ class EquilibriumField(BaseVelocityField):
             nn.Linear(hidden, dim),
         )
 
-    def forward(self, x: torch.Tensor, t: torch.Tensor, **cond) -> torch.Tensor:
+    def forward(self, x: torch.Tensor, **cond) -> torch.Tensor:
         return self.net(x)
 
 
@@ -47,7 +48,7 @@ def two_gaussians(n: int) -> torch.Tensor:
 def main():
     torch.manual_seed(0)
     field = EquilibriumField(dim=2)
-    loss_fn = ConditionalFlowMatchingLoss(interpolant=EquilibriumInterpolant())
+    loss_fn = EquilibriumMatchingLoss(interpolant=EquilibriumInterpolant())
     opt = torch.optim.Adam(field.parameters(), lr=2e-3)
 
     for step in range(800):

@@ -38,25 +38,22 @@ class EquilibriumSolver(BaseSolver):
     which reaches high-quality samples in fewer steps than vanilla gradient
     descent.
 
-    **Time invariance.** The trained field ignores its time argument, so the
-    solver evaluates it at a single fixed ``eval_time`` (its value does not
-    affect a properly EqM-trained, noise-unconditional model). ``eval_time`` is
-    still routed through ``time_scale`` for backbones that expect a rescaled
-    time input.
+    **No time.** An EqM field is a `BaseEquilibriumField`, a
+    time-invariant \(f(x)\) with no time (or \(\gamma\)) argument. The solver
+    therefore calls it as ``model(x, **cond)`` and there is no ``eval_time`` or
+    ``time_scale`` to route, sampling is pure optimisation on the landscape.
 
     References:
         Wang and Du, "Equilibrium Matching: Generative Modeling with Implicit
         Energy-Based Models" (2025), https://arxiv.org/abs/2510.02300.
 
     Args:
-        model: callable ``model(x, t, **cond) -> gradient`` (same signature as
-            `BaseVelocityField`),
-            returning the equilibrium gradient with the shape of ``x``.
+        model: callable ``model(x, **cond) -> gradient`` (same signature as
+            `BaseEquilibriumField`), returning the equilibrium
+            gradient with the shape of ``x``.
         step_size: gradient-descent step \(\eta\).
         momentum: Nesterov coefficient \(\mu\). ``0`` gives vanilla gradient
             descent, positive values give NAG-GD.
-        eval_time: fixed time at which the time-invariant field is queried.
-        time_scale: multiplies ``eval_time`` before it reaches the model.
     """
 
     def __init__(
@@ -64,17 +61,14 @@ class EquilibriumSolver(BaseSolver):
         model: Callable,
         step_size: float = 0.05,
         momentum: float = 0.0,
-        eval_time: float = 1.0,
-        time_scale: float = 1.0,
     ):
-        super().__init__(model, time_scale=time_scale)
+        super().__init__(model, time_scale=1.0)
         self.step_size = step_size
         self.momentum = momentum
-        self.eval_time = eval_time
 
     def _gradient(self, x: torch.Tensor, **cond) -> torch.Tensor:
         """Equilibrium gradient ``f(x)``, pointing from noise toward data."""
-        return self._eval_velocity(x, self.eval_time, **cond)
+        return self.model(x, **cond)
 
     def step(self, x: torch.Tensor, t: float, dt: float, **cond) -> torch.Tensor:
         """Single vanilla gradient-descent step (``t``/``dt`` are ignored).
