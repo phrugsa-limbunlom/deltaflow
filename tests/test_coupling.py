@@ -1,13 +1,55 @@
 import torch
 
+from deltaflow.core import BaseCoupling
 from deltaflow.interpolants import LinearInterpolant, OTInterpolant
 from deltaflow.losses import ConditionalFlowMatchingLoss, FlowMatchingLoss
 from deltaflow.trainer.coupling import IndependentCoupling, OTCoupling
+from deltaflow.utils.ot import batch_ot_permutation
 from tests.conftest import DummyVelocityField
 
 
 def test_flow_matching_loss_backwards_compat_alias():
     assert FlowMatchingLoss is ConditionalFlowMatchingLoss
+
+
+def test_batch_ot_permutation_moved_to_utils_with_alias():
+    """The OT assignment primitive now lives in ``deltaflow.utils.ot``.
+
+    The private name kept in ``deltaflow.interpolants.ot`` must remain a
+    backward-compatible alias for the public ``batch_ot_permutation``.
+    """
+    from deltaflow.interpolants.ot import _batch_ot_permutation
+    from deltaflow.utils import batch_ot_permutation as reexported
+
+    assert _batch_ot_permutation is batch_ot_permutation
+    assert reexported is batch_ot_permutation
+
+
+def test_batch_ot_permutation_returns_valid_permutation():
+    torch.manual_seed(0)
+    x0 = torch.randn(5, 3, 4, 4)
+    x1 = torch.randn(5, 3, 4, 4)
+    perm = batch_ot_permutation(x0, x1)
+    assert perm.shape == (5,)
+    assert perm.dtype == torch.long
+    # A permutation contains each index exactly once.
+    assert torch.equal(torch.sort(perm).values, torch.arange(5))
+
+
+def test_base_coupling_lives_in_core_and_is_reexported():
+    """``BaseCoupling`` was extracted to ``deltaflow.core``.
+
+    Every historical import path must resolve to the same class.
+    """
+    from deltaflow.core.base_coupling import BaseCoupling as CoreBase
+    from deltaflow.trainer import BaseCoupling as TrainerBase
+    from deltaflow.trainer.coupling import BaseCoupling as CouplingBase
+
+    assert BaseCoupling is CoreBase
+    assert BaseCoupling is TrainerBase
+    assert BaseCoupling is CouplingBase
+    assert issubclass(IndependentCoupling, BaseCoupling)
+    assert issubclass(OTCoupling, BaseCoupling)
 
 
 def test_independent_coupling_returns_noise_and_data_shapes():
