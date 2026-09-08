@@ -5,6 +5,7 @@ subclasses one of these bases, so new variants are drop-in and not
 rewrites of the surrounding machinery.
 """
 
+from .base_coupling import BaseCoupling
 from .base_equilibrium_field import BaseEquilibriumField
 from .base_equilibrium_interpolant import BaseEquilibriumInterpolant
 from .base_interpolant import BaseInterpolant
@@ -13,6 +14,7 @@ from .base_solver import BaseSolver
 from .base_velocity_field import BaseVelocityField
 
 __all__ = [
+    "BaseCoupling",
     "BaseEquilibriumField",
     "BaseEquilibriumInterpolant",
     "BaseInterpolant",

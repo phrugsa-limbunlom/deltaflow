@@ -16,20 +16,12 @@ arXiv:2509.26287) recommends OT coupling as the safer default when the
 trained model is later reused for posterior sampling.
 """
 
-from abc import ABC, abstractmethod
 from typing import Tuple
 
 import torch
 
+from ..core.base_coupling import BaseCoupling
 from ..utils.ot import batch_ot_permutation
-
-
-class BaseCoupling(ABC):
-    """Given a batch ``x1`` of data samples, return a paired ``(x0, x1)``."""
-
-    @abstractmethod
-    def sample_pair(self, x1: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
-        raise NotImplementedError
 
 
 class IndependentCoupling(BaseCoupling):
