@@ -10,9 +10,11 @@ from .numerical import (
     safe_normalize,
     safe_sqrt,
 )
+from .ot import batch_ot_permutation
 
 __all__ = [
     "StabilityConfig",
+    "batch_ot_permutation",
     "clamp_cosine_similarity",
     "clamp_loss",
     "clamp_noise",
