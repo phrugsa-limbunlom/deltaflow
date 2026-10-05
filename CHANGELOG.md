@@ -5,6 +5,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+
+- `deltaflow.models.DiT`: a class-conditional Diffusion Transformer velocity
+  field with **adaLN-Zero** conditioning (Peebles & Xie, 2023). Ships a reusable
+  `TimestepEmbedding`, a `LabelEmbedding` with a learned null token for
+  classifier-free guidance, zero-initialized modulation gates (identity at init,
+  zero initial velocity), `cond["y"]` support through the existing
+  `BaseVelocityField` API, and a `forward_with_cfg` guided-sampling helper. See
+  the new `examples/20-training/03-conditional-dit` walkthrough.
+
 ### Changed
 
 - `scipy` is now a core dependency (previously gated behind the `ot`
