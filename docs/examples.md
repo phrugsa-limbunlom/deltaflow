@@ -146,6 +146,42 @@ difference feature.
 
 ---
 
+## 20 training, conditional generation with a DiT
+
+[`examples/20-training/03-conditional-dit/main.py`](https://github.com/phrugsa-limbunlom/deltaflow/blob/main/examples/20-training/03-conditional-dit/main.py)
+
+The native transformer path. A small `DiT` velocity field conditions on a class
+label through **adaLN-Zero** (Peebles & Xie, 2023), the shared ``time + class``
+embedding drives per-block ``(shift, scale, gate)`` modulation, and the gates
+start at zero so the field begins as the identity. Two toy classes (bright-top
+versus bright-bottom 8x8 images) are learned with conditional flow matching, then
+sampled per class with classifier-free guidance.
+
+```python
+from deltaflow.models import DiT
+
+field = DiT(input_size=8, patch_size=2, in_channels=1, hidden_size=64,
+            depth=2, num_heads=4, num_classes=2, class_dropout_prob=0.1)
+
+loss = FlowMatchingLoss()(field, x1, y=y)   # label rides the opaque **cond channel
+
+# guided sampling: extrapolate between the conditional and null-token velocity
+v = field.forward_with_cfg(x, t, y=torch.zeros(64, dtype=torch.long), cfg_scale=2.0)
+```
+
+What to notice.
+
+- The label enters through the same opaque ``**cond`` channel every DeltaFlow
+  loss and solver forwards unchanged, here as ``y``. No loss or solver needs to
+  know about classes.
+- `LabelEmbedding` carries a learned **null** token. Train-time label dropout
+  teaches one network both the conditional and unconditional velocity, which is
+  exactly what `DiT.forward_with_cfg` extrapolates between at sample time.
+- The printed per-class pixel means separate cleanly (class 0 bright on top,
+  class 1 bright on bottom), confirming the conditioning took effect.
+
+---
+
 ## 30 inverse, posterior sampling
 
 [`examples/30-inverse/01-posterior/main.py`](https://github.com/phrugsa-limbunlom/deltaflow/blob/main/examples/30-inverse/01-posterior/main.py)
