@@ -103,6 +103,11 @@ include = ["deltaflow*"]
 # Auto-derive the version from the nearest git tag (e.g. v0.1.0 -> 0.1.0).
 # Falls back to "0.0.0.dev0" only when the tree has no tags at all.
 fallback_version = "0.0.0.dev0"
+# Drop the "+g<hash>" local segment. PyPI rejects local versions, so the
+# continuous-deployment publish on every merge (which builds an untagged
+# commit) needs a clean PEP 440 dev version like "0.2.3.dev4" instead of
+# "0.2.3.dev4+g1a2b3c4". Tagged releases are unaffected (distance 0, no .devN).
+local_scheme = "no-local-version"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
