@@ -1,11 +1,18 @@
 name: publish
 
-# Publishes torchdeltaflow to PyPI whenever a version tag (e.g. v0.2.2) is
-# pushed. The version is derived from the tag by setuptools_scm, so the tag is
-# the single source of truth. To cut a release, run:
+# Publishes torchdeltaflow to PyPI in two cases:
 #
-#     git tag v0.2.2
-#     git push origin v0.2.2
+#   1. A version tag (e.g. v0.2.2) is pushed -> a stable release. The version is
+#      derived from the tag by setuptools_scm, so the tag is the single source
+#      of truth. To cut a release, run:
+#
+#          git tag v0.2.2
+#          git push origin v0.2.2
+#
+#   2. A pull request is merged into main -> a dev pre-release. setuptools_scm
+#      derives a clean PEP 440 version from the commit distance to the last tag
+#      (e.g. "0.2.3.dev4"), which is unique per merge. "skip-existing" below
+#      guards against the rare case where the same version was already uploaded.
 #
 # Authentication uses a PyPI API token stored as the repository secret
 # PYPI_API_TOKEN. Create the token at https://pypi.org/manage/account/token/
@@ -16,12 +23,18 @@ on:
   push:
     tags:
       - "v*"
+  pull_request:
+    branches: [main]
+    types: [closed]
 
 permissions:
   contents: read
 
 jobs:
   build:
+    # Run for pushed version tags, or when a PR is actually merged (not just
+    # closed). Plain "closed" without merge must not publish.
+    if: github.event_name == 'push' || github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -60,3 +73,6 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           password: ${{ secrets.PYPI_API_TOKEN }}
+          # Merge builds may reproduce an existing dev version if no new commits
+          # changed the distance to the last tag. Skip rather than fail.
+          skip-existing: true
