@@ -4,7 +4,7 @@
 
 <p align="center">
     <a href="https://pypi.org/project/torchdeltaflow/" target="_blank" title="PyPI version">
-        <img alt="PyPI" src="https://img.shields.io/pypi/v/torchdeltaflow?style=flat-square&color=7a5cc0">
+        <img alt="PyPI" src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fpypi.org%2Fpypi%2Ftorchdeltaflow%2Fjson&query=%24.info.version&prefix=v&label=pypi&style=flat-square&color=7a5cc0&cacheSeconds=300">
     </a>
     <a href="https://github.com/phrugsa-limbunlom/deltaflow/blob/main/LICENSE" target="_blank" title="License">
         <img alt="License" src="https://img.shields.io/github/license/phrugsa-limbunlom/deltaflow?style=flat-square&color=3f9e73">
@@ -16,7 +16,7 @@
         <img alt="GitHub Stars" src="https://img.shields.io/github/stars/phrugsa-limbunlom/deltaflow?style=social">
     </a>
     <a href="https://deepwiki.com/phrugsa-limbunlom/deltaflow" target="_blank" title="Ask DeepWiki">
-        <img alt="Ask DeepWiki" src="https://deepwiki.com/badge.svg?v=1">
+        <img alt="Ask DeepWiki" src="https://img.shields.io/badge/Ask-DeepWiki-155e63?style=flat-square">
     </a>
     <a href="https://github.com/phrugsa-limbunlom/deltaflow/actions/workflows/ci.yml" target="_blank" title="Build Status">
         <img alt="Build Status" src="https://img.shields.io/github/actions/workflow/status/phrugsa-limbunlom/deltaflow/ci.yml?branch=main&style=flat-square&label=build&color=3f9e73">
