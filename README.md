@@ -16,7 +16,7 @@
         <img alt="GitHub Stars" src="https://img.shields.io/github/stars/phrugsa-limbunlom/deltaflow?style=social">
     </a>
     <a href="https://deepwiki.com/phrugsa-limbunlom/deltaflow" target="_blank" title="Ask DeepWiki">
-        <img alt="Ask DeepWiki" src="https://deepwiki.com/badge.svg">
+        <img alt="Ask DeepWiki" src="https://deepwiki.com/badge.svg?v=1">
     </a>
     <a href="https://github.com/phrugsa-limbunlom/deltaflow/actions/workflows/ci.yml" target="_blank" title="Build Status">
         <img alt="Build Status" src="https://img.shields.io/github/actions/workflow/status/phrugsa-limbunlom/deltaflow/ci.yml?branch=main&style=flat-square&label=build&color=3f9e73">
