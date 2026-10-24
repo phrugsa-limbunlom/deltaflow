@@ -20,6 +20,11 @@ just sample synthesis).
 
     The four base abstractions that make every component drop-in.
 
+- :material-image-multiple: **[DiT Walkthrough](concepts/dit.md)**
+
+    Follow an RGB image through every transformer block with interactive
+    tensor views and linked patch highlights.
+
 - :material-api: **[API Reference](api/index.md)**
 
     Auto-generated documentation for every public class and function.
@@ -64,6 +69,18 @@ distribution (\(t=1\)). The panels below come from the
 ![Sampling snapshots from noise to data](assets/sampling-flow/snapshots.png)
 
 ![Animated sampling flow](assets/sampling-flow/flow.gif)
+
+## DiT Walkthrough
+
+Follow a three-channel RGB image from patch embedding through every DiT block
+to the output velocity. Use **Next** to step through the layers and **Next
+operation** to explore attention and MLP transformations inside each block.
+Switch between **RGB**, **R**, **G**, and **B** to inspect the image channels.
+
+<div id="dit-viewer" data-src="assets/dit-walkthrough/dit_trace.json"></div>
+
+See the [full DiT Walkthrough](concepts/dit.md) for the tensor-shape reference,
+static figures, and instructions to reproduce the trained model.
 
 ## Probability paths
 
