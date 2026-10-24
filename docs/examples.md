@@ -180,6 +180,10 @@ What to notice.
 - The printed per-class pixel means separate cleanly (class 0 bright on top,
   class 1 bright on bottom), confirming the conditioning took effect.
 
+For a tensor-by-tensor trace of this model (patchify, conditioning, adaLN-Zero
+modulation, attention maps, unpatchify, CFG), see the
+[DiT Walkthrough](concepts/dit.md).
+
 ---
 
 ## 30 inverse, posterior sampling
@@ -516,4 +520,31 @@ samples (teal), traced by green streamlines.
 pip install -e ".[dev]" matplotlib
 python examples/90-showcase/09-equilibrium-matching-viz/main.py
 # artifacts are written to outputs/equilibrium_matching_viz/
+```
+
+## 90 showcase, DiT tensor walkthrough
+
+[`examples/90-showcase/10-dit-tensor-viz/main.py`](https://github.com/phrugsa-limbunlom/deltaflow/blob/main/examples/90-showcase/10-dit-tensor-viz/main.py)
+trains a three-channel RGB variant of the 8x8 conditional `DiT` toy, then replays
+its forward pass step by step and checks the replay against `field(x, t, y)`.
+It shows the image path (patches to tokens), the conditioning path (time and
+label summed into one vector `c`), the adaLN-Zero modulation `c` emits, the
+attention maps, the way back to a velocity, and what classifier-free guidance
+does from pure noise.
+
+![DiT attention maps](assets/dit-walkthrough/attention.png)
+
+The [DiT Walkthrough](concepts/dit.md) page hosts an interactive, guided tour
+of the same forward pass. Start with the image, follow each transformer block's
+attention and MLP tensors, then project and unpatchify back to a velocity image.
+RGB and individual-channel views, named layer navigation, and linked patch
+selection accompany the live heatmaps, followed by the full figure-by-figure
+explanation.
+
+### Reproduce
+
+```bash
+pip install -e ".[dev]" matplotlib
+python examples/90-showcase/10-dit-tensor-viz/main.py
+# artifacts are written to outputs/dit_tensor_viz/ (PNGs and dit_trace.json)
 ```

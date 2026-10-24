@@ -14,6 +14,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   zero initial velocity), `cond["y"]` support through the existing
   `BaseVelocityField` API, and a `forward_with_cfg` guided-sampling helper. See
   the new `examples/20-training/03-conditional-dit` walkthrough.
+- `examples/90-showcase/10-dit-tensor-viz` and the **DiT Walkthrough** docs page
+  (Concepts), an interactive image-to-velocity tour with named layer navigation,
+  patch-linked tensors, attention and MLP intermediates in every transformer
+  block, and final projection and unpatchify views. Tensors come from a trained
+  three-channel RGB model and are checked against `DiT.forward`. Includes
+  individual-channel views, CFG, sampling, and static reference figures.
+  The interactive tour is also embedded on Home.
 
 ### Changed
 
