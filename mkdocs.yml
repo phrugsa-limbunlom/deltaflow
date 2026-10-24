@@ -59,6 +59,7 @@ nav:
       - Inverse Problems: guides/inverse-problems.md
   - Concepts:
       - Architecture: concepts/architecture.md
+      - DiT Walkthrough: concepts/dit.md
   - Examples: examples.md
   - API Reference:
       - Overview: api/index.md
@@ -121,9 +122,11 @@ markdown_extensions:
 extra_javascript:
   - assets/js/mathjax.js
   - https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-chtml.js
+  - assets/js/dit-walkthrough.js
 
 extra_css:
   - assets/css/extra.css
+  - assets/css/dit-walkthrough.css
 
 extra:
   social:
