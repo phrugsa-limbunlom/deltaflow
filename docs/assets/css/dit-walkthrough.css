@@ -1,0 +1,470 @@
+/* DiT interactive walkthrough (docs/assets/js/dit-walkthrough.js).
+   Accents use the non-primary palette (green, yellow), never the theme blue. */
+
+#dit-viewer {
+  --dw-green: #3f9e73;
+  --dw-yellow: #e0b13c;
+  --dw-purple: #7a5cc0;
+  --dw-ink: #155e63;
+  --dw-border: var(--md-default-fg-color--lightest);
+  border: 1px solid var(--dw-border);
+  border-radius: 0.8rem;
+  padding: 1.1rem;
+  margin: 1.2rem 0 2rem;
+  font-size: 0.75rem;
+  background: var(--md-default-bg-color);
+  box-shadow: 0 0.4rem 1.6rem #155e630d;
+}
+
+#dit-viewer .dw-intro {
+  border-bottom: 1px solid var(--dw-border);
+  padding-bottom: 0.7rem;
+  margin-bottom: 0.7rem;
+}
+
+#dit-viewer .dw-kicker {
+  color: var(--dw-green);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+}
+
+#dit-viewer .dw-intro h2 {
+  font-size: 1.55rem;
+  font-weight: 750;
+  letter-spacing: -0.04em;
+  line-height: 1.2;
+  margin: 0.35rem 0;
+}
+
+#dit-viewer .dw-intro p {
+  margin: 0.3rem 0;
+  color: var(--md-default-fg-color--light);
+}
+
+#dit-viewer:focus-visible,
+#dit-viewer :is(button, input, select, summary):focus-visible {
+  outline: 2px solid var(--dw-purple);
+  outline-offset: 3px;
+}
+
+#dit-viewer .dw-loading {
+  color: var(--md-default-fg-color--light);
+}
+
+#dit-viewer .dw-controls,
+#dit-viewer .dw-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 1.1rem;
+}
+
+#dit-viewer .dw-controls {
+  padding-bottom: 0.7rem;
+  border-bottom: 1px solid var(--dw-border);
+}
+
+#dit-viewer .dw-row {
+  align-items: flex-start;
+  gap: 0.6rem;
+  margin: 0.6rem 0 0.8rem;
+}
+
+#dit-viewer .dw-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+}
+
+#dit-viewer .dw-glabel {
+  color: var(--md-default-fg-color--light);
+  margin-right: 0.2rem;
+}
+
+#dit-viewer .dw-btn,
+#dit-viewer .dw-dot {
+  font: inherit;
+  cursor: pointer;
+  border: 1px solid var(--dw-border);
+  background: var(--md-default-bg-color);
+  color: var(--md-default-fg-color);
+  border-radius: 0.3rem;
+  padding: 0.3rem 0.55rem;
+  min-height: 1.7rem;
+  transition: background 0.12s, border-color 0.12s;
+}
+
+#dit-viewer .dw-btn:hover:not(:disabled),
+#dit-viewer .dw-dot:hover {
+  border-color: var(--dw-green);
+}
+
+#dit-viewer .dw-btn.is-active,
+#dit-viewer .dw-dot.is-active {
+  background: var(--dw-ink);
+  border-color: var(--dw-ink);
+  color: #fff;
+}
+
+#dit-viewer .dw-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+#dit-viewer .dw-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  margin: 0.8rem 0 0.4rem;
+}
+
+#dit-viewer .dw-dots {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(6.1rem, 1fr));
+  gap: 0.3rem;
+  margin-top: 0.75rem;
+}
+
+#dit-viewer .dw-dot {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.45rem;
+  text-align: left;
+  font-size: 0.62rem;
+}
+
+#dit-viewer .dw-node-no {
+  opacity: 0.65;
+  font-family: var(--md-code-font-family);
+  font-size: 0.55rem;
+}
+
+#dit-viewer .dw-dot.is-done {
+  border-color: var(--dw-green);
+}
+
+#dit-viewer .dw-next:not(:disabled) {
+  border-color: var(--dw-green);
+  font-weight: 600;
+}
+
+#dit-viewer .dw-head h3 {
+  margin: 0.25rem 0 0.6rem;
+  font-size: 1.12rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+#dit-viewer .dw-stepno {
+  color: var(--dw-green);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 0.62rem;
+}
+
+#dit-viewer .dw-shapes {
+  line-height: 2.2;
+  color: var(--md-default-fg-color--light);
+  padding: 0.5rem 0.65rem;
+  border-left: 3px solid var(--dw-purple);
+  background: var(--md-code-bg-color);
+  border-radius: 0 0.3rem 0.3rem 0;
+}
+
+#dit-viewer code.dw-shape {
+  font-size: 0.66rem;
+  white-space: nowrap;
+}
+
+#dit-viewer .dw-text {
+  max-width: 46rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--dw-border);
+}
+
+#dit-viewer .dw-text p {
+  margin: 0.5rem 0;
+}
+
+#dit-viewer .dw-eq {
+  font-family: var(--md-code-font-family);
+  background: var(--md-code-bg-color);
+  padding: 0.35rem 0.6rem;
+  border-radius: 0.3rem;
+  display: inline-block;
+}
+
+#dit-viewer .dw-stage {
+  margin: 1rem 0;
+  min-width: 0;
+}
+
+#dit-viewer figure.dw-hm {
+  margin: 0;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  max-width: 100%;
+  min-width: 0;
+  padding: 0.5rem;
+  border: 1px solid var(--dw-border);
+  border-radius: 0.4rem;
+  background: var(--md-default-bg-color);
+}
+
+#dit-viewer figure.dw-hm.is-active canvas {
+  outline: 2px solid var(--dw-yellow);
+  outline-offset: 1px;
+}
+
+#dit-viewer figure.dw-hm figcaption {
+  font-size: 0.64rem;
+  color: var(--md-default-fg-color--light);
+  margin: 0 0 0.25rem;
+  max-width: 26rem;
+  font-style: normal;
+  text-align: left;
+  line-height: 1.6;
+}
+
+#dit-viewer .dw-hm-body {
+  display: flex;
+  max-width: 100%;
+  min-width: 0;
+}
+
+#dit-viewer .dw-rowlabels {
+  font-size: 0.56rem;
+  text-align: right;
+  padding-right: 0.3rem;
+  color: var(--md-default-fg-color--light);
+  white-space: nowrap;
+}
+
+#dit-viewer canvas {
+  image-rendering: pixelated;
+  border-radius: 2px;
+  cursor: crosshair;
+  max-width: 100%;
+  height: auto !important;
+  min-width: 0;
+  object-fit: contain;
+  align-self: flex-start;
+}
+
+#dit-viewer .dw-op {
+  align-self: center;
+  font-size: 0.9rem;
+  color: var(--md-default-fg-color--light);
+}
+
+#dit-viewer .dw-chip {
+  align-self: center;
+  border: 1px solid var(--dw-yellow);
+  border-radius: 0.4rem;
+  padding: 0.35rem 0.7rem;
+  text-align: center;
+}
+
+#dit-viewer .dw-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-self: center;
+}
+
+#dit-viewer .dw-slider input {
+  vertical-align: middle;
+  accent-color: var(--dw-green);
+  width: 12rem;
+}
+
+#dit-viewer input[type="range"] {
+  accent-color: var(--dw-green);
+}
+
+#dit-viewer .dw-legend {
+  font-size: 0.62rem;
+}
+
+#dit-viewer .dw-svg {
+  background: var(--md-code-bg-color);
+  border-radius: 0.3rem;
+  max-width: 100%;
+  height: auto;
+}
+
+#dit-viewer .dw-input-info {
+  flex: 1 1 12rem;
+  align-self: center;
+  padding: 0.6rem;
+}
+
+#dit-viewer .dw-input-info h4 {
+  font-size: 1.15rem;
+  margin: 0.4rem 0;
+}
+
+#dit-viewer .dw-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+#dit-viewer .dw-facts span {
+  border: 1px solid var(--dw-border);
+  border-radius: 0.3rem;
+  padding: 0.4rem 0.6rem;
+  font-size: 0.65rem;
+}
+
+#dit-viewer .dw-facts b {
+  display: block;
+  font-size: 0.95rem;
+}
+
+#dit-viewer .dw-detail {
+  box-shadow: none;
+  border: 1px solid var(--dw-border);
+  border-radius: 0.4rem;
+  margin: 0.8rem 0;
+  padding: 0.6rem;
+  font-size: inherit;
+}
+
+#dit-viewer .dw-detail > summary {
+  background: transparent;
+  cursor: pointer;
+  font-weight: 600;
+  margin: 0;
+  padding: 0.1rem;
+}
+
+#dit-viewer .dw-detail > summary::before,
+#dit-viewer .dw-detail > summary::after {
+  display: none;
+}
+
+#dit-viewer .dw-detail > summary::marker {
+  color: var(--dw-green);
+}
+
+#dit-viewer .dw-token-picker {
+  flex: 1;
+  align-self: center;
+  font-size: 0.68rem;
+}
+
+#dit-viewer select {
+  display: block;
+  max-width: 100%;
+  margin-top: 0.35rem;
+  padding: 0.4rem;
+  border: 1px solid var(--dw-border);
+  border-radius: 0.3rem;
+  color: var(--md-default-fg-color);
+  background: var(--md-default-bg-color);
+  font: inherit;
+}
+
+#dit-viewer .dw-caption,
+#dit-viewer .dw-operation-note {
+  font-size: 0.68rem;
+  color: var(--md-default-fg-color--light);
+}
+
+#dit-viewer .dw-tensors {
+  flex-wrap: nowrap;
+}
+
+#dit-viewer .dw-tensors > .dw-hm {
+  flex: 1 1 0;
+  align-self: stretch;
+}
+
+#dit-viewer .dw-scale {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  width: 100%;
+  margin-top: 0.35rem;
+  font-size: 0.5rem;
+  font-family: var(--md-code-font-family);
+}
+
+#dit-viewer .dw-scale-bar {
+  flex: 1;
+  height: 0.2rem;
+  min-width: 1rem;
+  border-radius: 0.15rem;
+}
+
+#dit-viewer .dw-image-note {
+  width: 0;
+  min-width: 100%;
+  margin-top: 0.25rem;
+  font-size: 0.52rem;
+  color: var(--md-default-fg-color--light);
+}
+
+#dit-viewer .dw-status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+@media (max-width: 600px) {
+  #dit-viewer {
+    padding: 0.65rem;
+  }
+
+  #dit-viewer .dw-dots {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  #dit-viewer .dw-dot {
+    font-size: 0.57rem;
+    gap: 0.2rem;
+  }
+
+  #dit-viewer .dw-intro h2 {
+    font-size: 1.25rem;
+  }
+
+  #dit-viewer .dw-op {
+    display: none;
+  }
+
+  #dit-viewer .dw-tensors {
+    flex-direction: column;
+  }
+
+  #dit-viewer .dw-tensors > .dw-hm {
+    flex: auto;
+  }
+
+  #dit-viewer .dw-slider input {
+    max-width: 100%;
+  }
+}
+
+.dw-tip {
+  position: fixed;
+  z-index: 1000;
+  pointer-events: none;
+  display: none;
+  background: var(--md-default-fg-color);
+  color: var(--md-default-bg-color);
+  font-size: 0.62rem;
+  line-height: 1.35;
+  padding: 0.25rem 0.45rem;
+  border-radius: 0.25rem;
+  max-width: 16rem;
+}
