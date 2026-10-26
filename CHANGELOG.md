@@ -7,6 +7,24 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- `deltaflow.expansion`: Active Flow Expansion (ActFlow, De Santi et al.,
+  2026, arXiv:2606.08802), continued pre-training that grows a flow's generable
+  set toward the valid design space of a black-box verifier. Ships
+  `FlowRepresentation` (hidden features `phi_s` of the velocity field at noise
+  level `s`), `KernelUncertainty` (the closed-form Eq. 10 posterior standard
+  deviation, linear or RBF kernel, differentiable), `UncertaintyGuidance` (the
+  Eq. 9 tilt `p * exp(sigma / beta)` as a `Likelihood`, sampled by the existing
+  `PosteriorSolver`), the `ActFlow` round loop (Algorithm 1), and
+  `generable_coverage`. See the new
+  `examples/20-training/04-active-flow-expansion` walkthrough and the
+  **Active Flow Expansion** guide.
+- `deltaflow.losses.SignedReplayFlowMatchingLoss`: accept-attract,
+  reject-repel flow matching `L+ - alpha_t * L-`, with a fixed weight or the
+  paper's gradient-norm calibration of `alpha_t`.
+- `examples/90-showcase/11-active-flow-expansion-viz`: round-by-round
+  self-training vs ActFlow on the annulus toy, with labelled queries,
+  uncertainty maps, coverage curves, and an animated GIF.
+
 - `deltaflow.models.DiT`: a class-conditional Diffusion Transformer velocity
   field with **adaLN-Zero** conditioning (Peebles & Xie, 2023). Ships a reusable
   `TimestepEmbedding`, a `LabelEmbedding` with a learned null token for

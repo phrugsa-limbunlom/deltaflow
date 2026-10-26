@@ -9,7 +9,7 @@ source, run it, and tinker in one sitting.
 |---|---|
 | `00-foundations/` | Core primitives in isolation (the linear interpolant) |
 | `10-sampling/` | ODE sampling from a learned field (Euler flow) |
-| `20-training/` | Flow-matching and delta-alignment training runs |
+| `20-training/` | Flow-matching, delta-alignment, and active flow expansion training runs |
 | `30-inverse/` | Posterior sampling for inverse problems |
 | `90-showcase/` | End-to-end demos and visualizations |
 
@@ -183,6 +183,45 @@ What to notice.
 For a tensor-by-tensor trace of this model (patchify, conditioning, adaLN-Zero
 modulation, attention maps, unpatchify, CFG), see the
 [DiT Walkthrough](concepts/dit.md).
+
+---
+
+## 20 training, active flow expansion
+
+[`examples/20-training/04-active-flow-expansion/main.py`](https://github.com/phrugsa-limbunlom/deltaflow/blob/main/examples/20-training/04-active-flow-expansion/main.py)
+
+A toy version of the 2D experiment in ActFlow (De Santi et al., 2026). The
+valid design space is an annulus, but the pre-training data covers only a
+60 degree arc of it, so the pre-trained flow can generate only that arc.
+`ActFlow` fine-tunes it on self-generated samples labelled by a black-box
+verifier, steering each batch toward the uncertain frontier of what the model
+already reaches. The same loop with the tilt turned off (`beta=math.inf`) is
+the self-training baseline.
+
+```python
+act = ActFlow(
+    field, verifier, torch.optim.Adam(field.parameters(), lr=1e-3),
+    sample_shape=(2,),
+    representation=FlowRepresentation(field, s=0.9, layer="net.3"),
+    uncertainty=KernelUncertainty(kernel="linear", reg=1e-2),
+    loss=SignedReplayFlowMatchingLoss(alpha=0.05, alpha_mode="grad_norm"),
+    beta=0.1, guidance_scale=1.0,
+)
+act.run(n_rounds=20, n_samples=128)
+```
+
+What to notice.
+
+- Self-training stays on the arc (coverage around 0.18). It only reinforces
+  what the model already generates.
+- ActFlow spreads around the ring (coverage around 0.86) while validity stays
+  near 0.77. The acceptance rate drops to about 0.5 because the tilt
+  deliberately queries the frontier, and the rejections become the repulsive
+  term of the signed replay loss.
+- The tilt is just a `Likelihood`. `PosteriorSolver` samples it with the same
+  code path it uses for inverse problems.
+
+See [Active Flow Expansion](guides/active-flow-expansion.md) for the algorithm.
 
 ---
 
@@ -547,4 +586,41 @@ explanation.
 pip install -e ".[dev]" matplotlib
 python examples/90-showcase/10-dit-tensor-viz/main.py
 # artifacts are written to outputs/dit_tensor_viz/ (PNGs and dit_trace.json)
+```
+
+## 90 showcase, active flow expansion
+
+[`examples/90-showcase/11-active-flow-expansion-viz/main.py`](https://github.com/phrugsa-limbunlom/deltaflow/blob/main/examples/90-showcase/11-active-flow-expansion-viz/main.py)
+replays the annulus toy from the [Active Flow Expansion](guides/active-flow-expansion.md)
+guide round by round. A flow pre-trained on a 60 degree arc is fine-tuned for
+20 rounds of 128 verifier queries, once by self-training (`beta=inf`) and once
+by ActFlow (`beta=0.1`), from the same weights.
+
+![Self-training against ActFlow, round by round](assets/active-flow-expansion/expansion.gif)
+
+**Why it matters.** Self-training only re-learns the displacement toward the
+arc it already reaches, so its coverage stays flat. ActFlow tilts each batch
+toward high verifier uncertainty, its queries land beyond the generable set
+(some are rejected, in yellow), and the accepted ones pull the flow around the
+ring.
+
+![Model samples and labelled queries per round](assets/active-flow-expansion/expansion_rounds.png)
+
+The uncertainty \(\sigma_t(\phi_s(x))\) is computed in the flow's own noised
+representation, not in input space. It collapses where queries have been made,
+and the bright frontier marks where the next round samples.
+
+![Verifier uncertainty over rounds](assets/active-flow-expansion/uncertainty_rounds.png)
+
+![Coverage and validity per round](assets/active-flow-expansion/coverage.png)
+
+Validity dips while ActFlow explores (frontier queries are often invalid) and
+recovers as the signed replay loss repels rejected samples.
+
+### Reproduce
+
+```bash
+pip install -e ".[dev]" matplotlib
+python examples/90-showcase/11-active-flow-expansion-viz/main.py
+# artifacts are written to outputs/active_flow_expansion_viz/
 ```
