@@ -131,9 +131,10 @@ Reproduce these figures from the
 | `deltaflow.core` | Abstract base classes every component subclasses |
 | `deltaflow.interpolants` | Probability paths (linear, mini-batch OT, variance-preserving, Schrödinger bridge) |
 | `deltaflow.samplers` / `deltaflow.solvers` | Euler & Heun integration, posterior sampling |
-| `deltaflow.losses` | Flow matching + delta alignment |
+| `deltaflow.losses` | Flow matching, signed replay, delta alignment |
 | `deltaflow.models` | Backbones, EMA, multi-scale projector heads |
 | `deltaflow.inverse` | Measurement operators, Tweedie decomposition, likelihoods |
+| `deltaflow.expansion` | Active Flow Expansion, verifier-guided growth of the generable set |
 | `deltaflow.trainer` | Streaming data, mixed-precision loop, OT coupling |
 | `deltaflow.datasets` | Radiograph dataset wrappers (chest / cephalo / hand) |
 
