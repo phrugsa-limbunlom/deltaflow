@@ -58,6 +58,7 @@ So DeltaFlow implements each component once and lets the method be a configurati
 | **Objective** | how is the field fit to data? | `deltaflow.losses` |
 | **Solver** | which dynamics turn the field into samples? | `deltaflow.solvers` |
 | **Inverse** | how does one measurement steer sampling? | `deltaflow.inverse` |
+| **Expansion** | how does a verifier grow what the model can generate? | `deltaflow.expansion` |
 
 Compose them one way and you have flow matching with an independent coupling. Another way and you have OT-coupled rectified flow. Another and you have posterior sampling for an inverse problem, reusing the very same pretrained field.
 
@@ -91,6 +92,7 @@ The coupling decides which noise becomes which datum. Straighter pairings mean s
 |---|---|
 | `FlowMatchingLoss` / `ConditionalFlowMatchingLoss` | regress $v_\theta(x_t, t)$ onto the path's conditional velocity $u_t$ |
 | `DeltaAlignmentLoss` | align the guidance-difference feature $\Delta h = h_\text{cond} - h_\text{uncond}$ across two views, an anatomy-cancelling representation loss |
+| `SignedReplayFlowMatchingLoss` | flow matching on verifier-accepted samples minus $\alpha_t$ times flow matching on rejected ones, accept to attract and reject to repel |
 
 ### Solvers (`deltaflow.solvers`)
 
@@ -103,6 +105,10 @@ The coupling decides which noise becomes which datum. Straighter pairings mean s
 ### Inverse problems (`deltaflow.inverse`)
 
 Measurement operators (`MaskOperator`, `BlurOperator`, `DownsampleOperator`, `IdentityOperator`), a flow-matching Tweedie decomposition (`LinearTweedie`, `VPTweedie`) that recovers a clean-signal estimate from $(x_t, v_t, t)$, and Gaussian likelihoods (`GaussianLikelihood`) with an optional decoder pullback for the latent-space case.
+
+### Generable-set expansion (`deltaflow.expansion`)
+
+Active Flow Expansion (`ActFlow`) grows the set of designs a pre-trained flow can generate, not just its fit to the data. Each round it reads features $\phi_s$ from the velocity field (`FlowRepresentation`), fits a verifier-uncertainty $\sigma_t$ on them (`KernelUncertainty`), samples the tilt $p_\theta \exp(\sigma_t/\beta)$ through `PosteriorSolver` (`UncertaintyGuidance`), queries a black-box verifier, and fine-tunes with `SignedReplayFlowMatchingLoss`. `generable_coverage` measures the result.
 
 ## Install
 
@@ -254,6 +260,26 @@ solver = PosteriorSolver(
 x = solver.sample(torch.randn(16, 1, 16, 16), n_steps=60)     # posterior samples
 ```
 
+### Active flow expansion
+
+[Active Flow Expansion for Out-of-Distribution Discovery: from Theory to Molecules](https://arxiv.org/abs/2606.08802), De Santi et al. 2026. Grow a pre-trained flow's generable set toward everything a black-box verifier accepts. Each round steers self-generation toward high verifier uncertainty in the flow's own noised representation, then fine-tunes on the accepted (attract) and rejected (repel) samples. On a toy annulus whose training data covers one arc, coverage rises from 0.18 with plain self-training to 0.86 with ActFlow.
+
+```python
+import torch
+from deltaflow.expansion import ActFlow, FlowRepresentation, KernelUncertainty
+from deltaflow.losses import SignedReplayFlowMatchingLoss
+
+act = ActFlow(
+    model, verifier, torch.optim.Adam(model.parameters(), lr=1e-3),
+    sample_shape=(2,),
+    representation=FlowRepresentation(model, s=0.9, layer="net.3"),   # phi_s
+    uncertainty=KernelUncertainty(kernel="linear", reg=1e-2),         # sigma_t, Eq. 10
+    loss=SignedReplayFlowMatchingLoss(alpha=0.05, alpha_mode="grad_norm"),
+    beta=0.1, guidance_scale=1.0,                                     # tilt p * exp(sigma / beta)
+)
+rounds = act.run(n_rounds=20, n_samples=128)
+```
+
 ## Visualizing the algorithm
 
 Beyond the animations above, [`examples/90-showcase/02-sampling-flow-viz/`](https://github.com/phrugsa-limbunlom/deltaflow/tree/main/examples/90-showcase/02-sampling-flow-viz) records every intermediate state of a small MLP field trained on a 2D two-moons target.
@@ -305,7 +331,7 @@ The [`examples/`](https://github.com/phrugsa-limbunlom/deltaflow/tree/main/examp
 |---|---|
 | [`00-foundations/`](https://github.com/phrugsa-limbunlom/deltaflow/tree/main/examples/00-foundations) | work with interpolants and the linear probability path |
 | [`10-sampling/`](https://github.com/phrugsa-limbunlom/deltaflow/tree/main/examples/10-sampling) | integrate a learned field with the Euler and Heun solvers |
-| [`20-training/`](https://github.com/phrugsa-limbunlom/deltaflow/tree/main/examples/20-training) | fit a field with flow matching, OT coupling, and delta alignment |
+| [`20-training/`](https://github.com/phrugsa-limbunlom/deltaflow/tree/main/examples/20-training) | fit a field with flow matching, OT coupling, and delta alignment, and expand it with ActFlow |
 | [`90-showcase/`](https://github.com/phrugsa-limbunlom/deltaflow/tree/main/examples/90-showcase) | study end-to-end demos and the visualizations above, including the [Schrödinger-bridge path and trained sampler](https://github.com/phrugsa-limbunlom/deltaflow/tree/main/examples/90-showcase/05-schrodinger-bridge-viz), the [four-algorithm comparison](https://github.com/phrugsa-limbunlom/deltaflow/tree/main/examples/90-showcase/06-algorithm-comparison), [landmark detection as conditional flow](https://github.com/phrugsa-limbunlom/deltaflow/tree/main/examples/90-showcase/07-landmark-detection), and [guidance-aligned representation pretraining](https://github.com/phrugsa-limbunlom/deltaflow/tree/main/examples/90-showcase/08-guidance-alignment-pretraining) |
 
 ## Development
@@ -434,6 +460,16 @@ DeltaFlow builds on the following work.
   year    = {2024},
   eprint  = {2307.03672},
   url     = {https://arxiv.org/abs/2307.03672},
+}
+```
+
+```bibtex
+@article{desanti2026actflow,
+  title   = {Active Flow Expansion for Out-of-Distribution Discovery: from Theory to Molecules},
+  author  = {De Santi, Riccardo and Lee, Bruce and Perez Jensen, Cristian and Protopapas, Kimon and Tang, Sophia and Liu, Cheng-Hao and Chatterjee, Pranam and Yue, Yisong and Krause, Andreas},
+  year    = {2026},
+  eprint  = {2606.08802},
+  url     = {https://arxiv.org/abs/2606.08802},
 }
 ```
 
