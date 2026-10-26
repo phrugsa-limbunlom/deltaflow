@@ -57,6 +57,7 @@ nav:
       - Delta Alignment: guides/delta-alignment.md
       - Training at Image Scale: guides/training.md
       - Inverse Problems: guides/inverse-problems.md
+      - Active Flow Expansion: guides/active-flow-expansion.md
   - Concepts:
       - Architecture: concepts/architecture.md
       - DiT Walkthrough: concepts/dit.md
@@ -70,6 +71,7 @@ nav:
       - samplers: api/samplers.md
       - models: api/models.md
       - inverse: api/inverse.md
+      - expansion: api/expansion.md
       - trainer: api/trainer.md
       - datasets: api/datasets.md
       - utils: api/utils.md
