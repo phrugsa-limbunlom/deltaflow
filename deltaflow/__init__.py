@@ -27,6 +27,9 @@ Module map:
   ``deltaflow.inverse.__init__`` docstring).
 - `deltaflow.models`, backbone wrappers, EMA, and projector
   heads used by the delta-alignment loss.
+- `deltaflow.expansion`, Active Flow Expansion (ActFlow), verifier-guided
+  continued pre-training that grows the set of designs the flow can generate,
+  built from the solvers and losses above.
 """
 
 from importlib.metadata import PackageNotFoundError, version
