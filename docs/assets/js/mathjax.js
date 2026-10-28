@@ -11,8 +11,16 @@ window.MathJax = {
   },
 };
 
+// MathJax typesets the first page itself during startup. Clearing the output
+// cache at that point drops the CHTML glyph styles and leaves every formula
+// blank, so only re-typeset after Material's instant navigation swaps the page.
+let mathjaxFirstPage = true;
 document$.subscribe(() => {
-  MathJax.startup.output.clearCache();
+  if (mathjaxFirstPage) {
+    mathjaxFirstPage = false;
+    return;
+  }
+  if (!window.MathJax || !MathJax.typesetPromise) return;
   MathJax.typesetClear();
   MathJax.texReset();
   MathJax.typesetPromise();
