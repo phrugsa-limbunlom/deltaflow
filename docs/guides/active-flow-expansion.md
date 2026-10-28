@@ -36,22 +36,28 @@ At round \(t\), with query history \(\mathcal{D}_t = \{(x_i, y_i)\}\),
 1. **Fit uncertainty.** Read features \(\phi_s(x_i)\) from the *current*
    velocity field at noise level \(s\) and fit the verifier uncertainty
    \(\sigma_t\) (Eq. 10),
-   \[
-   \sigma_t^2(x) = k(x, x) - k(x, X_t)\bigl(K_t + \lambda I\bigr)^{-1} k(X_t, x).
-   \]
+
+    $$
+    \sigma_t^2(x) = k(x, x) - k(x, X_t)\bigl(K_t + \lambda I\bigr)^{-1} k(X_t, x).
+    $$
+
 2. **Self-generate.** Sample from the KL-regularised exploration objective
    (Eq. 9),
-   \[
-   \tilde{p}_t = \arg\max_q\; \mathbb{E}_q\bigl[\sigma_t(\phi_s(x))\bigr]
-     - \beta\,\mathrm{KL}(q \,\Vert\, p^{\theta_t}_1)
-   \;\propto\; p^{\theta_t}_1(x)\,\exp\bigl(\sigma_t(\phi_s(x))/\beta\bigr).
-   \]
+
+    $$
+    \tilde{p}_t = \arg\max_q\; \mathbb{E}_q\bigl[\sigma_t(\phi_s(x))\bigr]
+    {}- \beta\,\mathrm{KL}\bigl(q \,\Vert\, p^{\theta_t}_1\bigr)
+    \;\propto\; p^{\theta_t}_1(x)\,\exp\bigl(\sigma_t(\phi_s(x))/\beta\bigr).
+    $$
+
 3. **Query.** \(y_{t+1} = \tilde{v}(x_{t+1})\), append to \(\mathcal{D}_t\).
 4. **Update the flow** with signed replay (Apx. D.1),
-   \[
-   \mathcal{L}^\text{signed}_t = \hat{\mathcal{L}}^{+}_t - \alpha_t\,\hat{\mathcal{L}}^{-}_t,
-   \]
-   where accepted samples attract mass and rejected samples repel it.
+
+    $$
+    \mathcal{L}^\text{signed}_t = \hat{\mathcal{L}}^{+}_t - \alpha_t\,\hat{\mathcal{L}}^{-}_t,
+    $$
+
+    where accepted samples attract mass and rejected samples repel it.
 
 \(\beta \to \infty\) recovers plain self-training. \(\beta \to 0\) is pure
 uncertainty maximisation, which may leave the region where the model prior
