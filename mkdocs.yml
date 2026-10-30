@@ -58,6 +58,7 @@ nav:
       - Training at Image Scale: guides/training.md
       - Inverse Problems: guides/inverse-problems.md
       - Active Flow Expansion: guides/active-flow-expansion.md
+      - Time-Unconditioned Flow Matching: guides/time-unconditioned-fm.md
   - Concepts:
       - Architecture: concepts/architecture.md
       - DiT Walkthrough: concepts/dit.md

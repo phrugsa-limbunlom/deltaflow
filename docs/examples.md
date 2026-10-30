@@ -2,8 +2,8 @@
 
 The repository ships a runnable, tiered curriculum under
 [`examples/`](https://github.com/phrugsa-limbunlom/deltaflow/tree/main/examples).
-Each example runs standalone in well under a minute on CPU, so you can read the
-source, run it, and tinker in one sitting.
+Each example runs standalone in well under a minute on CPU, so the source can be
+read, run, and modified in one sitting.
 
 | Tier | Focus |
 |---|---|
@@ -52,7 +52,7 @@ What to notice.
   equals `x1`. The example asserts both, which is the sanity check every new
   interpolant must pass.
 
-Run it first. Every later tier assumes you have this picture in your head.
+Run it first. Every later tier builds on this picture.
 
 ---
 
@@ -83,7 +83,7 @@ What to notice.
   loop is ordinary regression. Sampling is a separate, later step.
 - `EulerSolver.sample` integrates \(dx/dt = v_\theta(x, t)\) with `n_steps`
   Euler updates. Fewer steps trade accuracy for speed, and straighter paths
-  (see OT coupling) let you cut the count.
+  (see OT coupling) allow fewer steps.
 - The printed sample mean and std should land near the target's, a quick
   numerical check that the field learned the right transport.
 
@@ -117,7 +117,7 @@ interpolant options.
 [`examples/20-training/02-delta-alignment/main.py`](https://github.com/phrugsa-limbunlom/deltaflow/blob/main/examples/20-training/02-delta-alignment/main.py)
 
 Delta alignment is the representation-learning half of the library. This example
-fits `DeltaAlignmentLoss` on synthetic multi-level feature maps, so you can see
+fits `DeltaAlignmentLoss` on synthetic multi-level feature maps, which shows
 the API without wiring a full conditional backbone.
 
 ```python
@@ -255,7 +255,7 @@ What to notice.
 - `PosteriorSolver` wraps the *same* Euler solver used for unconditional
   sampling. It injects a measurement-likelihood gradient per step rather than
   re-implementing integration.
-- The reported observed-region MSE lets you compare the two coupling strategies
+- The reported observed-region MSE compares the two coupling strategies
   on the reconstruction task.
 - The point is API wiring, not image quality. The dataset is synthetic and the
   backbone is deliberately tiny.
@@ -623,4 +623,41 @@ recovers as the signed replay loss repels rejected samples.
 pip install -e ".[dev]" matplotlib
 python examples/90-showcase/11-active-flow-expansion-viz/main.py
 # artifacts are written to outputs/active_flow_expansion_viz/
+```
+
+## 90 showcase, time-unconditioned flow matching
+
+[`examples/90-showcase/12-time-unconditioned-fm-viz/main.py`](https://github.com/phrugsa-limbunlom/deltaflow/blob/main/examples/90-showcase/12-time-unconditioned-fm-viz/main.py)
+compares a time-conditioned velocity field \(v(x, t)\)
+(`ConditionalFlowMatchingLoss`) with a time-blind one \(v(x)\)
+(`TimeUnconditionedFlowMatchingLoss` + `TimeBlindVelocityField`) on two-moons,
+following [arXiv:2605.08344](https://arxiv.org/abs/2605.08344).
+
+![Training loss, conditioned vs time-blind](assets/time-unconditioned-fm/loss_curves.png)
+
+![Samples from both models](assets/time-unconditioned-fm/samples.png)
+
+![Sampling from noise, conditioned vs time-blind](assets/time-unconditioned-fm/samples.gif)
+
+**Caveat.** In 2D the data fills the whole space, so time is not identifiable
+from \(x_t\) and the time-blind model is visibly worse. The paper's claim is
+about high dimensions.
+
+**Why it works in high dimensions.** When data lies near a \(k\)-dimensional
+subspace of \(\mathbb{R}^d\), the directions orthogonal to the data carry only
+noise scaled by \((1-t)\), so \(t\) can be read off a single \(x_t\) with error
+\(O(1/\sqrt{d-k})\). The
+[Time-Unconditioned Flow Matching](guides/time-unconditioned-fm.md) guide walks
+through this geometry step by step.
+
+![x_t collapsing onto the data plane](assets/time-unconditioned-fm/geometry_3d.gif)
+
+![Time recovered from a single noisy observation](assets/time-unconditioned-fm/time_identifiability.png)
+
+### Reproduce
+
+```bash
+pip install -e ".[dev]" matplotlib
+python examples/90-showcase/12-time-unconditioned-fm-viz/main.py
+# artifacts are written to outputs/time_unconditioned_fm_viz/
 ```

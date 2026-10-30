@@ -69,6 +69,25 @@ class WrappedBackbone(BaseVelocityField):
         return self.backbone(x, t_, **cond)
 
 
+class TimeBlindVelocityField(BaseVelocityField):
+    """Velocity field that never sees the interpolation time.
+
+    Wraps a network ``net(x, **cond) -> velocity`` and accepts (then discards)
+    ``t`` so it stays compatible with the solvers, which always call
+    ``model(x, t)``. See `TimeUnconditionedFlowMatchingLoss`.
+
+    Args:
+        backbone: network called as ``backbone(x, **cond)``.
+    """
+
+    def __init__(self, backbone: nn.Module):
+        super().__init__()
+        self.backbone = backbone
+
+    def forward(self, x: torch.Tensor, t=None, **cond) -> torch.Tensor:
+        return self.backbone(x, **cond)
+
+
 class TinyVelocityField(BaseVelocityField):
     """A tiny convolutional velocity field for tests and toy runs.
 
@@ -106,4 +125,4 @@ class TinyVelocityField(BaseVelocityField):
         return self.net(h)
 
 
-__all__ = ["TinyVelocityField", "WrappedBackbone"]
+__all__ = ["TimeBlindVelocityField", "TinyVelocityField", "WrappedBackbone"]

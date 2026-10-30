@@ -7,6 +7,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- `deltaflow.losses.TimeUnconditionedFlowMatchingLoss` and
+  `deltaflow.models.TimeBlindVelocityField`: time-blind flow matching
+  (arXiv:2605.08344), where the model never receives the interpolation time.
+  New **Time-Unconditioned Flow Matching** guide explains why time is
+  recoverable from `x_t` in high dimensions, with the
+  `examples/90-showcase/12-time-unconditioned-fm-viz` figures.
+
 - `deltaflow.expansion`: Active Flow Expansion (ActFlow, De Santi et al.,
   2026, arXiv:2606.08802), continued pre-training that grows a flow's generable
   set toward the valid design space of a black-box verifier. Ships
