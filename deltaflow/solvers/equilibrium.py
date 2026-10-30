@@ -106,7 +106,7 @@ class EquilibriumSolver(BaseSolver):
         steps = tqdm(
             range(n_steps), desc=type(self).__name__, leave=False, disable=not show_progress
         )
-        m = torch.zeros_like(x)
+        m = torch.zeros_like(x)  # Nesterov momentum buffer
         for _ in steps:
             if mu != 0.0:
                 x_look = x + eta * mu * m
