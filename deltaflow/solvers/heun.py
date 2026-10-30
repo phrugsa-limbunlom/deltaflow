@@ -26,16 +26,11 @@ class HeunSolver(BaseSolver):
     samplers.
     """
 
-    @torch.no_grad()
     def step(self, x: torch.Tensor, t: float, dt: float, **cond) -> torch.Tensor:
-        k1 = self._eval_velocity(x, t, **cond)
+        k1 = self.velocity(x, t, **cond)
         x_pred = x + dt * k1
-        k2 = self._eval_velocity(x_pred, t + dt, **cond)
+        k2 = self.velocity(x_pred, t + dt, **cond)
         return x + 0.5 * dt * (k1 + k2)
-
-    def sample(self, *args, **kwargs) -> torch.Tensor:
-        kwargs.setdefault("progress_desc", "HeunSolver")
-        return super().sample(*args, **kwargs)
 
 
 __all__ = ["HeunSolver"]
