@@ -72,10 +72,9 @@ class EquilibriumMatchingLoss(BaseLoss):
         self.loss_type = loss_type
 
     def __call__(self, model, x1: torch.Tensor, **cond) -> torch.Tensor:
+        x0 = None
         if self.coupling is not None:
             x0, x1 = self.coupling.sample_pair(x1)
-        else:
-            x0 = None
         gamma = torch.rand(x1.shape[0], device=x1.device)
         x_gamma, target = self.interpolant.interpolate(x1, gamma, x0=x0)
         # gamma is implicit and there is no time: the field is queried as f(x).

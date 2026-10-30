@@ -59,10 +59,9 @@ class ConditionalFlowMatchingLoss(BaseLoss):
         self.time_scale = time_scale
 
     def __call__(self, model, x1: torch.Tensor, **cond) -> torch.Tensor:
+        x0 = None
         if self.coupling is not None:
             x0, x1 = self.coupling.sample_pair(x1)
-        else:
-            x0 = None
         t = torch.rand(x1.shape[0], device=x1.device)
         x_t, target_v = self.interpolant.interpolate(x1, t, x0=x0)
         pred_v = model(x_t, t * self.time_scale, **cond)
