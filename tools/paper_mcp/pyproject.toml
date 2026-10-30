@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "deltaflow-paper-mcp"
+version = "0.1.0"
+description = "MCP server that turns a research paper into a deltaflow GitHub issue."
+requires-python = ">=3.10"
+dependencies = [
+    "mcp>=2,<3",
+    "pypdf>=4",
+    "truststore>=0.9",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7"]
+
+[project.scripts]
+deltaflow-paper-mcp = "paper_mcp.server:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+paper_mcp = ["blueprint.md"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.black]
+line-length = 100
+
+[tool.isort]
+profile = "black"
+line_length = 100

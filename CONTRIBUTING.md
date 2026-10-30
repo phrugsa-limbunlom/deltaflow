@@ -73,6 +73,14 @@ abstraction into `core`) rather than importing across.
 Then add the new name to the matching `docs/api/*.md` page and to
 `CHANGELOG.md` under *Unreleased*.
 
+### Turning a paper into an issue
+
+New methods usually start from a research paper. The MCP server in
+[`tools/paper_mcp`](tools/paper_mcp/README.md) reads an arXiv paper or local
+PDF and opens a GitHub issue that follows a fixed blueprint (summary, key idea,
+proposed API, math, task checklist, tests, docs). It is a separate package and
+is not part of `deltaflow`.
+
 ## Before opening a PR
 
 ```bash
