@@ -118,7 +118,4 @@ class EquilibriumSolver(BaseSolver):
         return x
 
 
-# Descriptive alias for the vanilla (momentum-free) sampler.
-GradientDescentSolver = EquilibriumSolver
-
-__all__ = ["EquilibriumSolver", "GradientDescentSolver"]
+__all__ = ["EquilibriumSolver"]
