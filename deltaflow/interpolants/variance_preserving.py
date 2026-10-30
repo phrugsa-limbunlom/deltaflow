@@ -22,6 +22,7 @@ from typing import Optional, Tuple
 import torch
 
 from ..core.base_interpolant import BaseInterpolant
+from ..utils.tensor import broadcast_time
 
 
 class VariancePreservingInterpolant(BaseInterpolant):
@@ -60,7 +61,7 @@ class VariancePreservingInterpolant(BaseInterpolant):
     ) -> Tuple[torch.Tensor, torch.Tensor]:
         if x0 is None:
             x0 = torch.randn_like(x1)
-        t_ = t.view(-1, *([1] * (x1.dim() - 1)))
+        t_ = broadcast_time(t, x1)
         half_pi = 0.5 * math.pi
         alpha = torch.sin(half_pi * t_)
         sigma = torch.cos(half_pi * t_)

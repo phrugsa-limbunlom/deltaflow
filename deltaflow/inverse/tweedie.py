@@ -20,13 +20,7 @@ from typing import Tuple, Union
 
 import torch
 
-
-def _broadcast_time(t: Union[float, torch.Tensor], x: torch.Tensor) -> torch.Tensor:
-    if isinstance(t, torch.Tensor):
-        if t.dim() == 0:
-            return t
-        return t.view(-1, *([1] * (x.dim() - 1)))
-    return torch.tensor(t, device=x.device, dtype=x.dtype)
+from ..utils.tensor import broadcast_time
 
 
 class BaseTweedie(ABC):
@@ -59,7 +53,7 @@ class LinearTweedie(BaseTweedie):
     """
 
     def decompose(self, x_t, v_t, t):
-        t_ = _broadcast_time(t, x_t)
+        t_ = broadcast_time(t, x_t)
         x_clean = x_t + (1.0 - t_) * v_t
         x_noise = x_t - t_ * v_t
         return x_clean, x_noise
@@ -81,10 +75,9 @@ class VPTweedie(BaseTweedie):
     """
 
     def decompose(self, x_t, v_t, t):
-        t_ = _broadcast_time(t, x_t)
-        half_pi = 0.5 * math.pi
-        alpha = torch.sin(half_pi * t_) if isinstance(t_, torch.Tensor) else math.sin(half_pi * float(t_))
-        sigma = torch.cos(half_pi * t_) if isinstance(t_, torch.Tensor) else math.cos(half_pi * float(t_))
+        t_ = broadcast_time(t, x_t)
+        alpha = torch.sin(0.5 * math.pi * t_)
+        sigma = torch.cos(0.5 * math.pi * t_)
         two_over_pi = 2.0 / math.pi
         x_clean = alpha * x_t + two_over_pi * sigma * v_t
         x_noise = sigma * x_t - two_over_pi * alpha * v_t
