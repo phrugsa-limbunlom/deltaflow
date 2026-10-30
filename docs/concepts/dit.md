@@ -121,9 +121,9 @@ summed, so `c` is one `(D,)` vector per image. The bottom-right panel isolates
 Each block maps `c` through `SiLU` and a `Linear(D, 6D)` and splits the result
 into six `(D,)` vectors. Each sub-layer (attention, then MLP) applies
 
-\[
+$$
 h \leftarrow h + \text{gate} \odot \text{sublayer}\big(\text{LN}(h)\,(1 + \text{scale}) + \text{shift}\big).
-\]
+$$
 
 The vectors are unsqueezed to `(B, 1, D)`, so **the same values apply to all
 16 tokens**. Conditioning changes how each channel is normalised and how much of
@@ -155,9 +155,9 @@ This differs from the channel-first patch layout at the input.
 `_unpatchify` reshapes to
 `(B, n, n, p, p, C)` and the einsum `bhwpqc -> bchpwq` interleaves grid and
 in-patch indices back into `(B, C, H, W)`. The prediction regresses the
-flow-matching target, the displacement \(\Delta = x_1 - x_0\) between the noise
+flow-matching target, the displacement $\Delta = x_1 - x_0$ between the noise
 and data distributions. Following it for the remaining time,
-\(x_t + (1 - t)\,v\), estimates the clean RGB image.
+$x_t + (1 - t)\,v$, estimates the clean RGB image.
 
 ## 6. What the label does, and classifier-free guidance
 
@@ -169,9 +169,9 @@ green top and `y = 1` to a green bottom. The null token points to a
 blend of the two classes. Classifier-free guidance
 (Ho & Salimans, 2022) extrapolates away from that blend,
 
-\[
+$$
 v_\text{cfg} = v_\text{null} + s\,\big(v_\text{cond} - v_\text{null}\big),
-\]
+$$
 
 and `DiT.forward_with_cfg` computes both terms in one batched forward pass.
 

@@ -7,20 +7,20 @@ assigns them negligible probability and never generates them.
 
 Active Flow Expansion (ActFlow, De Santi et al., 2026,
 [arXiv:2606.08802](https://arxiv.org/abs/2606.08802)) changes the goal from
-matching \(p_\text{data}\) to growing the model's **generable set**,
+matching $p_\text{data}$ to growing the model's **generable set**,
 
-\[
+$$
 \Omega^\tau_\theta = \{x : p^\theta_1(x) \ge \tau\},
-\]
+$$
 
-until it covers as much of the valid design space \(\Omega^*\) as possible.
+until it covers as much of the valid design space $\Omega^*$ as possible.
 Validity is judged by a black-box **verifier**, which can only be queried on
 designs the model can already generate. Expansion is therefore recursive.
 Each round, the model generates queries, the verifier labels them, and the
 model is fine-tuned on the result.
 
 In DeltaFlow's displacement view, plain self-training keeps re-learning the
-displacement \(\Delta\) toward modes the flow already reaches. ActFlow chooses
+displacement $\Delta$ toward modes the flow already reaches. ActFlow chooses
 *which* endpoints the field is retrained to reach, so the learned transport
 extends into new valid regions.
 
@@ -31,11 +31,11 @@ walks through this comparison and the uncertainty maps behind it.
 
 ## Algorithm
 
-At round \(t\), with query history \(\mathcal{D}_t = \{(x_i, y_i)\}\),
+At round $t$, with query history $\mathcal{D}_t = \{(x_i, y_i)\}$,
 
-1. **Fit uncertainty.** Read features \(\phi_s(x_i)\) from the *current*
-   velocity field at noise level \(s\) and fit the verifier uncertainty
-   \(\sigma_t\) (Eq. 10),
+1. **Fit uncertainty.** Read features $\phi_s(x_i)$ from the *current*
+   velocity field at noise level $s$ and fit the verifier uncertainty
+   $\sigma_t$ (Eq. 10),
 
     $$
     \sigma_t^2(x) = k(x, x) - k(x, X_t)\bigl(K_t + \lambda I\bigr)^{-1} k(X_t, x).
@@ -50,7 +50,7 @@ At round \(t\), with query history \(\mathcal{D}_t = \{(x_i, y_i)\}\),
     \;\propto\; p^{\theta_t}_1(x)\,\exp\bigl(\sigma_t(\phi_s(x))/\beta\bigr).
     $$
 
-3. **Query.** \(y_{t+1} = \tilde{v}(x_{t+1})\), append to \(\mathcal{D}_t\).
+3. **Query.** $y_{t+1} = \tilde{v}(x_{t+1})$, append to $\mathcal{D}_t$.
 4. **Update the flow** with signed replay (Apx. D.1),
 
     $$
@@ -59,7 +59,7 @@ At round \(t\), with query history \(\mathcal{D}_t = \{(x_i, y_i)\}\),
 
     where accepted samples attract mass and rejected samples repel it.
 
-\(\beta \to \infty\) recovers plain self-training. \(\beta \to 0\) is pure
+$\beta \to \infty$ recovers plain self-training. $\beta \to 0$ is pure
 uncertainty maximisation, which may leave the region where the model prior
 still gives a useful validity bias.
 
@@ -69,17 +69,17 @@ Each step is a separate, swappable DeltaFlow component.
 
 | Step | Component | Notes |
 |---|---|---|
-| \(\phi_s\) | `FlowRepresentation` | hooks any sub-module of the velocity field, pools tokens or feature maps |
-| \(\sigma_t\) | `KernelUncertainty` | linear (paper default) or RBF kernel, differentiable, automatic primal form when \(t > D\) |
-| tilt | `UncertaintyGuidance` | exposes \(\exp(\sigma_t/\beta)\) as a `Likelihood`, so `PosteriorSolver` samples it |
-| update | `SignedReplayFlowMatchingLoss` | fixed \(\alpha\), or the paper's gradient-norm calibration |
+| $\phi_s$ | `FlowRepresentation` | hooks any sub-module of the velocity field, pools tokens or feature maps |
+| $\sigma_t$ | `KernelUncertainty` | linear (paper default) or RBF kernel, differentiable, automatic primal form when $t > D$ |
+| tilt | `UncertaintyGuidance` | exposes $\exp(\sigma_t/\beta)$ as a `Likelihood`, so `PosteriorSolver` samples it |
+| update | `SignedReplayFlowMatchingLoss` | fixed $\alpha$, or the paper's gradient-norm calibration |
 | loop | `ActFlow` | Algorithm 1, buffers, warm-up, per-round summaries |
 | metric | `generable_coverage` | histogram coverage and validity for 2D problems |
 
 The tilt reuses the posterior-sampling machinery. Sampling
-\(p_\theta \exp(\sigma/\beta)\) is a posterior problem with
-\(\exp(\sigma/\beta)\) in place of a measurement likelihood, so
-`PosteriorSolver` applies \(\nabla \sigma_t(\phi_s(\hat{x}_1)) / \beta\) on the
+$p_\theta \exp(\sigma/\beta)$ is a posterior problem with
+$\exp(\sigma/\beta)$ in place of a measurement likelihood, so
+`PosteriorSolver` applies $\nabla \sigma_t(\phi_s(\hat{x}_1)) / \beta$ on the
 Tweedie estimate at every step, exactly as it does for inverse problems (see
 [Inverse Problems](inverse-problems.md)).
 
@@ -107,15 +107,15 @@ for r in act.run(n_rounds=20, n_samples=128):
 
 ## Practical notes
 
-- **Feature level \(s\).** The paper's ablation finds features read close to
-  the data end work best, but not at it. The default is \(s = 0.9\).
+- **Feature level $s$.** The paper's ablation finds features read close to
+  the data end work best, but not at it. The default is $s = 0.9$.
 - **Tilt strength.** The effective per-step push is
-  \(\eta / \beta \cdot \nabla \sigma\), with \(\eta\) the `guidance_scale`.
-  With L2-normalised features the linear-kernel \(\sigma\) is small, so
-  \(\eta\) usually needs to be of order one. Watch the acceptance rate. If it
-  collapses, the tilt is leaving the valid region, so raise \(\beta\).
-- **Repulsion.** \(\alpha = 0\) (flow matching on accepted samples only) is
-  often enough. With `alpha_mode="grad_norm"`, \(\alpha\) is the fraction of
+  $\eta / \beta \cdot \nabla \sigma$, with $\eta$ the `guidance_scale`.
+  With L2-normalised features the linear-kernel $\sigma$ is small, so
+  $\eta$ usually needs to be of order one. Watch the acceptance rate. If it
+  collapses, the tilt is leaving the valid region, so raise $\beta$.
+- **Repulsion.** $\alpha = 0$ (flow matching on accepted samples only) is
+  often enough. With `alpha_mode="grad_norm"`, $\alpha$ is the fraction of
   the accepted-sample gradient norm given to the rejected-sample term, which
   keeps the unbounded repulsive loss under control.
 - **Other uncertainty models.** Subclass `BaseUncertainty` (for example a

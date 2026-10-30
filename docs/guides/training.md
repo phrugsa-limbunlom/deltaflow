@@ -30,13 +30,13 @@ train(model, loss_fn, loader, optimizer, config)
 
 ## Coupling strategies
 
-At train time each minibatch pairs data samples \(x_1\) with noise \(x_0\).
+At train time each minibatch pairs data samples $x_1$ with noise $x_0$.
 The pairing is pluggable:
 
 | Coupling | Behaviour |
 |---|---|
 | `IndependentCoupling` | Pairs noise and data independently (standard flow matching) |
-| `OTCoupling` | Solves a mini-batch OT assignment so paired \((x_0, x_1)\) are close, yielding straighter flows |
+| `OTCoupling` | Solves a mini-batch OT assignment so paired $(x_0, x_1)$ are close, yielding straighter flows |
 
 `OTCoupling` uses the Hungarian algorithm by default (`scipy` is a core
 dependency), falling back to a greedy nearest-neighbour matcher only if
