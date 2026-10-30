@@ -24,9 +24,6 @@ from ..core.base_interpolant import BaseInterpolant
 from ..utils.ot import batch_ot_permutation
 from .linear import LinearInterpolant
 
-# Backward-compat alias: the implementation now lives in ``deltaflow.utils.ot``.
-_batch_ot_permutation = batch_ot_permutation
-
 
 class OTInterpolant(BaseInterpolant):
     r"""Linear probability path with mini-batch optimal-transport coupling.

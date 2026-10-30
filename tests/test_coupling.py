@@ -8,19 +8,6 @@ from deltaflow.utils.ot import batch_ot_permutation
 from tests.conftest import DummyVelocityField
 
 
-def test_batch_ot_permutation_moved_to_utils_with_alias():
-    """The OT assignment primitive now lives in ``deltaflow.utils.ot``.
-
-    The private name kept in ``deltaflow.interpolants.ot`` must remain a
-    backward-compatible alias for the public ``batch_ot_permutation``.
-    """
-    from deltaflow.interpolants.ot import _batch_ot_permutation
-    from deltaflow.utils import batch_ot_permutation as reexported
-
-    assert _batch_ot_permutation is batch_ot_permutation
-    assert reexported is batch_ot_permutation
-
-
 def test_batch_ot_permutation_returns_valid_permutation():
     torch.manual_seed(0)
     x0 = torch.randn(5, 3, 4, 4)
