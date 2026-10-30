@@ -5,6 +5,7 @@ from typing import Optional, Tuple
 import torch
 
 from ..core.base_equilibrium_interpolant import BaseEquilibriumInterpolant
+from ..utils.tensor import broadcast_time
 
 
 class EquilibriumInterpolant(BaseEquilibriumInterpolant):
@@ -115,7 +116,7 @@ class EquilibriumInterpolant(BaseEquilibriumInterpolant):
     ) -> Tuple[torch.Tensor, torch.Tensor]:
         if x0 is None:
             x0 = torch.randn_like(x1)
-        gamma = gamma.view(-1, *([1] * (x1.dim() - 1)))
+        gamma = broadcast_time(gamma, x1)
         x_gamma = (1 - gamma) * x0 + gamma * x1
         target_v = self.equilibrium_coefficient(gamma) * (x1 - x0)
         return x_gamma, target_v

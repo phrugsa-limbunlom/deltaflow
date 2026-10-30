@@ -48,6 +48,7 @@ from typing import Optional, Tuple
 import torch
 
 from ..core.base_interpolant import BaseInterpolant
+from ..utils.tensor import broadcast_time
 
 
 class SchrodingerBridgeInterpolant(BaseInterpolant):
@@ -121,7 +122,7 @@ class SchrodingerBridgeInterpolant(BaseInterpolant):
     ) -> Tuple[torch.Tensor, torch.Tensor]:
         if x0 is None:
             x0 = torch.randn_like(x1)
-        t_ = t.view(-1, *([1] * (x1.dim() - 1)))
+        t_ = broadcast_time(t, x1)
 
         mean = (1 - t_) * x0 + t_ * x1
         var = t_ * (1 - t_)
