@@ -35,7 +35,7 @@
 <p align="center">
   <img src="https://raw.githubusercontent.com/phrugsa-limbunlom/deltaflow/main/docs/assets/sampling-flow/flow.gif" alt="A learned velocity field transporting noise onto a two-moons distribution" width="480"/>
   <br>
-  <em>A learned field integrated from noise onto data with <code>FlowSampler</code>.</em>
+  <em>A learned field integrated from noise onto data with <code>EulerSolver</code>.</em>
 </p>
 
 ## What is DeltaFlow?
@@ -90,7 +90,7 @@ The coupling decides which noise becomes which datum. Straighter pairings mean s
 
 | Objective | Idea |
 |---|---|
-| `FlowMatchingLoss` / `ConditionalFlowMatchingLoss` | regress $v_\theta(x_t, t)$ onto the path's conditional velocity $u_t$ |
+| `ConditionalFlowMatchingLoss` | regress $v_\theta(x_t, t)$ onto the path's conditional velocity $u_t$ |
 | `DeltaAlignmentLoss` | align the guidance-difference feature $\Delta h = h_\text{cond} - h_\text{uncond}$ across two views, an anatomy-cancelling representation loss |
 | `SignedReplayFlowMatchingLoss` | flow matching on verifier-accepted samples minus $\alpha_t$ times flow matching on rejected ones, accept to attract and reject to repel |
 
@@ -98,7 +98,7 @@ The coupling decides which noise becomes which datum. Straighter pairings mean s
 
 | Solver | Dynamics |
 |---|---|
-| `EulerSolver` (`FlowSampler`) | first-order explicit Euler integration of the flow ODE |
+| `EulerSolver` | first-order explicit Euler integration of the flow ODE |
 | `HeunSolver` | second-order Heun integration, more accurate at low step counts |
 | `PosteriorSolver` | wraps any base solver and injects a measurement-likelihood gradient per step |
 
@@ -137,14 +137,14 @@ Each block below is one method, in as few lines as it takes. Annotated, full-sca
 ```python
 import torch
 from deltaflow.interpolants import LinearInterpolant
-from deltaflow.losses import FlowMatchingLoss
-from deltaflow.samplers import FlowSampler
+from deltaflow.losses import ConditionalFlowMatchingLoss
+from deltaflow.solvers import EulerSolver
 
-loss_fn = FlowMatchingLoss(interpolant=LinearInterpolant())
+loss_fn = ConditionalFlowMatchingLoss(interpolant=LinearInterpolant())
 loss = loss_fn(model, x1)                        # model(x_t, t) -> predicted velocity
 loss.backward()
 
-samples = FlowSampler(model).sample(torch.randn(1000, 2), n_steps=50)
+samples = EulerSolver(model).sample(torch.randn(1000, 2), n_steps=50)
 ```
 
 ### Optimal-transport couplings
@@ -171,9 +171,9 @@ loss = loss_fn(model, x1)
 
 ```python
 from deltaflow.interpolants import VariancePreservingInterpolant
-from deltaflow.losses import FlowMatchingLoss
+from deltaflow.losses import ConditionalFlowMatchingLoss
 
-loss_fn = FlowMatchingLoss(interpolant=VariancePreservingInterpolant())
+loss_fn = ConditionalFlowMatchingLoss(interpolant=VariancePreservingInterpolant())
 loss = loss_fn(model, x1)
 ```
 

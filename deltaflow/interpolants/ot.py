@@ -10,10 +10,8 @@ optimal transport" (arXiv:2302.00482), and the OT-vs-independent ablation
 in "Flower: A Flow-Matching Solver for Inverse Problems" (arXiv:2509.26287)
 for the sampling side.
 
-Exact optimal assignment (Hungarian algorithm) is used by default, since
-``scipy`` is a core dependency. A deterministic greedy nearest-neighbour
-fallback is used only if ``scipy`` is unavailable in the environment. This
-is a coupling strategy, not a new probability path, the same
+Pairs are matched with an exact optimal assignment (Hungarian algorithm via
+``scipy``). This is a coupling strategy, not a new probability path, the same
 straight-line ``x_t = (1-t) x0 + t x1`` interpolation is applied after
 permuting.
 """
@@ -25,9 +23,6 @@ import torch
 from ..core.base_interpolant import BaseInterpolant
 from ..utils.ot import batch_ot_permutation
 from .linear import LinearInterpolant
-
-# Backward-compat alias: the implementation now lives in ``deltaflow.utils.ot``.
-_batch_ot_permutation = batch_ot_permutation
 
 
 class OTInterpolant(BaseInterpolant):
@@ -60,9 +55,8 @@ class OTInterpolant(BaseInterpolant):
     objective is identical to standard conditional flow matching and no other
     component (loss, solver, model) needs to change.
 
-    **Solver.** The exact assignment (Hungarian algorithm) is used by
-    default, since ``scipy`` is a core dependency. A deterministic greedy
-    nearest-neighbour fallback is used only if ``scipy`` is unavailable.
+    **Solver.** Pairs are matched with the exact assignment (Hungarian
+    algorithm, via ``scipy``).
 
     References:
         Tong et al., "Improving and generalizing flow-based generative

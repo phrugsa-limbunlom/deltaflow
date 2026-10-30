@@ -43,9 +43,10 @@ data.**
 ### `BaseSolver`
 
 Holds a `model` reference and a `time_scale`. `step()` is the per-step rule,
-while `sample()` loops it from `t_start` to `t_end`. `_eval_velocity` multiplies `t`
-by `time_scale` before calling the model, so a backbone trained with a
-different numeric time convention still integrates correctly.
+while `sample()` loops it from `t_start` to `t_end` under `torch.no_grad()`.
+`velocity(x, t)` multiplies `t` by `time_scale` before calling the model, so a
+backbone trained with a different numeric time convention still integrates
+correctly.
 
 ### `BaseLoss`
 
@@ -68,8 +69,7 @@ Three patterns are best understood by reading across modules:
 ## Conventions
 
 - Import bases from `deltaflow.core` (e.g.
-  `from deltaflow.core import BaseVelocityField`). The modules
-  `core/base.py` and `interpolants/base.py` are backward-compat shims.
+  `from deltaflow.core import BaseVelocityField`).
 - Use the numerical helpers in [`deltaflow.utils`](../api/utils.md)
   (`safe_normalize`, `safe_sqrt`, `clamp_*`) in loss/feature math. They keep
   FP16/BF16 autocast from producing NaN/Inf.

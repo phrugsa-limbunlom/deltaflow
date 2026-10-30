@@ -6,8 +6,8 @@ Fit a toy flow-matching model and draw samples in a few lines.
 import torch
 import torch.nn as nn
 from deltaflow.core import BaseVelocityField
-from deltaflow.losses import FlowMatchingLoss
-from deltaflow.samplers import FlowSampler
+from deltaflow.losses import ConditionalFlowMatchingLoss
+from deltaflow.solvers import EulerSolver
 
 
 class MLPVelocityField(BaseVelocityField):
@@ -22,7 +22,7 @@ class MLPVelocityField(BaseVelocityField):
 
 
 field = MLPVelocityField()
-loss_fn = FlowMatchingLoss()
+loss_fn = ConditionalFlowMatchingLoss()
 opt = torch.optim.Adam(field.parameters(), lr=1e-3)
 
 data = torch.randn(2000, 2)
@@ -33,12 +33,12 @@ for _ in range(300):
     loss.backward()
     opt.step()
 
-samples = FlowSampler(field).sample(torch.randn(1000, 2), n_steps=50)  # (2)!
+samples = EulerSolver(field).sample(torch.randn(1000, 2), n_steps=50)  # (2)!
 ```
 
-1. `FlowMatchingLoss` samples a time `t`, builds `x_t` from the interpolant,
+1. `ConditionalFlowMatchingLoss` samples a time `t`, builds `x_t` from the interpolant,
    and regresses `field(x_t, t)` onto the conditional target velocity.
-2. `FlowSampler` integrates `dx/dt = field(x, t)` with Euler from `t=0`
+2. `EulerSolver` integrates `dx/dt = field(x, t)` with Euler from `t=0`
    (noise) to `t=1` (data).
 
 !!! tip "Time convention"

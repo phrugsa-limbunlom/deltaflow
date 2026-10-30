@@ -1,16 +1,14 @@
 """Equilibrium Matching loss (energy-compatible target, time-invariant field)."""
 
-from typing import TYPE_CHECKING, Optional
+from typing import Optional
 
 import torch
-import torch.nn.functional as F
 
+from ..core.base_coupling import BaseCoupling
 from ..core.base_equilibrium_interpolant import BaseEquilibriumInterpolant
 from ..core.base_loss import BaseLoss
 from ..interpolants.equilibrium import EquilibriumInterpolant
-
-if TYPE_CHECKING:
-    from ..trainer.coupling import BaseCoupling
+from ._reduction import regression_loss
 
 
 class EquilibriumMatchingLoss(BaseLoss):
@@ -66,32 +64,22 @@ class EquilibriumMatchingLoss(BaseLoss):
     def __init__(
         self,
         interpolant: Optional[BaseEquilibriumInterpolant] = None,
-        coupling: Optional["BaseCoupling"] = None,
+        coupling: Optional[BaseCoupling] = None,
         loss_type: str = "l2",
     ):
         self.interpolant = interpolant or EquilibriumInterpolant()
         self.coupling = coupling
         self.loss_type = loss_type
 
-    def _reduce(self, target: torch.Tensor, pred: torch.Tensor) -> torch.Tensor:
-        if self.loss_type == "l1":
-            return F.l1_loss(target, pred)
-        if self.loss_type == "l2":
-            return F.mse_loss(target, pred)
-        if self.loss_type == "huber":
-            return F.smooth_l1_loss(target, pred)
-        raise NotImplementedError(f"Unknown loss_type: {self.loss_type!r}")
-
     def __call__(self, model, x1: torch.Tensor, **cond) -> torch.Tensor:
+        x0 = None
         if self.coupling is not None:
             x0, x1 = self.coupling.sample_pair(x1)
-        else:
-            x0 = None
         gamma = torch.rand(x1.shape[0], device=x1.device)
         x_gamma, target = self.interpolant.interpolate(x1, gamma, x0=x0)
         # gamma is implicit and there is no time: the field is queried as f(x).
         pred = model(x_gamma, **cond)
-        return self._reduce(target, pred)
+        return regression_loss(pred, target, self.loss_type)
 
 
 __all__ = ["EquilibriumMatchingLoss"]

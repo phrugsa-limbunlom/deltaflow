@@ -50,7 +50,7 @@ except ImportError as exc:  # pragma: no cover - install hint only
         "This example needs matplotlib. Install it with:\n    pip install matplotlib"
     ) from exc
 
-from deltaflow.losses import FlowMatchingLoss
+from deltaflow.losses import ConditionalFlowMatchingLoss
 from deltaflow.models import DiT
 from deltaflow.models.dit import modulate
 
@@ -90,7 +90,7 @@ def class_images(y: torch.Tensor, noise: float = 0.05) -> torch.Tensor:
 
 
 def train(field: DiT, steps: int = 400, batch: int = 64) -> None:
-    loss_fn = FlowMatchingLoss()
+    loss_fn = ConditionalFlowMatchingLoss()
     opt = torch.optim.Adam(field.parameters(), lr=2e-3)
     field.train()
     for step in range(steps):

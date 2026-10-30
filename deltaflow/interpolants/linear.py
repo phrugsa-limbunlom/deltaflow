@@ -5,6 +5,7 @@ from typing import Optional, Tuple
 import torch
 
 from ..core.base_interpolant import BaseInterpolant
+from ..utils.tensor import broadcast_time
 
 
 class LinearInterpolant(BaseInterpolant):
@@ -43,7 +44,7 @@ class LinearInterpolant(BaseInterpolant):
     ) -> Tuple[torch.Tensor, torch.Tensor]:
         if x0 is None:
             x0 = torch.randn_like(x1)
-        t_ = t.view(-1, *([1] * (x1.dim() - 1)))  # reshape t to match the dimensions of x1 for broadcasting e.g., (B, 1, 1, 1) -> (B, C, H, W) during operation
+        t_ = broadcast_time(t, x1)  # (B,) -> (B, 1, ..., 1)
         x_t = (1 - t_) * x0 + t_ * x1
         target_v = x1 - x0
         return x_t, target_v

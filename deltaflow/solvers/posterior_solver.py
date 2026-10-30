@@ -12,7 +12,7 @@ pretrained velocity field.
 Per step, given the current state ``x_t`` and the velocity ``v_theta(x_t, t)``,
 the update is::
 
-    x_clean_hat = Tweedie.decompose(x_t, v_t, t).x_clean
+    x_clean_hat, _ = tweedie.decompose(x_t, v_t, t)
     g = grad_{x_t} -log p( y | x_clean_hat )
     x_{t+dt} = BaseSolver.step(x_t, t, dt) - eta * g
 
@@ -30,6 +30,7 @@ import torch
 from ..core.base_solver import BaseSolver
 from ..inverse.likelihood import Likelihood
 from ..inverse.tweedie import BaseTweedie, LinearTweedie
+from ..utils.tensor import broadcast_time
 
 
 class PosteriorSolver(BaseSolver):
@@ -88,7 +89,6 @@ class PosteriorSolver(BaseSolver):
         guidance_scale: float = 1.0,
         grad_normalize: bool = False,
     ):
-        # Re-use the base solver's model reference and time_scale.
         super().__init__(model=base_solver.model, time_scale=base_solver.time_scale)
         self.base = base_solver
         self.likelihood = likelihood
@@ -97,9 +97,11 @@ class PosteriorSolver(BaseSolver):
         self.grad_normalize = grad_normalize
 
     def _likelihood_grad(self, x: torch.Tensor, t: float, **cond) -> torch.Tensor:
-        x_grad = x.detach().requires_grad_(True)
+        """Gradient of ``-log p(y | x_clean_hat(x))`` with respect to ``x``."""
+        # `sample` runs under no_grad, so autograd is re-enabled locally here.
         with torch.enable_grad():
-            v = self.base._eval_velocity(x_grad, t, **cond)
+            x_grad = x.detach().requires_grad_(True)
+            v = self.base.velocity(x_grad, t, **cond)
             x_clean_hat, _ = self.tweedie.decompose(x_grad, v, t)
             neg_log_lik = self.likelihood.neg_log_prob(x_clean_hat)
             if neg_log_lik.dim() > 0:
@@ -111,20 +113,12 @@ class PosteriorSolver(BaseSolver):
         grad = self._likelihood_grad(x, t, **cond)
         with torch.no_grad():
             x_next = self.base.step(x, t, dt, **cond)
-            correction = self.guidance_scale * grad
             if self.grad_normalize:
-                base_step_norm = (x_next - x).flatten(1).norm(dim=1, keepdim=True)
-                grad_norm = grad.flatten(1).norm(dim=1, keepdim=True).clamp_min(1e-8)
-                scale = (base_step_norm / grad_norm).view(-1, *([1] * (grad.dim() - 1)))
-                correction = self.guidance_scale * scale * grad
-            return x_next - correction
-
-    def sample(self, *args, **kwargs) -> torch.Tensor:
-        kwargs.setdefault("progress_desc", "PosteriorSolver")
-        # Autograd needs to run inside step(); do not use the enclosing no_grad
-        # from the base implementation. BaseSolver.sample() does not wrap in
-        # no_grad, so we can call through directly.
-        return super().sample(*args, **kwargs)
+                # Rescale each sample's gradient to the norm of its base step.
+                base_step_norm = (x_next - x).flatten(1).norm(dim=1)
+                grad_norm = grad.flatten(1).norm(dim=1).clamp_min(1e-8)
+                grad = broadcast_time(base_step_norm / grad_norm, grad) * grad
+            return x_next - self.guidance_scale * grad
 
 
 __all__ = ["PosteriorSolver"]

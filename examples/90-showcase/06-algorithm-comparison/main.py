@@ -42,7 +42,7 @@ except ImportError as exc:  # pragma: no cover - install hint only
 
 from matplotlib import animation
 
-from deltaflow.core.base import BaseVelocityField
+from deltaflow.core import BaseVelocityField
 from deltaflow.interpolants import (
     LinearInterpolant,
     SchrodingerBridgeInterpolant,

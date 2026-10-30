@@ -1,19 +1,13 @@
-"""ODE solvers that integrate a learned velocity field.
+"""Samplers that turn a learned field into data: ODE integrators and gradient descent."""
 
-The historical module name was `deltaflow.samplers`, which still
-imports from here for backward compatibility.
-"""
-
-from .euler import EulerSolver, FlowSampler
-from .gradient_descent import EquilibriumSolver, GradientDescentSolver
+from .equilibrium import EquilibriumSolver
+from .euler import EulerSolver
 from .heun import HeunSolver
 from .posterior_solver import PosteriorSolver
 
 __all__ = [
     "EulerSolver",
-    "FlowSampler",
     "EquilibriumSolver",
-    "GradientDescentSolver",
     "HeunSolver",
     "PosteriorSolver",
 ]

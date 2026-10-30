@@ -1,16 +1,14 @@
 """Conditional flow matching loss with pluggable train-time coupling."""
 
-from typing import TYPE_CHECKING, Optional
+from typing import Optional
 
 import torch
-import torch.nn.functional as F
 
+from ..core.base_coupling import BaseCoupling
 from ..core.base_interpolant import BaseInterpolant
 from ..core.base_loss import BaseLoss
 from ..interpolants.linear import LinearInterpolant
-
-if TYPE_CHECKING:
-    from ..trainer.coupling import BaseCoupling
+from ._reduction import regression_loss
 
 
 class ConditionalFlowMatchingLoss(BaseLoss):
@@ -51,7 +49,7 @@ class ConditionalFlowMatchingLoss(BaseLoss):
     def __init__(
         self,
         interpolant: Optional[BaseInterpolant] = None,
-        coupling: Optional["BaseCoupling"] = None,
+        coupling: Optional[BaseCoupling] = None,
         loss_type: str = "l2",
         time_scale: float = 1.0,
     ):
@@ -60,27 +58,14 @@ class ConditionalFlowMatchingLoss(BaseLoss):
         self.loss_type = loss_type
         self.time_scale = time_scale
 
-    def _reduce(self, target_v: torch.Tensor, pred_v: torch.Tensor) -> torch.Tensor:
-        if self.loss_type == "l1":
-            return F.l1_loss(target_v, pred_v)
-        if self.loss_type == "l2":
-            return F.mse_loss(target_v, pred_v)
-        if self.loss_type == "huber":
-            return F.smooth_l1_loss(target_v, pred_v)
-        raise NotImplementedError(f"Unknown loss_type: {self.loss_type!r}")
-
     def __call__(self, model, x1: torch.Tensor, **cond) -> torch.Tensor:
+        x0 = None
         if self.coupling is not None:
             x0, x1 = self.coupling.sample_pair(x1)
-        else:
-            x0 = None
         t = torch.rand(x1.shape[0], device=x1.device)
         x_t, target_v = self.interpolant.interpolate(x1, t, x0=x0)
         pred_v = model(x_t, t * self.time_scale, **cond)
-        return self._reduce(target_v, pred_v)
+        return regression_loss(pred_v, target_v, self.loss_type)
 
 
-# Backwards-compatible alias: the earlier public name for this loss.
-FlowMatchingLoss = ConditionalFlowMatchingLoss
-
-__all__ = ["ConditionalFlowMatchingLoss", "FlowMatchingLoss"]
+__all__ = ["ConditionalFlowMatchingLoss"]

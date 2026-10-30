@@ -22,9 +22,9 @@ field of the flow-matching ODE \(dx/dt = v_\theta(x, t)\).
 
 ```python
 from deltaflow.interpolants import LinearInterpolant
-from deltaflow.losses import FlowMatchingLoss
+from deltaflow.losses import ConditionalFlowMatchingLoss
 
-loss_fn = FlowMatchingLoss(interpolant=LinearInterpolant())
+loss_fn = ConditionalFlowMatchingLoss(interpolant=LinearInterpolant())
 loss = loss_fn(model, x1)     # model(x_t, t) -> predicted velocity
 loss.backward()
 ```
@@ -51,13 +51,13 @@ the path collapses onto `LinearInterpolant`.
 
 ## Sampling
 
-Integrate the learned field with any [solver](../api/solvers.md). `FlowSampler`
+Integrate the learned field with any [solver](../api/solvers.md). `EulerSolver`
 is a thin Euler wrapper:
 
 ```python
-from deltaflow.samplers import FlowSampler
+from deltaflow.solvers import EulerSolver
 
-samples = FlowSampler(model).sample(torch.randn(1000, 2), n_steps=50)
+samples = EulerSolver(model).sample(torch.randn(1000, 2), n_steps=50)
 ```
 
 For higher-order integration use `HeunSolver`. For measurement-conditioned

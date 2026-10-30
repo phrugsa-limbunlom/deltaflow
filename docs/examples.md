@@ -61,12 +61,12 @@ Run it first. Every later tier assumes you have this picture in your head.
 [`examples/10-sampling/01-euler-flow/main.py`](https://github.com/phrugsa-limbunlom/deltaflow/blob/main/examples/10-sampling/01-euler-flow/main.py)
 
 This is the shortest end-to-end story. Fit a tiny MLP velocity field on a
-two-Gaussian target with flow matching, then integrate it with `FlowSampler`
+two-Gaussian target with flow matching, then integrate it with `EulerSolver`
 (a thin Euler wrapper) to draw fresh samples.
 
 ```python
 field = MLPVelocityField(dim=2)
-loss_fn = FlowMatchingLoss()
+loss_fn = ConditionalFlowMatchingLoss()
 opt = torch.optim.Adam(field.parameters(), lr=2e-3)
 
 for step in range(500):
@@ -74,14 +74,14 @@ for step in range(500):
     loss = loss_fn(field, x1)         # samples x0, t internally
     opt.zero_grad(); loss.backward(); opt.step()
 
-samples = FlowSampler(field).sample(torch.randn(1000, 2), n_steps=50)
+samples = EulerSolver(field).sample(torch.randn(1000, 2), n_steps=50)
 ```
 
 What to notice.
 
 - Training never runs the sampler. The loss draws its own `x0` and `t`, so the
   loop is ordinary regression. Sampling is a separate, later step.
-- `FlowSampler.sample` integrates \(dx/dt = v_\theta(x, t)\) with `n_steps`
+- `EulerSolver.sample` integrates \(dx/dt = v_\theta(x, t)\) with `n_steps`
   Euler updates. Fewer steps trade accuracy for speed, and straighter paths
   (see OT coupling) let you cut the count.
 - The printed sample mean and std should land near the target's, a quick
@@ -98,7 +98,7 @@ anisotropic Gaussian. Use it as the reference for the loss signature and the
 `loss_type` option.
 
 ```python
-loss_fn = FlowMatchingLoss(loss_type="l2")
+loss_fn = ConditionalFlowMatchingLoss(loss_type="l2")
 data = torch.randn(2000, 2) * torch.tensor([3.0, 1.0])
 
 for step in range(300):
@@ -163,7 +163,7 @@ from deltaflow.models import DiT
 field = DiT(input_size=8, patch_size=2, in_channels=1, hidden_size=64,
             depth=2, num_heads=4, num_classes=2, class_dropout_prob=0.1)
 
-loss = FlowMatchingLoss()(field, x1, y=y)   # label rides the opaque **cond channel
+loss = ConditionalFlowMatchingLoss()(field, x1, y=y)   # label rides the opaque **cond channel
 
 # guided sampling: extrapolate between the conditional and null-token velocity
 v = field.forward_with_cfg(x, t, y=torch.zeros(64, dtype=torch.long), cfg_scale=2.0)

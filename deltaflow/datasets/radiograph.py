@@ -6,18 +6,15 @@ intentionally minimal, bring your own annotation parser for a specific
 benchmark by subclassing and overriding `_load_landmarks`.
 """
 
+import csv
 from pathlib import Path
 from typing import Callable, Optional, Union
 
+import numpy as np
 import torch
 from torch.utils.data import Dataset
 
-try:
-    from PIL import Image
-except ImportError:  # pragma: no cover
-    Image = None
-
-_IMAGE_EXTENSIONS = (".png", ".jpg", ".jpeg", ".tif", ".tiff", ".bmp")
+from ..utils.image_io import list_images, open_image, require_pillow
 
 
 class RadiographDataset(Dataset):
@@ -49,16 +46,13 @@ class RadiographDataset(Dataset):
         landmarks_file: Optional[Union[str, Path]] = None,
         normalize_landmarks: bool = True,
     ):
-        if Image is None:
-            raise ImportError("Pillow is required for RadiographDataset (pip install pillow)")
+        require_pillow()
 
         self.root = Path(root)
         self.image_size = image_size
         self.transform = transform
         self.normalize_landmarks = normalize_landmarks
-        self.image_paths = sorted(
-            p for p in self.root.rglob("*") if p.suffix.lower() in _IMAGE_EXTENSIONS
-        )
+        self.image_paths = list_images(self.root)
         self.landmarks = self._load_landmarks(landmarks_file) if landmarks_file else None
         if self.landmarks is not None:
             # Keep only images that actually carry an annotation. Real
@@ -91,14 +85,14 @@ class RadiographDataset(Dataset):
 
     def __getitem__(self, idx: int):
         path = self.image_paths[idx]
-        img = Image.open(path).convert("L")
+        img = open_image(path, "L")
         orig_w, orig_h = img.size
         if self.image_size is not None:
             img = img.resize((self.image_size, self.image_size))
         if self.transform is not None:
             img = self.transform(img)
 
-        x = torch.from_numpy(_to_numpy(img)).float().unsqueeze(0) / 255.0
+        x = torch.from_numpy(np.array(img)).float().unsqueeze(0) / 255.0
 
         if self.landmarks is None:
             return x
@@ -115,12 +109,6 @@ class RadiographDataset(Dataset):
             if self.normalize_landmarks:
                 lm = (lm / (self.image_size - 1)) * 2.0 - 1.0
         return x, lm.reshape(-1)
-
-
-def _to_numpy(img):
-    import numpy as np
-
-    return np.array(img)
 
 
 class ChestXrayDataset(RadiographDataset):
@@ -208,11 +196,9 @@ class ISBI2015CephalometricDataset(CephalometricDataset):
 
     def _load_landmarks_csv(self, csv_path: Path) -> dict:
         """Parse a wide ``image_path,1_x,1_y,...`` CSV split file."""
-        import csv as _csv
-
         landmarks = {}
         with open(csv_path, newline="") as f:
-            reader = _csv.reader(f)
+            reader = csv.reader(f)
             header = next(reader, None)
             if header is None:
                 raise ValueError(f"Empty CSV annotation file: {csv_path}")

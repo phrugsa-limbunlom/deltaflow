@@ -8,8 +8,8 @@ Run: python examples/20-training/01-flow-matching/main.py
 import torch
 import torch.nn as nn
 
-from deltaflow.core.base import BaseVelocityField
-from deltaflow.losses import FlowMatchingLoss
+from deltaflow.core import BaseVelocityField
+from deltaflow.losses import ConditionalFlowMatchingLoss
 
 
 class MLPVelocityField(BaseVelocityField):
@@ -28,7 +28,7 @@ class MLPVelocityField(BaseVelocityField):
 def main():
     torch.manual_seed(0)
     field = MLPVelocityField(dim=2)
-    loss_fn = FlowMatchingLoss(loss_type="l2")
+    loss_fn = ConditionalFlowMatchingLoss(loss_type="l2")
     opt = torch.optim.Adam(field.parameters(), lr=1e-3)
 
     data = torch.randn(2000, 2) * torch.tensor([3.0, 1.0])

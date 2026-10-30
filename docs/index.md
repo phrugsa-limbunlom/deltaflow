@@ -56,7 +56,7 @@ loss, **delta alignment**, which aligns the guidance-difference feature
 data-scarce domains.
 
 The library targets 2D radiography (chest X-ray, cephalometric, and hand
-radiographs), but the core primitives (`interpolants`, `samplers`, `losses`,
+radiographs), but the core primitives (`interpolants`, `solvers`, `losses`,
 `models.projector`) are domain-agnostic.
 
 ## Visualizing the algorithm
@@ -130,7 +130,7 @@ Reproduce these figures from the
 |---|---|
 | `deltaflow.core` | Abstract base classes every component subclasses |
 | `deltaflow.interpolants` | Probability paths (linear, mini-batch OT, variance-preserving, Schrödinger bridge) |
-| `deltaflow.samplers` / `deltaflow.solvers` | Euler & Heun integration, posterior sampling |
+| `deltaflow.solvers` | Euler & Heun integration, posterior sampling |
 | `deltaflow.losses` | Flow matching, signed replay, delta alignment |
 | `deltaflow.models` | Backbones, EMA, multi-scale projector heads |
 | `deltaflow.inverse` | Measurement operators, Tweedie decomposition, likelihoods |

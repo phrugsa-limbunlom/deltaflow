@@ -10,7 +10,7 @@ from deltaflow.core import (
 )
 from deltaflow.interpolants import EquilibriumInterpolant, LinearInterpolant
 from deltaflow.losses import EquilibriumMatchingLoss
-from deltaflow.solvers import EquilibriumSolver, GradientDescentSolver
+from deltaflow.solvers import EquilibriumSolver
 
 
 def test_equilibrium_coefficient_plateau_and_vanishes_at_data():
@@ -213,7 +213,3 @@ def test_momentum_changes_trajectory():
     out_gd = gd.sample(x0.clone(), n_steps=5, show_progress=False)
     out_nag = nag.sample(x0.clone(), n_steps=5, show_progress=False)
     assert not torch.allclose(out_gd, out_nag)
-
-
-def test_gradient_descent_solver_is_equilibrium_solver_alias():
-    assert GradientDescentSolver is EquilibriumSolver

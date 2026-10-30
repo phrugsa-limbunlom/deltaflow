@@ -1,6 +1,6 @@
 """
 10-sampling/01-euler-flow: sample a toy Gaussian-mixture target with
-`FlowSampler`, after fitting a tiny MLP velocity field with flow matching.
+`EulerSolver`, after fitting a tiny MLP velocity field with flow matching.
 
 Run: python examples/10-sampling/01-euler-flow/main.py
 """
@@ -8,9 +8,9 @@ Run: python examples/10-sampling/01-euler-flow/main.py
 import torch
 import torch.nn as nn
 
-from deltaflow.core.base import BaseVelocityField
-from deltaflow.losses import FlowMatchingLoss
-from deltaflow.samplers import FlowSampler
+from deltaflow.core import BaseVelocityField
+from deltaflow.losses import ConditionalFlowMatchingLoss
+from deltaflow.solvers import EulerSolver
 
 
 class MLPVelocityField(BaseVelocityField):
@@ -38,7 +38,7 @@ def two_gaussians(n: int) -> torch.Tensor:
 def main():
     torch.manual_seed(0)
     field = MLPVelocityField(dim=2)
-    loss_fn = FlowMatchingLoss()
+    loss_fn = ConditionalFlowMatchingLoss()
     opt = torch.optim.Adam(field.parameters(), lr=2e-3)
 
     for step in range(500):
@@ -50,7 +50,7 @@ def main():
         if step % 100 == 0:
             print(f"step={step:4d}  loss={loss.item():.4f}")
 
-    sampler = FlowSampler(field)
+    sampler = EulerSolver(field)
     samples = sampler.sample(torch.randn(1000, 2), n_steps=50, show_progress=False)
     print("sample mean:", samples.mean(dim=0).tolist())
     print("sample std:", samples.std(dim=0).tolist())
