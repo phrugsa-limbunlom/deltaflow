@@ -8,7 +8,7 @@ Run: python examples/20-training/01-flow-matching/main.py
 import torch
 import torch.nn as nn
 
-from deltaflow.core.base import BaseVelocityField
+from deltaflow.core import BaseVelocityField
 from deltaflow.losses import ConditionalFlowMatchingLoss
 
 

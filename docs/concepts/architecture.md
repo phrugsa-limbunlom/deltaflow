@@ -68,8 +68,7 @@ Three patterns are best understood by reading across modules:
 ## Conventions
 
 - Import bases from `deltaflow.core` (e.g.
-  `from deltaflow.core import BaseVelocityField`). The modules
-  `core/base.py` and `interpolants/base.py` are backward-compat shims.
+  `from deltaflow.core import BaseVelocityField`).
 - Use the numerical helpers in [`deltaflow.utils`](../api/utils.md)
   (`safe_normalize`, `safe_sqrt`, `clamp_*`) in loss/feature math. They keep
   FP16/BF16 autocast from producing NaN/Inf.

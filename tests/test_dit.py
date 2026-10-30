@@ -2,7 +2,7 @@
 
 import torch
 
-from deltaflow.core.base import BaseVelocityField
+from deltaflow.core import BaseVelocityField
 from deltaflow.models import DiT, LabelEmbedding, TimestepEmbedding, modulate
 
 

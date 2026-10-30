@@ -8,7 +8,7 @@ Run: python examples/10-sampling/01-euler-flow/main.py
 import torch
 import torch.nn as nn
 
-from deltaflow.core.base import BaseVelocityField
+from deltaflow.core import BaseVelocityField
 from deltaflow.losses import ConditionalFlowMatchingLoss
 from deltaflow.solvers import EulerSolver
 
