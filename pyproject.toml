@@ -47,9 +47,8 @@ classifiers = [
 
 # Keep the runtime footprint minimal: torch + a few pure-python utilities,
 # plus scipy for the exact Hungarian-algorithm mini-batch OT assignment
-# (deltaflow.interpolants.OTInterpolant, deltaflow.trainer.OTCoupling). A
-# greedy nearest-neighbour matcher remains as a defensive fallback if scipy
-# is ever missing from the environment. Everything else domain-specific
+# (deltaflow.interpolants.OTInterpolant, deltaflow.trainer.OTCoupling).
+# Everything else domain-specific
 # (image loading, dev tooling, docs) is an optional extra, in the same
 # spirit as torchebm.
 dependencies = [
