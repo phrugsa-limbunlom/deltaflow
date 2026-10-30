@@ -1,16 +1,14 @@
 """Equilibrium Matching loss (energy-compatible target, time-invariant field)."""
 
-from typing import TYPE_CHECKING, Optional
+from typing import Optional
 
 import torch
 import torch.nn.functional as F
 
+from ..core.base_coupling import BaseCoupling
 from ..core.base_equilibrium_interpolant import BaseEquilibriumInterpolant
 from ..core.base_loss import BaseLoss
 from ..interpolants.equilibrium import EquilibriumInterpolant
-
-if TYPE_CHECKING:
-    from ..trainer.coupling import BaseCoupling
 
 
 class EquilibriumMatchingLoss(BaseLoss):
@@ -66,7 +64,7 @@ class EquilibriumMatchingLoss(BaseLoss):
     def __init__(
         self,
         interpolant: Optional[BaseEquilibriumInterpolant] = None,
-        coupling: Optional["BaseCoupling"] = None,
+        coupling: Optional[BaseCoupling] = None,
         loss_type: str = "l2",
     ):
         self.interpolant = interpolant or EquilibriumInterpolant()

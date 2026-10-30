@@ -1,16 +1,14 @@
 """Conditional flow matching loss with pluggable train-time coupling."""
 
-from typing import TYPE_CHECKING, Optional
+from typing import Optional
 
 import torch
 import torch.nn.functional as F
 
+from ..core.base_coupling import BaseCoupling
 from ..core.base_interpolant import BaseInterpolant
 from ..core.base_loss import BaseLoss
 from ..interpolants.linear import LinearInterpolant
-
-if TYPE_CHECKING:
-    from ..trainer.coupling import BaseCoupling
 
 
 class ConditionalFlowMatchingLoss(BaseLoss):
@@ -51,7 +49,7 @@ class ConditionalFlowMatchingLoss(BaseLoss):
     def __init__(
         self,
         interpolant: Optional[BaseInterpolant] = None,
-        coupling: Optional["BaseCoupling"] = None,
+        coupling: Optional[BaseCoupling] = None,
         loss_type: str = "l2",
         time_scale: float = 1.0,
     ):
