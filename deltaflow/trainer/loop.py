@@ -1,6 +1,6 @@
 """Image-scale training loop for flow matching.
 
-Features required by the design constraints:
+Features:
 
 - Mixed precision (``torch.amp.autocast`` + ``GradScaler``).
 - Gradient accumulation.
@@ -165,7 +165,11 @@ def train(
 
     amp_dtype = _select_amp_dtype(device, cfg.amp_dtype)
     use_amp = cfg.mixed_precision and device.type == "cuda"
+    # Loss scaling is only needed for float16. A disabled GradScaler is a
+    # pass-through (scale/unscale_ do nothing, step calls optimizer.step), so
+    # the loop below can always go through it.
     scaler = torch.amp.GradScaler("cuda", enabled=use_amp and amp_dtype == torch.float16)
+    ckpt_scaler = scaler if use_amp else None
 
     ema = EMA(beta=cfg.ema_beta) if cfg.ema_beta is not None else None
     ema_model: Optional[nn.Module] = None
@@ -179,12 +183,23 @@ def train(
             model=model,
             optimizer=optimizer,
             ema_model=ema_model,
-            scaler=scaler if use_amp else None,
+            scaler=ckpt_scaler,
             map_location=device,
         )
         cfg.log_fn(f"[deltaflow.trainer] resumed at step {start_step} from {cfg.resume_from}")
 
     ckpt_dir = Path(cfg.checkpoint_dir)
+
+    def checkpoint(name: str) -> None:
+        save_checkpoint(
+            ckpt_dir / name,
+            model=model,
+            optimizer=optimizer,
+            step=step,
+            ema_model=ema_model,
+            scaler=ckpt_scaler,
+        )
+
     data_iter = _infinite(dataloader)
 
     model.train()
@@ -207,10 +222,7 @@ def train(
             loss = loss_fn(model, x1)
             loss = loss / cfg.grad_accum_steps
 
-        if use_amp and amp_dtype == torch.float16:
-            scaler.scale(loss).backward()
-        else:
-            loss.backward()
+        scaler.scale(loss).backward()
 
         running_loss += loss.item() * cfg.grad_accum_steps
         accum_i += 1
@@ -220,15 +232,11 @@ def train(
         accum_i = 0
 
         if cfg.grad_clip is not None:
-            if use_amp and amp_dtype == torch.float16:
-                scaler.unscale_(optimizer)
+            scaler.unscale_(optimizer)
             torch.nn.utils.clip_grad_norm_(model.parameters(), cfg.grad_clip)
 
-        if use_amp and amp_dtype == torch.float16:
-            scaler.step(optimizer)
-            scaler.update()
-        else:
-            optimizer.step()
+        scaler.step(optimizer)
+        scaler.update()
         optimizer.zero_grad(set_to_none=True)
 
         if ema_model is not None:
@@ -240,29 +248,16 @@ def train(
             avg_loss = running_loss / (cfg.log_every * cfg.grad_accum_steps)
             dt = time.time() - t_last
             cfg.log_fn(
-                f"[deltaflow.trainer] step {step:>7d} | loss {avg_loss:.4f} | {dt:.1f}s / {cfg.log_every} steps"
+                f"[deltaflow.trainer] step {step:>7d} | loss {avg_loss:.4f} "
+                f"| {dt:.1f}s / {cfg.log_every} steps"
             )
             running_loss = 0.0
             t_last = time.time()
 
         if step % cfg.checkpoint_every == 0:
-            save_checkpoint(
-                ckpt_dir / f"step_{step:07d}.pt",
-                model=model,
-                optimizer=optimizer,
-                step=step,
-                ema_model=ema_model,
-                scaler=scaler if use_amp else None,
-            )
+            checkpoint(f"step_{step:07d}.pt")
 
-    save_checkpoint(
-        ckpt_dir / "last.pt",
-        model=model,
-        optimizer=optimizer,
-        step=step,
-        ema_model=ema_model,
-        scaler=scaler if use_amp else None,
-    )
+    checkpoint("last.pt")
     return ema_model if ema_model is not None else model
 
 
