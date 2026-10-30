@@ -3,12 +3,12 @@
 from typing import Optional
 
 import torch
-import torch.nn.functional as F
 
 from ..core.base_coupling import BaseCoupling
 from ..core.base_equilibrium_interpolant import BaseEquilibriumInterpolant
 from ..core.base_loss import BaseLoss
 from ..interpolants.equilibrium import EquilibriumInterpolant
+from ._reduction import regression_loss
 
 
 class EquilibriumMatchingLoss(BaseLoss):
@@ -71,15 +71,6 @@ class EquilibriumMatchingLoss(BaseLoss):
         self.coupling = coupling
         self.loss_type = loss_type
 
-    def _reduce(self, target: torch.Tensor, pred: torch.Tensor) -> torch.Tensor:
-        if self.loss_type == "l1":
-            return F.l1_loss(target, pred)
-        if self.loss_type == "l2":
-            return F.mse_loss(target, pred)
-        if self.loss_type == "huber":
-            return F.smooth_l1_loss(target, pred)
-        raise NotImplementedError(f"Unknown loss_type: {self.loss_type!r}")
-
     def __call__(self, model, x1: torch.Tensor, **cond) -> torch.Tensor:
         if self.coupling is not None:
             x0, x1 = self.coupling.sample_pair(x1)
@@ -89,7 +80,7 @@ class EquilibriumMatchingLoss(BaseLoss):
         x_gamma, target = self.interpolant.interpolate(x1, gamma, x0=x0)
         # gamma is implicit and there is no time: the field is queried as f(x).
         pred = model(x_gamma, **cond)
-        return self._reduce(target, pred)
+        return regression_loss(pred, target, self.loss_type)
 
 
 __all__ = ["EquilibriumMatchingLoss"]
