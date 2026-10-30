@@ -12,7 +12,7 @@ Run: python examples/20-training/03-conditional-dit/main.py
 
 import torch
 
-from deltaflow.losses import FlowMatchingLoss
+from deltaflow.losses import ConditionalFlowMatchingLoss
 from deltaflow.models import DiT
 from deltaflow.solvers import EulerSolver
 
@@ -43,7 +43,7 @@ def main():
         num_classes=N_CLASSES,
         class_dropout_prob=0.1,
     )
-    loss_fn = FlowMatchingLoss()
+    loss_fn = ConditionalFlowMatchingLoss()
     opt = torch.optim.Adam(field.parameters(), lr=2e-3)
 
     field.train()

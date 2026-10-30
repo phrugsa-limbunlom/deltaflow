@@ -51,7 +51,7 @@ except ImportError as exc:  # pragma: no cover - install hint only
 
 from deltaflow.core import BaseVelocityField
 from deltaflow.expansion import ActFlow, FlowRepresentation, KernelUncertainty, generable_coverage
-from deltaflow.losses import FlowMatchingLoss, SignedReplayFlowMatchingLoss
+from deltaflow.losses import ConditionalFlowMatchingLoss, SignedReplayFlowMatchingLoss
 from deltaflow.solvers import EulerSolver
 
 # Figure palette, deliberately NOT the docs theme primary (blue).
@@ -101,7 +101,7 @@ class MLPVelocityField(BaseVelocityField):
 def pretrain(steps: int = 1500) -> MLPVelocityField:
     field = MLPVelocityField()
     opt = torch.optim.Adam(field.parameters(), lr=2e-3)
-    loss_fn = FlowMatchingLoss()
+    loss_fn = ConditionalFlowMatchingLoss()
     data = arc_data(4000)
     for _ in range(steps):
         loss = loss_fn(field, data[torch.randint(len(data), (256,))])

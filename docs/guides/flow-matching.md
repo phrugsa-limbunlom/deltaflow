@@ -22,9 +22,9 @@ field of the flow-matching ODE \(dx/dt = v_\theta(x, t)\).
 
 ```python
 from deltaflow.interpolants import LinearInterpolant
-from deltaflow.losses import FlowMatchingLoss
+from deltaflow.losses import ConditionalFlowMatchingLoss
 
-loss_fn = FlowMatchingLoss(interpolant=LinearInterpolant())
+loss_fn = ConditionalFlowMatchingLoss(interpolant=LinearInterpolant())
 loss = loss_fn(model, x1)     # model(x_t, t) -> predicted velocity
 loss.backward()
 ```

@@ -8,7 +8,7 @@ subpackage.
 |---|---|
 | [core](core.md) | `BaseVelocityField`, `BaseInterpolant`, `BaseSolver`, `BaseLoss` |
 | [interpolants](interpolants.md) | `LinearInterpolant`, `OTInterpolant`, `VariancePreservingInterpolant` |
-| [losses](losses.md) | `FlowMatchingLoss`, `ConditionalFlowMatchingLoss`, `DeltaAlignmentLoss`, `SignedReplayFlowMatchingLoss` |
+| [losses](losses.md) | `ConditionalFlowMatchingLoss`, `DeltaAlignmentLoss`, `SignedReplayFlowMatchingLoss` |
 | [solvers](solvers.md) | `EulerSolver`, `HeunSolver`, `PosteriorSolver` |
 | [models](models.md) | `TinyVelocityField`, `WrappedBackbone`, `EMA`, `MultiScaleProjector`, `ProjectorHead` |
 | [inverse](inverse.md) | Operators, Tweedie decompositions, `GaussianLikelihood` |

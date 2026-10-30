@@ -90,7 +90,7 @@ The coupling decides which noise becomes which datum. Straighter pairings mean s
 
 | Objective | Idea |
 |---|---|
-| `FlowMatchingLoss` / `ConditionalFlowMatchingLoss` | regress $v_\theta(x_t, t)$ onto the path's conditional velocity $u_t$ |
+| `ConditionalFlowMatchingLoss` | regress $v_\theta(x_t, t)$ onto the path's conditional velocity $u_t$ |
 | `DeltaAlignmentLoss` | align the guidance-difference feature $\Delta h = h_\text{cond} - h_\text{uncond}$ across two views, an anatomy-cancelling representation loss |
 | `SignedReplayFlowMatchingLoss` | flow matching on verifier-accepted samples minus $\alpha_t$ times flow matching on rejected ones, accept to attract and reject to repel |
 
@@ -137,10 +137,10 @@ Each block below is one method, in as few lines as it takes. Annotated, full-sca
 ```python
 import torch
 from deltaflow.interpolants import LinearInterpolant
-from deltaflow.losses import FlowMatchingLoss
+from deltaflow.losses import ConditionalFlowMatchingLoss
 from deltaflow.solvers import EulerSolver
 
-loss_fn = FlowMatchingLoss(interpolant=LinearInterpolant())
+loss_fn = ConditionalFlowMatchingLoss(interpolant=LinearInterpolant())
 loss = loss_fn(model, x1)                        # model(x_t, t) -> predicted velocity
 loss.backward()
 
@@ -171,9 +171,9 @@ loss = loss_fn(model, x1)
 
 ```python
 from deltaflow.interpolants import VariancePreservingInterpolant
-from deltaflow.losses import FlowMatchingLoss
+from deltaflow.losses import ConditionalFlowMatchingLoss
 
-loss_fn = FlowMatchingLoss(interpolant=VariancePreservingInterpolant())
+loss_fn = ConditionalFlowMatchingLoss(interpolant=VariancePreservingInterpolant())
 loss = loss_fn(model, x1)
 ```
 
