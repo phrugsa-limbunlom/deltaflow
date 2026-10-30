@@ -40,7 +40,7 @@ except ImportError as exc:  # pragma: no cover - install hint only
         "    pip install matplotlib"
     ) from exc
 
-from deltaflow.core.base import BaseVelocityField
+from deltaflow.core import BaseVelocityField
 from deltaflow.losses import ConditionalFlowMatchingLoss
 from deltaflow.solvers import EulerSolver
 

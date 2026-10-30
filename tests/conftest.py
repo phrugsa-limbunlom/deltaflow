@@ -3,7 +3,7 @@
 import torch
 import torch.nn as nn
 
-from deltaflow.core.base import BaseVelocityField
+from deltaflow.core import BaseVelocityField
 
 
 class DummyVelocityField(BaseVelocityField):
