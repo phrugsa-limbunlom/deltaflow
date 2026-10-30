@@ -14,12 +14,7 @@ import numpy as np
 import torch
 from torch.utils.data import Dataset
 
-try:
-    from PIL import Image
-except ImportError:  # pragma: no cover
-    Image = None
-
-_IMAGE_EXTENSIONS = (".png", ".jpg", ".jpeg", ".tif", ".tiff", ".bmp")
+from ..utils.image_io import list_images, open_image, require_pillow
 
 
 class RadiographDataset(Dataset):
@@ -51,16 +46,13 @@ class RadiographDataset(Dataset):
         landmarks_file: Optional[Union[str, Path]] = None,
         normalize_landmarks: bool = True,
     ):
-        if Image is None:
-            raise ImportError("Pillow is required for RadiographDataset (pip install pillow)")
+        require_pillow()
 
         self.root = Path(root)
         self.image_size = image_size
         self.transform = transform
         self.normalize_landmarks = normalize_landmarks
-        self.image_paths = sorted(
-            p for p in self.root.rglob("*") if p.suffix.lower() in _IMAGE_EXTENSIONS
-        )
+        self.image_paths = list_images(self.root)
         self.landmarks = self._load_landmarks(landmarks_file) if landmarks_file else None
         if self.landmarks is not None:
             # Keep only images that actually carry an annotation. Real
@@ -93,7 +85,7 @@ class RadiographDataset(Dataset):
 
     def __getitem__(self, idx: int):
         path = self.image_paths[idx]
-        img = Image.open(path).convert("L")
+        img = open_image(path, "L")
         orig_w, orig_h = img.size
         if self.image_size is not None:
             img = img.resize((self.image_size, self.image_size))
