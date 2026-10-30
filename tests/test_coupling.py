@@ -2,14 +2,10 @@ import torch
 
 from deltaflow.core import BaseCoupling
 from deltaflow.interpolants import LinearInterpolant, OTInterpolant
-from deltaflow.losses import ConditionalFlowMatchingLoss, FlowMatchingLoss
+from deltaflow.losses import ConditionalFlowMatchingLoss
 from deltaflow.trainer.coupling import IndependentCoupling, OTCoupling
 from deltaflow.utils.ot import batch_ot_permutation
 from tests.conftest import DummyVelocityField
-
-
-def test_flow_matching_loss_backwards_compat_alias():
-    assert FlowMatchingLoss is ConditionalFlowMatchingLoss
 
 
 def test_batch_ot_permutation_moved_to_utils_with_alias():

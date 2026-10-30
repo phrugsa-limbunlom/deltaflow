@@ -41,7 +41,7 @@ except ImportError as exc:  # pragma: no cover - install hint only
     ) from exc
 
 from deltaflow.core.base import BaseVelocityField
-from deltaflow.losses import FlowMatchingLoss
+from deltaflow.losses import ConditionalFlowMatchingLoss
 from deltaflow.solvers import EulerSolver
 
 # Figure palette: deliberately NOT the docs theme primary (purple).
@@ -313,7 +313,7 @@ def main() -> None:
 
     # ---- Train a small velocity field on two-moons -----------------------
     field = MLPVelocityField(dim=2, hidden=128)
-    loss_fn = FlowMatchingLoss()
+    loss_fn = ConditionalFlowMatchingLoss()
     opt = torch.optim.Adam(field.parameters(), lr=2e-3)
 
     n_train_steps = 2000

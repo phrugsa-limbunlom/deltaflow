@@ -9,7 +9,7 @@ import torch
 import torch.nn as nn
 
 from deltaflow.core.base import BaseVelocityField
-from deltaflow.losses import FlowMatchingLoss
+from deltaflow.losses import ConditionalFlowMatchingLoss
 from deltaflow.solvers import EulerSolver
 
 
@@ -38,7 +38,7 @@ def two_gaussians(n: int) -> torch.Tensor:
 def main():
     torch.manual_seed(0)
     field = MLPVelocityField(dim=2)
-    loss_fn = FlowMatchingLoss()
+    loss_fn = ConditionalFlowMatchingLoss()
     opt = torch.optim.Adam(field.parameters(), lr=2e-3)
 
     for step in range(500):

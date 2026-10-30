@@ -1,6 +1,6 @@
 import torch
 
-from deltaflow.losses import FlowMatchingLoss
+from deltaflow.losses import ConditionalFlowMatchingLoss
 from deltaflow.losses.delta_alignment import delta_alignment_loss
 from deltaflow.models import MultiScaleProjector
 from tests.conftest import DummyVelocityField
@@ -9,7 +9,7 @@ from tests.conftest import DummyVelocityField
 def test_flow_matching_loss_is_scalar_and_nonnegative():
     torch.manual_seed(0)
     model = DummyVelocityField(dim=4)
-    loss_fn = FlowMatchingLoss()
+    loss_fn = ConditionalFlowMatchingLoss()
 
     x1 = torch.randn(6, 4)
     loss = loss_fn(model, x1)

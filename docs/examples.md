@@ -66,7 +66,7 @@ two-Gaussian target with flow matching, then integrate it with `EulerSolver`
 
 ```python
 field = MLPVelocityField(dim=2)
-loss_fn = FlowMatchingLoss()
+loss_fn = ConditionalFlowMatchingLoss()
 opt = torch.optim.Adam(field.parameters(), lr=2e-3)
 
 for step in range(500):
@@ -98,7 +98,7 @@ anisotropic Gaussian. Use it as the reference for the loss signature and the
 `loss_type` option.
 
 ```python
-loss_fn = FlowMatchingLoss(loss_type="l2")
+loss_fn = ConditionalFlowMatchingLoss(loss_type="l2")
 data = torch.randn(2000, 2) * torch.tensor([3.0, 1.0])
 
 for step in range(300):
@@ -163,7 +163,7 @@ from deltaflow.models import DiT
 field = DiT(input_size=8, patch_size=2, in_channels=1, hidden_size=64,
             depth=2, num_heads=4, num_classes=2, class_dropout_prob=0.1)
 
-loss = FlowMatchingLoss()(field, x1, y=y)   # label rides the opaque **cond channel
+loss = ConditionalFlowMatchingLoss()(field, x1, y=y)   # label rides the opaque **cond channel
 
 # guided sampling: extrapolate between the conditional and null-token velocity
 v = field.forward_with_cfg(x, t, y=torch.zeros(64, dtype=torch.long), cfg_scale=2.0)

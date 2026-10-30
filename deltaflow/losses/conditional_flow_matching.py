@@ -68,7 +68,4 @@ class ConditionalFlowMatchingLoss(BaseLoss):
         return regression_loss(pred_v, target_v, self.loss_type)
 
 
-# Backwards-compatible alias: the earlier public name for this loss.
-FlowMatchingLoss = ConditionalFlowMatchingLoss
-
-__all__ = ["ConditionalFlowMatchingLoss", "FlowMatchingLoss"]
+__all__ = ["ConditionalFlowMatchingLoss"]
