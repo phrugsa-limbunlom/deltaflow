@@ -5,7 +5,7 @@ imports from here for backward compatibility.
 """
 
 from .euler import EulerSolver, FlowSampler
-from .gradient_descent import EquilibriumSolver, GradientDescentSolver
+from .equilibrium import EquilibriumSolver, GradientDescentSolver
 from .heun import HeunSolver
 from .posterior_solver import PosteriorSolver
 
