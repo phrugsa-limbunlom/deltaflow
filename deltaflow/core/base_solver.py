@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 from typing import Callable, Optional
 
 import torch
+from tqdm import tqdm
 
 
 class BaseSolver(ABC):
@@ -56,20 +57,12 @@ class BaseSolver(ABC):
     ) -> torch.Tensor:
         """Integrate from ``t_start`` to ``t_end`` in ``n_steps`` uniform steps."""
         dt = (t_end - t_start) / n_steps
-        steps = range(n_steps)
-        if show_progress:
-            try:
-                from tqdm import tqdm
-
-                steps = tqdm(
-                    steps,
-                    desc=progress_desc or type(self).__name__,
-                    total=n_steps,
-                    leave=False,
-                )
-            except ImportError:
-                pass
-
+        steps = tqdm(
+            range(n_steps),
+            desc=progress_desc or type(self).__name__,
+            leave=False,
+            disable=not show_progress,
+        )
         for i in steps:
             t_val = t_start + i * dt
             x = self.step(x, t_val, dt, **cond)
