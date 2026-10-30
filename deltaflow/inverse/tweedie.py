@@ -15,7 +15,6 @@ likelihood on the clean-signal estimate at every sampling step.
 
 import math
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
 from typing import Tuple, Union
 
 import torch
@@ -84,12 +83,4 @@ class VPTweedie(BaseTweedie):
         return x_clean, x_noise
 
 
-@dataclass
-class TweedieEstimates:
-    """Bundle of the two endpoint estimates for convenience."""
-
-    x_clean: torch.Tensor
-    x_noise: torch.Tensor
-
-
-__all__ = ["BaseTweedie", "LinearTweedie", "TweedieEstimates", "VPTweedie"]
+__all__ = ["BaseTweedie", "LinearTweedie", "VPTweedie"]
