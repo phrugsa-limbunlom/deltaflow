@@ -18,7 +18,12 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from ..models.projector import MultiScaleProjector
-from ..utils.numerical import clamp_cosine_similarity, clamp_loss, clamp_prediction, safe_normalize
+from ..utils.numerical import (
+    clamp_cosine_similarity,
+    clamp_loss,
+    clamp_prediction,
+    safe_normalize,
+)
 
 
 def _cosine_dissimilarity(z1: torch.Tensor, z2: torch.Tensor) -> torch.Tensor:
@@ -49,35 +54,20 @@ def delta_alignment_loss(
     Returns the average of ``loss_l`` over all levels present in every
     feature dict and in ``projector``.
     """
-    layer_set = projector.layer_set
+    # Normalisation is done here with `safe_normalize` (FP16/BF16-safe).
+    z_view1 = projector.project_delta_h(feats_c1, feats_u1, normalize=False)
+    z_view2 = projector.project_delta_h(feats_c2, feats_u2, normalize=False)
+    shared_layers = [layer for layer in z_view1 if layer in z_view2]
+
     total_loss = torch.tensor(0.0, device=next(iter(feats_u1.values())).device)
-    num_layers = 0
+    for layer in shared_layers:
+        z1 = safe_normalize(z_view1[layer], dim=-1)
+        z2 = safe_normalize(z_view2[layer], dim=-1)
+        total_loss = total_loss + clamp_loss(_cosine_dissimilarity(z1, z2), max_val=10.0)
 
-    for layer in layer_set:
-        if not all(layer in feats for feats in (feats_u1, feats_c1, feats_u2, feats_c2)):
-            continue
-        if layer not in projector.projectors:
-            continue
-
-        delta_h1 = feats_c1[layer] - feats_u1[layer]
-        delta_h2 = feats_c2[layer] - feats_u2[layer]
-
-        z1 = projector.pool_feature(delta_h1)
-        z2 = projector.pool_feature(delta_h2)
-
-        z1 = projector.projectors[layer](z1)
-        z2 = projector.projectors[layer](z2)
-
-        z1 = safe_normalize(z1, dim=-1)
-        z2 = safe_normalize(z2, dim=-1)
-
-        layer_loss = clamp_loss(_cosine_dissimilarity(z1, z2), max_val=10.0)
-        total_loss = total_loss + layer_loss
-        num_layers += 1
-
-    if num_layers == 0:
+    if not shared_layers:
         return total_loss
-    return total_loss / num_layers
+    return total_loss / len(shared_layers)
 
 
 def flow_matching_velocity_loss(v_pred: torch.Tensor, v_target: torch.Tensor) -> torch.Tensor:
@@ -133,20 +123,27 @@ class DeltaAlignmentLoss(nn.Module):
 
     def forward(
         self,
-        v_c1: torch.Tensor, v_u1: torch.Tensor, target_v1: torch.Tensor,
-        v_c2: torch.Tensor, v_u2: torch.Tensor, target_v2: torch.Tensor,
+        v_c1: torch.Tensor,
+        v_u1: torch.Tensor,
+        target_v1: torch.Tensor,
+        v_c2: torch.Tensor,
+        v_u2: torch.Tensor,
+        target_v2: torch.Tensor,
         feats_u1: Dict[str, torch.Tensor],
         feats_c1: Dict[str, torch.Tensor],
         feats_u2: Dict[str, torch.Tensor],
         feats_c2: Dict[str, torch.Tensor],
     ) -> Tuple[torch.Tensor, Dict[str, torch.Tensor]]:
+        """Return ``(total_loss, detached_components)``.
+
+        Suffix ``c``/``u`` is conditional/unconditional, ``1``/``2`` the
+        augmented view. ``feats_*`` are per-level feature dicts from the
+        backbone for the matching pass.
+        """
         # Flow-matching loss over both views and both conditioning modes.
-        loss_flow_c = (
-            flow_matching_velocity_loss(v_c1, target_v1) + flow_matching_velocity_loss(v_c2, target_v2)
-        ) / 2
-        loss_flow_u = (
-            flow_matching_velocity_loss(v_u1, target_v1) + flow_matching_velocity_loss(v_u2, target_v2)
-        ) / 2
+        fm = flow_matching_velocity_loss
+        loss_flow_c = (fm(v_c1, target_v1) + fm(v_c2, target_v2)) / 2
+        loss_flow_u = (fm(v_u1, target_v1) + fm(v_u2, target_v2)) / 2
         loss_flow = loss_flow_c + loss_flow_u
 
         # Multi-scale delta-alignment loss.
