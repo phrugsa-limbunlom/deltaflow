@@ -51,13 +51,13 @@ the path collapses onto `LinearInterpolant`.
 
 ## Sampling
 
-Integrate the learned field with any [solver](../api/solvers.md). `FlowSampler`
+Integrate the learned field with any [solver](../api/solvers.md). `EulerSolver`
 is a thin Euler wrapper:
 
 ```python
-from deltaflow.solvers import FlowSampler
+from deltaflow.solvers import EulerSolver
 
-samples = FlowSampler(model).sample(torch.randn(1000, 2), n_steps=50)
+samples = EulerSolver(model).sample(torch.randn(1000, 2), n_steps=50)
 ```
 
 For higher-order integration use `HeunSolver`. For measurement-conditioned

@@ -63,7 +63,4 @@ class EulerSolver(BaseSolver):
         )
 
 
-# Backwards-compatible alias: earlier public name for this solver.
-FlowSampler = EulerSolver
-
-__all__ = ["EulerSolver", "FlowSampler"]
+__all__ = ["EulerSolver"]
