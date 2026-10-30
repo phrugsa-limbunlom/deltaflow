@@ -44,8 +44,8 @@ x_t, u_t = interpolant.interpolate(x1, t=torch.full((4,), 0.5), x0=x0)
 
 What to notice.
 
-- The path is the straight line \(x_t = (1-t)\,x_0 + t\,x_1\), so the target
-  velocity is the constant displacement \(u_t = x_1 - x_0\). This is the
+- The path is the straight line $x_t = (1-t)\,x_0 + t\,x_1$, so the target
+  velocity is the constant displacement $u_t = x_1 - x_0$. This is the
   **delta** the whole library is named after, the change that carries one
   distribution onto the other.
 - The boundary conditions are exact. At `t=0` the point equals `x0`, at `t=1` it
@@ -81,7 +81,7 @@ What to notice.
 
 - Training never runs the sampler. The loss draws its own `x0` and `t`, so the
   loop is ordinary regression. Sampling is a separate, later step.
-- `EulerSolver.sample` integrates \(dx/dt = v_\theta(x, t)\) with `n_steps`
+- `EulerSolver.sample` integrates $dx/dt = v_\theta(x, t)$ with `n_steps`
   Euler updates. Fewer steps trade accuracy for speed, and straighter paths
   (see OT coupling) allow fewer steps.
 - The printed sample mean and std should land near the target's, a quick
@@ -137,8 +137,8 @@ What to notice.
 
 - Two augmented views feed the loss. Each view carries a conditional and an
   unconditional feature dict at every hierarchy level.
-- The loss aligns the **guidance-difference feature** \(\Delta h = h_\text{cond}
-  - h_\text{uncond}\) across the two views, not the raw features. The returned
+- The loss aligns the **guidance-difference feature** $\Delta h = h_\text{cond}
+  - h_\text{uncond}$ across the two views, not the raw features. The returned
   `loss_dict` breaks out each term for logging.
 
 See [Delta Alignment](guides/delta-alignment.md) for the reasoning behind the
@@ -285,11 +285,11 @@ data (teal, `t=1`), traced by green streamlines.
 
 ![Particle trajectories](assets/sampling-flow/trajectories.png)
 
-**Learned velocity field.** Quiver plots of \(v(x, t)\) at three times.
+**Learned velocity field.** Quiver plots of $v(x, t)$ at three times.
 
 ![Velocity field](assets/sampling-flow/velocity_field.png)
 
-Early on the field points broadly inward. By \(t \approx 0.9\) it resolves the
+Early on the field points broadly inward. By $t \approx 0.9$ it resolves the
 two-moons structure.
 
 ### Reproduce
@@ -524,12 +524,12 @@ trains a noise-unconditional field with `EquilibriumMatchingLoss` on the same
 2D *two-moons* target as the flow-matching showcase above, then samples it by
 gradient descent on the learned landscape (no ODE integration). Reusing the
 dataset makes the contrast with flow matching direct. Equilibrium Matching
-drops the time-conditional dynamics of flow models, so the field \(f(x)\) is
+drops the time-conditional dynamics of flow models, so the field $f(x)$ is
 time-invariant and a single picture of it describes the whole sampler. The
-interpolation coefficient \(\gamma\) is implicit and never seen by the model.
+interpolation coefficient $\gamma$ is implicit and never seen by the model.
 
-**Time-invariant landscape.** Arrows are the field \(f(x)\), the heatmap is the
-gradient norm \(|f(x)|\). The norm collapses toward zero along the two moons, so
+**Time-invariant landscape.** Arrows are the field $f(x)$, the heatmap is the
+gradient norm $|f(x)|$. The norm collapses toward zero along the two moons, so
 those points are the equilibria (minima) of the implicit energy the field
 descends. One panel replaces the per-time quiver the flow-matching showcase
 needs.
@@ -606,7 +606,7 @@ ring.
 
 ![Model samples and labelled queries per round](assets/active-flow-expansion/expansion_rounds.png)
 
-The uncertainty \(\sigma_t(\phi_s(x))\) is computed in the flow's own noised
+The uncertainty $\sigma_t(\phi_s(x))$ is computed in the flow's own noised
 representation, not in input space. It collapses where queries have been made,
 and the bright frontier marks where the next round samples.
 
@@ -628,8 +628,8 @@ python examples/90-showcase/11-active-flow-expansion-viz/main.py
 ## 90 showcase, time-unconditioned flow matching
 
 [`examples/90-showcase/12-time-unconditioned-fm-viz/main.py`](https://github.com/phrugsa-limbunlom/deltaflow/blob/main/examples/90-showcase/12-time-unconditioned-fm-viz/main.py)
-compares a time-conditioned velocity field \(v(x, t)\)
-(`ConditionalFlowMatchingLoss`) with a time-blind one \(v(x)\)
+compares a time-conditioned velocity field $v(x, t)$
+(`ConditionalFlowMatchingLoss`) with a time-blind one $v(x)$
 (`TimeUnconditionedFlowMatchingLoss` + `TimeBlindVelocityField`) on two-moons,
 following [arXiv:2605.08344](https://arxiv.org/abs/2605.08344).
 
@@ -640,13 +640,13 @@ following [arXiv:2605.08344](https://arxiv.org/abs/2605.08344).
 ![Sampling from noise, conditioned vs time-blind](assets/time-unconditioned-fm/samples.gif)
 
 **Caveat.** In 2D the data fills the whole space, so time is not identifiable
-from \(x_t\) and the time-blind model is visibly worse. The paper's claim is
+from $x_t$ and the time-blind model is visibly worse. The paper's claim is
 about high dimensions.
 
-**Why it works in high dimensions.** When data lies near a \(k\)-dimensional
-subspace of \(\mathbb{R}^d\), the directions orthogonal to the data carry only
-noise scaled by \((1-t)\), so \(t\) can be read off a single \(x_t\) with error
-\(O(1/\sqrt{d-k})\). The
+**Why it works in high dimensions.** When data lies near a $k$-dimensional
+subspace of $\mathbb{R}^d$, the directions orthogonal to the data carry only
+noise scaled by $(1-t)$, so $t$ can be read off a single $x_t$ with error
+$O(1/\sqrt{d-k})$. The
 [Time-Unconditioned Flow Matching](guides/time-unconditioned-fm.md) guide walks
 through this geometry step by step.
 

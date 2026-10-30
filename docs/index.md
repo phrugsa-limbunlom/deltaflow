@@ -72,11 +72,11 @@ DeltaFlow is built on a single idea, a **delta** (the change carried from one
 distribution to another) and the **flow** that realises it.
 
 - **Δ, the change between two things.** The learning signal is a *displacement*
-  \(\Delta = x_1 - x_0\), the straight-line velocity carrying a source sample
-  \(x_0\) (noise) to a data sample \(x_1\). Regressing a velocity field onto
-  \(\Delta\) is exactly the flow-matching objective (Lipman et al., 2023).
-- **Flow, integrating the change.** A learned field \(v_\theta(x, t)\) is
-  integrated as an ODE \(dx/dt = v_\theta(x, t)\), transporting the *whole*
+  $\Delta = x_1 - x_0$, the straight-line velocity carrying a source sample
+  $x_0$ (noise) to a data sample $x_1$. Regressing a velocity field onto
+  $\Delta$ is exactly the flow-matching objective (Lipman et al., 2023).
+- **Flow, integrating the change.** A learned field $v_\theta(x, t)$ is
+  integrated as an ODE $dx/dt = v_\theta(x, t)$, transporting the *whole*
   source distribution onto the data distribution.
 - **Straighter Δ via optimal transport.** **Mini-batch optimal-transport
   coupling** solves the discrete Kantorovich assignment on each batch, the
@@ -87,14 +87,14 @@ distribution to another) and the **flow** that realises it.
 
 The *same difference principle* also drives an optional representation-learning
 loss, **delta alignment**, which aligns the guidance-difference feature
-\(\Delta h = h_\text{cond} - h_\text{uncond}\) for generative pretraining in
+$\Delta h = h_\text{cond} - h_\text{uncond}$ for generative pretraining in
 data-scarce domains.
 
 ## Visualizing the algorithm
 
-Flow matching learns a time-conditioned velocity field \(v(x, t)\) that
-transports a simple source density (Gaussian noise, \(t=0\)) onto the data
-distribution (\(t=1\)). The panels below come from the
+Flow matching learns a time-conditioned velocity field $v(x, t)$ that
+transports a simple source density (Gaussian noise, $t=0$) onto the data
+distribution ($t=1$). The panels below come from the
 [sampling-flow example](examples.md).
 
 ![Sampling snapshots from noise to data](assets/sampling-flow/snapshots.png)
@@ -120,17 +120,17 @@ The *same* training loop, loss, and solver are reused across all of them.
 
 | Interpolant | Path |
 |---|---|
-| `LinearInterpolant` | straight-line rectified-flow path, \(x_t = (1-t)x_0 + t x_1\) |
-| `VariancePreservingInterpolant` | trigonometric diffusion path, \(\alpha_t = \sin(\tfrac{\pi}{2}t)\), \(\sigma_t = \cos(\tfrac{\pi}{2}t)\) |
-| `OTInterpolant` | the linear path applied after a mini-batch OT re-ordering of \(x_0\) |
-| `SchrodingerBridgeInterpolant` | entropic Schrödinger-bridge path, a Brownian bridge \(x_t = (1-t)x_0 + t x_1 + \sigma\sqrt{t(1-t)}\,z\) around the straight line, diffusivity \(\sigma\) |
+| `LinearInterpolant` | straight-line rectified-flow path, $x_t = (1-t)x_0 + t x_1$ |
+| `VariancePreservingInterpolant` | trigonometric diffusion path, $\alpha_t = \sin(\tfrac{\pi}{2}t)$, $\sigma_t = \cos(\tfrac{\pi}{2}t)$ |
+| `OTInterpolant` | the linear path applied after a mini-batch OT re-ordering of $x_0$ |
+| `SchrodingerBridgeInterpolant` | entropic Schrödinger-bridge path, a Brownian bridge $x_t = (1-t)x_0 + t x_1 + \sigma\sqrt{t(1-t)}\,z$ around the straight line, diffusivity $\sigma$ |
 
 ### Schrödinger bridge
 
 The dynamic Schrödinger bridge between noise and data, conditioned on an
 endpoint pair, is a Brownian bridge around the straight-line path. Regressing
 onto its conditional velocity trains a stochastic interpolant that recovers the
-entropic optimal-transport bridge as the coupling of \((x_0, x_1)\) approaches
+entropic optimal-transport bridge as the coupling of $(x_0, x_1)$ approaches
 the true OT plan. Pairing endpoints with `OTCoupling` (rather than drawing them
 independently) is what makes this approximation tight in practice
 ([De Bortoli et al., 2021](https://arxiv.org/abs/2106.01357) and

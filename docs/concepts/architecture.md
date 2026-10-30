@@ -60,8 +60,8 @@ Three patterns are best understood by reading across modules:
   integration, it hooks a likelihood gradient into each `step()` call. See
   [Inverse Problems](../guides/inverse-problems.md).
 - **`DeltaAlignmentLoss` consumes per-level feature dicts** and a
-  `MultiScaleProjector`, operating on \(\Delta h = h_\text{cond} -
-  h_\text{uncond}\). See [Delta Alignment](../guides/delta-alignment.md).
+  `MultiScaleProjector`, operating on $\Delta h = h_\text{cond} -
+  h_\text{uncond}$. See [Delta Alignment](../guides/delta-alignment.md).
 - **`trainer.train` is framework-light.** Mixed precision, grad accumulation,
   checkpoint/resume, EMA, and pluggable coupling in a plain loop. See
   [Training](../guides/training.md).
