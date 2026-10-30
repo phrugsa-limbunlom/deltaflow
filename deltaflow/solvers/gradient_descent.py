@@ -3,6 +3,7 @@
 from typing import Any, Callable, Optional
 
 import torch
+from tqdm import tqdm
 
 from ..core.base_solver import BaseSolver
 
@@ -96,21 +97,15 @@ class EquilibriumSolver(BaseSolver):
             step_size: overrides ``self.step_size`` for this call.
             momentum: overrides ``self.momentum`` for this call (Nesterov
                 look-ahead when positive).
-            show_progress: display a tqdm progress bar if available.
+            show_progress: display a tqdm progress bar.
             **cond: extra keyword arguments forwarded to the model unchanged.
         """
         eta = self.step_size if step_size is None else step_size
         mu = self.momentum if momentum is None else momentum
 
-        steps = range(n_steps)
-        if show_progress:
-            try:
-                from tqdm import tqdm
-
-                steps = tqdm(steps, desc=type(self).__name__, total=n_steps, leave=False)
-            except ImportError:
-                pass
-
+        steps = tqdm(
+            range(n_steps), desc=type(self).__name__, leave=False, disable=not show_progress
+        )
         m = torch.zeros_like(x)
         for _ in steps:
             if mu != 0.0:
