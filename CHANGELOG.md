@@ -45,8 +45,46 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - `scipy` is now a core dependency (previously gated behind the `ot`
   extra), so `OTInterpolant`/`OTCoupling` use the exact Hungarian-algorithm
   mini-batch OT assignment by default. The `ot` extra is kept as a
-  backwards-compatible no-op, and the greedy nearest-neighbour matcher
-  remains as a defensive fallback if `scipy` is ever missing.
+  backwards-compatible no-op. The greedy nearest-neighbour fallback has been
+  removed, since `scipy` is always installed.
+- Internal cleanup: hard dependencies (`tqdm`, `scipy`, `numpy`) are imported
+  at module level instead of inside guarded `try/except ImportError` blocks.
+  Optional Pillow handling lives in a single adapter,
+  `deltaflow.utils.image_io` (`require_pillow`, `open_image`, `list_images`,
+  `IMAGE_EXTENSIONS`), shared by `ImageFolderStream` and `RadiographDataset`
+  (which now also picks up `.webp` files). Losses depend on
+  `deltaflow.core.BaseCoupling` rather than `deltaflow.trainer`, and the
+  `l1`/`l2`/`huber` reduction is shared instead of duplicated.
+
+### Removed (breaking)
+
+- Legacy aliases and shim modules. Use the canonical names instead:
+  - `FlowSampler` -> `EulerSolver`
+  - `FlowMatchingLoss` -> `ConditionalFlowMatchingLoss`
+  - `GradientDescentSolver` -> `EquilibriumSolver`
+  - `deltaflow.samplers` -> `deltaflow.solvers`
+  - `deltaflow.core.base` and `deltaflow.interpolants.base` -> `deltaflow.core`
+  - `deltaflow.losses.flow_matching` -> `deltaflow.losses`
+  - `deltaflow.interpolants.ot._batch_ot_permutation` ->
+    `deltaflow.utils.batch_ot_permutation`
+- `deltaflow.solvers.gradient_descent` renamed to
+  `deltaflow.solvers.equilibrium` (matches `EquilibriumSolver`).
+- Unused `deltaflow.inverse.tweedie.TweedieEstimates`.
+
+### Changed (internal / readability)
+
+- `BaseSolver._eval_velocity` is now the public `BaseSolver.velocity(x, t)`.
+- `BaseSolver.sample` always runs under `torch.no_grad()`. `PosteriorSolver`
+  enables autograd locally for its likelihood gradient. Redundant `sample`
+  overrides were removed from `HeunSolver` and `PosteriorSolver`.
+- New `deltaflow.utils.broadcast_time` replaces the repeated
+  `t.view(-1, *[1] * ...)` reshapes in interpolants, Tweedie, and solvers.
+- `trainer.train` routes through a pass-through `GradScaler` instead of
+  repeating `float16` checks, and saves checkpoints through one helper.
+- `ActFlow` uses a `_model_mode` context manager for train/eval switching.
+- `delta_alignment_loss` reuses `MultiScaleProjector.project_delta_h`.
+- `CONTRIBUTING.md` documents the package layout, dependency rule, and how to
+  add an interpolant, solver, or loss.
 
 ## [0.2.2]
 
