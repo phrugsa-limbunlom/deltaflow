@@ -1,9 +1,8 @@
 # DeltaFlow
 
-DeltaFlow provides composable PyTorch primitives for generative modelling in
-**data-scarce domains** such as medical imaging, with a focus on
-*representation learning* and *studying the underlying data distribution* (not
-just sample synthesis).
+DeltaFlow provides composable PyTorch primitives for **flow-based generative
+modelling**: train, sample, and repurpose continuous-time flows on any tensor
+data, from toy distributions to images and latents.
 
 <div class="grid cards" markdown>
 
@@ -33,6 +32,42 @@ just sample synthesis).
 
 ## What is DeltaFlow?
 
+DeltaFlow is a modular PyTorch library for **flow-based generative modelling**.
+It provides composable building blocks to train, sample, and repurpose
+continuous-time flows on any data that can be represented as a tensor. A
+probability path, a coupling, a loss, or a solver can be swapped without
+rewriting the rest of the pipeline.
+
+It covers:
+
+- **Probability paths** (`interpolants`): linear, variance-preserving,
+  optimal-transport, Schrödinger bridge, and equilibrium interpolants.
+- **Training objectives** (`losses`): conditional flow matching,
+  time-unconditioned flow matching, equilibrium matching, signed replay, and
+  delta alignment.
+- **Couplings and training** (`trainer`): independent and mini-batch OT
+  pairing of noise and data, and a training loop with mixed precision,
+  gradient accumulation, EMA, checkpointing, and streaming data loaders.
+- **Samplers** (`solvers`): Euler and Heun ODE integrators, gradient-descent
+  equilibrium sampling, and posterior sampling.
+- **Models** (`models`): wrappers that turn any backbone into a velocity field
+  (time-conditioned or time-blind), a DiT with adaLN-Zero conditioning and
+  **classifier-free guidance**, EMA, and projector heads for representation
+  learning.
+- **Inverse problems** (`inverse`): forward operators, likelihoods, and Tweedie
+  estimates for training-free posterior sampling with a pretrained flow.
+- **Generative design** (`expansion`): Active Flow Expansion, which grows the
+  set of samples a flow can generate toward what an external verifier accepts.
+- **Utilities** (`utils`): numerical-stability helpers, batch OT permutation,
+  and image I/O.
+
+Everything above is domain-agnostic. Domain-specific code is kept at the edges
+(`datasets`, `examples`). As a worked example, the repository includes 2D
+radiography pipelines (chest X-ray, cephalometric, and hand radiographs) for
+data-scarce generative pretraining and landmark detection.
+
+### The core idea
+
 DeltaFlow is built on a single idea, a **delta** (the change carried from one
 distribution to another) and the **flow** that realises it.
 
@@ -54,10 +89,6 @@ The *same difference principle* also drives an optional representation-learning
 loss, **delta alignment**, which aligns the guidance-difference feature
 \(\Delta h = h_\text{cond} - h_\text{uncond}\) for generative pretraining in
 data-scarce domains.
-
-The library targets 2D radiography (chest X-ray, cephalometric, and hand
-radiographs), but the core primitives (`interpolants`, `solvers`, `losses`,
-`models.projector`) are domain-agnostic.
 
 ## Visualizing the algorithm
 

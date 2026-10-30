@@ -29,8 +29,8 @@
     </a>
 </p>
 
-<h1 align="center">DeltaFlow: optimal-transport flow matching for data-scarce domains</h1>
-<h3 align="center">Composable PyTorch primitives for representation learning and posterior sampling, built around the displacement between two distributions.</h3>
+<h1 align="center">DeltaFlow: modular flow-based generative modelling in PyTorch</h1>
+<h3 align="center">Composable PyTorch primitives for training, sampling, and repurposing generative flows, built around the displacement between two distributions.</h3>
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/phrugsa-limbunlom/deltaflow/main/docs/assets/sampling-flow/flow.gif" alt="A learned velocity field transporting noise onto a two-moons distribution" width="480"/>
@@ -40,7 +40,9 @@
 
 ## What is DeltaFlow?
 
-DeltaFlow is a PyTorch library for generative modelling in data-scarce domains such as medical imaging, with a focus on representation learning and studying the underlying data distribution rather than sample synthesis alone. It targets 2D radiography (chest X-ray, cephalometric, and hand radiographs), yet the core primitives stay domain-agnostic.
+DeltaFlow is a modular PyTorch library for flow-based generative modelling. It provides composable building blocks to train, sample, and repurpose continuous-time flows on any data that can be represented as a tensor: probability paths, noise-data couplings, training objectives, ODE and optimisation-based samplers, velocity-field models with classifier-free guidance, a training loop, posterior sampling for inverse problems, representation learning, and verifier-guided generative design. Swap one component without rewriting the rest of the pipeline.
+
+The core primitives are domain-agnostic, and domain-specific code is kept at the edges (`deltaflow.datasets`, `examples/`). As a worked example, the repository includes 2D radiography pipelines (chest X-ray, cephalometric, and hand radiographs) for data-scarce generative pretraining and landmark detection.
 
 The whole library follows from one idea, a **delta** (the change carried from a source distribution to a target one) and the **flow** that realises it.
 
@@ -56,6 +58,7 @@ So DeltaFlow implements each component once and lets the method be a configurati
 | **Interpolant** | along which path do noise and data connect? | `deltaflow.interpolants` |
 | **Coupling** | which noise sample is paired with which datum? | `deltaflow.trainer` |
 | **Objective** | how is the field fit to data? | `deltaflow.losses` |
+| **Training loop** | how is the fit run at scale? | `deltaflow.trainer` |
 | **Solver** | which dynamics turn the field into samples? | `deltaflow.solvers` |
 | **Inverse** | how does one measurement steer sampling? | `deltaflow.inverse` |
 | **Expansion** | how does a verifier grow what the model can generate? | `deltaflow.expansion` |
@@ -65,6 +68,17 @@ Compose them one way and you have flow matching with an independent coupling. An
 Full documentation lives on the [**DeltaFlow website**](https://phrugsa-limbunlom.github.io/deltaflow).
 
 ## What's inside
+
+### Velocity-field models (`deltaflow.models`)
+
+| Component | Role |
+|---|---|
+| `WrappedBackbone` | adapts any `nn.Module` (UNet, DiT, ...) to the velocity-field interface, normalising and rescaling `t` |
+| `TimeBlindVelocityField` | wraps a network `net(x)` that never sees `t`, for time-unconditioned flow matching |
+| `DiT` | Diffusion Transformer with adaLN-Zero conditioning on time and class label |
+| Classifier-free guidance | `DiT` trains with label dropout to a learned null token, and `DiT.forward_with_cfg` returns $v_\text{uncond} + s\,(v_\text{cond} - v_\text{uncond})$ |
+| `EMA` | exponential moving average of weights for sampling |
+| `ProjectorHead`, `MultiScaleProjector` | project multi-level backbone features for `DeltaAlignmentLoss` |
 
 ### Probability paths (`deltaflow.interpolants`)
 
@@ -76,6 +90,7 @@ The path decides how noise becomes data. Every path returns the interpolated sta
 | `VariancePreservingInterpolant` | trigonometric diffusion path, $\alpha_t = \sin(\tfrac{\pi}{2}t)$, $\sigma_t = \cos(\tfrac{\pi}{2}t)$ |
 | `OTInterpolant` | the linear path applied after a mini-batch OT re-ordering of $x_0$ |
 | `SchrodingerBridgeInterpolant` | entropic Schrödinger-bridge path, a Brownian bridge $x_t = (1-t)x_0 + t x_1 + \sigma\sqrt{t(1-t)}\,z$ around the straight line, diffusivity $\sigma$ |
+| `EquilibriumInterpolant` | the noise-to-data path for Equilibrium Matching, with a time-invariant gradient target |
 
 ### Couplings (`deltaflow.trainer`)
 
@@ -86,11 +101,17 @@ The coupling decides which noise becomes which datum. Straighter pairings mean s
 | `IndependentCoupling` | draw $x_0 \sim \mathcal{N}(0, I)$ independently of $x_1$, the classical setup |
 | `OTCoupling` | permute $x_0$ within the batch to minimise squared transport cost (Hungarian, greedy fallback) |
 
+### Training loop (`deltaflow.trainer`)
+
+`train(model, optimizer, loss_fn, loader, TrainConfig(...))` runs any DeltaFlow loss with mixed precision, gradient accumulation and clipping, EMA, periodic checkpoints, and resume (`save_checkpoint`, `load_checkpoint`). `ImageFolderStream` and `build_loader` stream image folders into batches.
+
 ### Objectives (`deltaflow.losses`)
 
 | Objective | Idea |
 |---|---|
 | `ConditionalFlowMatchingLoss` | regress $v_\theta(x_t, t)$ onto the path's conditional velocity $u_t$ |
+| `TimeUnconditionedFlowMatchingLoss` | time-blind flow matching, regress $v_\theta(x_t)$ with no time input; time is recoverable from $x_t$ for high-dimensional data |
+| `EquilibriumMatchingLoss` | learn a time-invariant gradient field whose equilibria are the data |
 | `DeltaAlignmentLoss` | align the guidance-difference feature $\Delta h = h_\text{cond} - h_\text{uncond}$ across two views, an anatomy-cancelling representation loss |
 | `SignedReplayFlowMatchingLoss` | flow matching on verifier-accepted samples minus $\alpha_t$ times flow matching on rejected ones, accept to attract and reject to repel |
 
@@ -100,6 +121,7 @@ The coupling decides which noise becomes which datum. Straighter pairings mean s
 |---|---|
 | `EulerSolver` | first-order explicit Euler integration of the flow ODE |
 | `HeunSolver` | second-order Heun integration, more accurate at low step counts |
+| `EquilibriumSolver` | gradient descent (optionally with Nesterov momentum) on a learned equilibrium landscape |
 | `PosteriorSolver` | wraps any base solver and injects a measurement-likelihood gradient per step |
 
 ### Inverse problems (`deltaflow.inverse`)
@@ -109,6 +131,10 @@ Measurement operators (`MaskOperator`, `BlurOperator`, `DownsampleOperator`, `Id
 ### Generable-set expansion (`deltaflow.expansion`)
 
 Active Flow Expansion (`ActFlow`) grows the set of designs a pre-trained flow can generate, not just its fit to the data. Each round it reads features $\phi_s$ from the velocity field (`FlowRepresentation`), fits a verifier-uncertainty $\sigma_t$ on them (`KernelUncertainty`), samples the tilt $p_\theta \exp(\sigma_t/\beta)$ through `PosteriorSolver` (`UncertaintyGuidance`), queries a black-box verifier, and fine-tunes with `SignedReplayFlowMatchingLoss`. `generable_coverage` measures the result.
+
+### Datasets and utilities (`deltaflow.datasets`, `deltaflow.utils`)
+
+`deltaflow.datasets` holds the example-domain wrappers (`ChestXrayDataset`, `CephalometricDataset`, `ISBI2015CephalometricDataset`, `HandRadiographDataset`). `deltaflow.utils` provides numerical-stability helpers (`StabilityConfig`, safe normalisation and clamping), batch OT permutation, time broadcasting, and image I/O.
 
 ## Install
 
@@ -307,9 +333,9 @@ python examples/90-showcase/07-landmark-detection/main.py    # landmark detectio
 python examples/90-showcase/08-guidance-alignment-pretraining/main.py # guidance-aligned pretraining
 ```
 
-### Landmark detection and representation learning
+### Example domain: landmark detection and representation learning in 2D radiography
 
-Two paired showcases cover the anatomical-landmark story. [`07-landmark-detection/`](https://github.com/phrugsa-limbunlom/deltaflow/tree/main/examples/90-showcase/07-landmark-detection) frames detection as a conditional flow `p(landmarks | image)`, so sampling at inference time is detection (synthetic by default, with real ISBI2015 cephalometric support). [`08-guidance-alignment-pretraining/`](https://github.com/phrugsa-limbunlom/deltaflow/tree/main/examples/90-showcase/08-guidance-alignment-pretraining) is the representation-learning counterpart, the CDPM-Align pretraining phase, where a class-conditioned image flow plus the `DeltaAlignmentLoss` over `Δh = h_cond − h_uncond` yields an anatomy-discriminative backbone.
+Two paired showcases apply the domain-agnostic primitives to anatomical landmarks. [`07-landmark-detection/`](https://github.com/phrugsa-limbunlom/deltaflow/tree/main/examples/90-showcase/07-landmark-detection) frames detection as a conditional flow `p(landmarks | image)`, so sampling at inference time is detection (synthetic by default, with real ISBI2015 cephalometric support). [`08-guidance-alignment-pretraining/`](https://github.com/phrugsa-limbunlom/deltaflow/tree/main/examples/90-showcase/08-guidance-alignment-pretraining) is the representation-learning counterpart, the CDPM-Align pretraining phase, where a class-conditioned image flow plus the `DeltaAlignmentLoss` over `Δh = h_cond − h_uncond` yields an anatomy-discriminative backbone.
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/phrugsa-limbunlom/deltaflow/main/docs/assets/landmark-detection/landmark_detection.png" alt="Landmark detection on held-out cephalometric X-rays" width="900"/>
