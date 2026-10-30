@@ -18,7 +18,7 @@ into any script.
 from deltaflow.trainer import TrainConfig, train, build_loader
 from deltaflow.trainer.coupling import OTCoupling
 
-loader = build_loader(...)                 # your DataLoader
+loader = build_loader(...)                 # a torch DataLoader
 config = TrainConfig(
     max_steps=10_000,
     grad_accum_steps=4,

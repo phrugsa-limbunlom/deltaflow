@@ -8,7 +8,7 @@ data, from toy distributions to images and latents.
 
 - :material-rocket-launch: **[Getting Started](getting-started/installation.md)**
 
-    Install DeltaFlow and fit your first flow-matching model in a few lines.
+    Install DeltaFlow and fit a first flow-matching model in a few lines.
 
 - :material-book-open-variant: **[Guides](guides/flow-matching.md)**
 
@@ -171,5 +171,5 @@ Reproduce these figures from the
 
 ## Citation
 
-If you use DeltaFlow in your research, please cite it (see
+If DeltaFlow is used in published research, please cite it (see
 [`CITATION.cff`](https://github.com/phrugsa-limbunlom/deltaflow/blob/main/CITATION.cff)).

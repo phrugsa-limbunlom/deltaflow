@@ -63,7 +63,7 @@ So DeltaFlow implements each component once and lets the method be a configurati
 | **Inverse** | how does one measurement steer sampling? | `deltaflow.inverse` |
 | **Expansion** | how does a verifier grow what the model can generate? | `deltaflow.expansion` |
 
-Compose them one way and you have flow matching with an independent coupling. Another way and you have OT-coupled rectified flow. Another and you have posterior sampling for an inverse problem, reusing the very same pretrained field.
+One composition gives flow matching with an independent coupling. Another gives OT-coupled rectified flow. Another gives posterior sampling for an inverse problem, reusing the very same pretrained field.
 
 Full documentation lives on the [**DeltaFlow website**](https://phrugsa-limbunlom.github.io/deltaflow).
 
@@ -353,7 +353,7 @@ Two paired showcases apply the domain-agnostic primitives to anatomical landmark
 
 The [`examples/`](https://github.com/phrugsa-limbunlom/deltaflow/tree/main/examples) tree is a tiered, runnable curriculum.
 
-| Tier | You learn to |
+| Tier | Learn to |
 |---|---|
 | [`00-foundations/`](https://github.com/phrugsa-limbunlom/deltaflow/tree/main/examples/00-foundations) | work with interpolants and the linear probability path |
 | [`10-sampling/`](https://github.com/phrugsa-limbunlom/deltaflow/tree/main/examples/10-sampling) | integrate a learned field with the Euler and Heun solvers |
@@ -373,7 +373,7 @@ Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) before
 
 ## Citation
 
-If DeltaFlow is useful in your research, please cite it (see [CITATION.cff](CITATION.cff)):
+If DeltaFlow is useful in published research, please cite it (see [CITATION.cff](CITATION.cff)):
 
 ```bibtex
 @misc{deltaflow_library_2025,
