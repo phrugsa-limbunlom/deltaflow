@@ -59,7 +59,9 @@ class MultiScaleProjector(nn.Module):
 
         self.projectors = nn.ModuleDict(
             {
-                layer: ProjectorHead(in_dim=feature_dims[layer], hidden_dim=hidden_dim, out_dim=out_dim)
+                layer: ProjectorHead(
+                    in_dim=feature_dims[layer], hidden_dim=hidden_dim, out_dim=out_dim
+                )
                 for layer in self.layer_set
                 if layer in feature_dims
             }
