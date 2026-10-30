@@ -68,7 +68,6 @@ nav:
       - interpolants: api/interpolants.md
       - losses: api/losses.md
       - solvers: api/solvers.md
-      - samplers: api/samplers.md
       - models: api/models.md
       - inverse: api/inverse.md
       - expansion: api/expansion.md
