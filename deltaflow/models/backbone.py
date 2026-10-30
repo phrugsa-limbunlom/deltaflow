@@ -1,8 +1,7 @@
 """Backbone wrapper: turn any ``nn.Module`` into a DeltaFlow velocity field.
 
-The design constraint from the build prompt is to *wrap* an existing image
-backbone (UNet, DiT, ...) rather than ship one from scratch. This module
-provides a thin adapter that
+DeltaFlow *wraps* an existing image backbone (UNet, DiT, ...) rather than
+shipping one from scratch. This module provides a thin adapter that
 
 - adopts the `BaseVelocityField` interface,
 - normalises the time signature (float / 0-d tensor / (B,) tensor) and
