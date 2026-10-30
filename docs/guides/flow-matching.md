@@ -55,7 +55,7 @@ Integrate the learned field with any [solver](../api/solvers.md). `FlowSampler`
 is a thin Euler wrapper:
 
 ```python
-from deltaflow.samplers import FlowSampler
+from deltaflow.solvers import FlowSampler
 
 samples = FlowSampler(model).sample(torch.randn(1000, 2), n_steps=50)
 ```

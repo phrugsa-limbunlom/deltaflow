@@ -10,7 +10,6 @@ subpackage.
 | [interpolants](interpolants.md) | `LinearInterpolant`, `OTInterpolant`, `VariancePreservingInterpolant` |
 | [losses](losses.md) | `FlowMatchingLoss`, `ConditionalFlowMatchingLoss`, `DeltaAlignmentLoss`, `SignedReplayFlowMatchingLoss` |
 | [solvers](solvers.md) | `EulerSolver`, `HeunSolver`, `PosteriorSolver` |
-| [samplers](samplers.md) | `FlowSampler` and re-exported solvers |
 | [models](models.md) | `TinyVelocityField`, `WrappedBackbone`, `EMA`, `MultiScaleProjector`, `ProjectorHead` |
 | [inverse](inverse.md) | Operators, Tweedie decompositions, `GaussianLikelihood` |
 | [expansion](expansion.md) | `ActFlow`, `FlowRepresentation`, `KernelUncertainty`, `UncertaintyGuidance`, `generable_coverage` |

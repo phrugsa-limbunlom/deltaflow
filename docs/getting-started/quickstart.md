@@ -7,7 +7,7 @@ import torch
 import torch.nn as nn
 from deltaflow.core import BaseVelocityField
 from deltaflow.losses import FlowMatchingLoss
-from deltaflow.samplers import FlowSampler
+from deltaflow.solvers import FlowSampler
 
 
 class MLPVelocityField(BaseVelocityField):

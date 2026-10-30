@@ -1,6 +1,6 @@
 import torch
 
-from deltaflow.samplers import FlowSampler
+from deltaflow.solvers import FlowSampler
 from tests.conftest import DummyVelocityField
 
 

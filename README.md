@@ -138,7 +138,7 @@ Each block below is one method, in as few lines as it takes. Annotated, full-sca
 import torch
 from deltaflow.interpolants import LinearInterpolant
 from deltaflow.losses import FlowMatchingLoss
-from deltaflow.samplers import FlowSampler
+from deltaflow.solvers import FlowSampler
 
 loss_fn = FlowMatchingLoss(interpolant=LinearInterpolant())
 loss = loss_fn(model, x1)                        # model(x_t, t) -> predicted velocity
