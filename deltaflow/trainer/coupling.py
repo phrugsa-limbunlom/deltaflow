@@ -35,10 +35,8 @@ class OTCoupling(BaseCoupling):
     """Mini-batch optimal-transport coupling on squared-L2 cost.
 
     Draws ``x0 ~ N(0, I)`` and then permutes it within the batch so that
-    each ``(x0, x1)`` pair minimises the batch's total transport cost. Uses
-    ``scipy.optimize.linear_sum_assignment`` (``scipy`` is a core
-    dependency, so this is the default path); falls back to a deterministic
-    greedy nearest-neighbour matching only if ``scipy`` is unavailable.
+    each ``(x0, x1)`` pair minimises the batch's total transport cost, using
+    the exact Hungarian assignment (``scipy.optimize.linear_sum_assignment``).
     """
 
     def sample_pair(self, x1: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
