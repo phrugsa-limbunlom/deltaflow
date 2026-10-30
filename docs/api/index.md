@@ -15,4 +15,4 @@ subpackage.
 | [expansion](expansion.md) | `ActFlow`, `FlowRepresentation`, `KernelUncertainty`, `UncertaintyGuidance`, `generable_coverage` |
 | [trainer](trainer.md) | `TrainConfig`, `train`, coupling strategies, checkpointing |
 | [datasets](datasets.md) | Radiograph dataset wrappers |
-| [utils](utils.md) | Numerical stability helpers |
+| [utils](utils.md) | Numerical stability, `broadcast_time`, OT assignment, image I/O |
