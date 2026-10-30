@@ -35,7 +35,7 @@
 <p align="center">
   <img src="https://raw.githubusercontent.com/phrugsa-limbunlom/deltaflow/main/docs/assets/sampling-flow/flow.gif" alt="A learned velocity field transporting noise onto a two-moons distribution" width="480"/>
   <br>
-  <em>A learned field integrated from noise onto data with <code>FlowSampler</code>.</em>
+  <em>A learned field integrated from noise onto data with <code>EulerSolver</code>.</em>
 </p>
 
 ## What is DeltaFlow?
@@ -98,7 +98,7 @@ The coupling decides which noise becomes which datum. Straighter pairings mean s
 
 | Solver | Dynamics |
 |---|---|
-| `EulerSolver` (`FlowSampler`) | first-order explicit Euler integration of the flow ODE |
+| `EulerSolver` | first-order explicit Euler integration of the flow ODE |
 | `HeunSolver` | second-order Heun integration, more accurate at low step counts |
 | `PosteriorSolver` | wraps any base solver and injects a measurement-likelihood gradient per step |
 
@@ -138,13 +138,13 @@ Each block below is one method, in as few lines as it takes. Annotated, full-sca
 import torch
 from deltaflow.interpolants import LinearInterpolant
 from deltaflow.losses import FlowMatchingLoss
-from deltaflow.solvers import FlowSampler
+from deltaflow.solvers import EulerSolver
 
 loss_fn = FlowMatchingLoss(interpolant=LinearInterpolant())
 loss = loss_fn(model, x1)                        # model(x_t, t) -> predicted velocity
 loss.backward()
 
-samples = FlowSampler(model).sample(torch.randn(1000, 2), n_steps=50)
+samples = EulerSolver(model).sample(torch.randn(1000, 2), n_steps=50)
 ```
 
 ### Optimal-transport couplings
