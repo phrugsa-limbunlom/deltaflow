@@ -6,9 +6,11 @@ intentionally minimal, bring your own annotation parser for a specific
 benchmark by subclassing and overriding `_load_landmarks`.
 """
 
+import csv
 from pathlib import Path
 from typing import Callable, Optional, Union
 
+import numpy as np
 import torch
 from torch.utils.data import Dataset
 
@@ -98,7 +100,7 @@ class RadiographDataset(Dataset):
         if self.transform is not None:
             img = self.transform(img)
 
-        x = torch.from_numpy(_to_numpy(img)).float().unsqueeze(0) / 255.0
+        x = torch.from_numpy(np.array(img)).float().unsqueeze(0) / 255.0
 
         if self.landmarks is None:
             return x
@@ -115,12 +117,6 @@ class RadiographDataset(Dataset):
             if self.normalize_landmarks:
                 lm = (lm / (self.image_size - 1)) * 2.0 - 1.0
         return x, lm.reshape(-1)
-
-
-def _to_numpy(img):
-    import numpy as np
-
-    return np.array(img)
 
 
 class ChestXrayDataset(RadiographDataset):
@@ -208,11 +204,9 @@ class ISBI2015CephalometricDataset(CephalometricDataset):
 
     def _load_landmarks_csv(self, csv_path: Path) -> dict:
         """Parse a wide ``image_path,1_x,1_y,...`` CSV split file."""
-        import csv as _csv
-
         landmarks = {}
         with open(csv_path, newline="") as f:
-            reader = _csv.reader(f)
+            reader = csv.reader(f)
             header = next(reader, None)
             if header is None:
                 raise ValueError(f"Empty CSV annotation file: {csv_path}")

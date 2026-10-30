@@ -11,6 +11,7 @@ WebDataset, an in-house one) just plug it into
 from pathlib import Path
 from typing import Callable, Optional, Sequence, Union
 
+import numpy as np
 import torch
 from torch.utils.data import DataLoader, Dataset
 
@@ -67,8 +68,6 @@ class ImageFolderStream(Dataset):
             if isinstance(out, torch.Tensor):
                 return out
             img = out
-        import numpy as np
-
         arr = np.array(img)
         if arr.ndim == 2:
             arr = arr[..., None]
