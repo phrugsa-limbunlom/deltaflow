@@ -24,10 +24,9 @@ class EulerSolver(BaseSolver):
     """
 
     def step(self, x: torch.Tensor, t: float, dt: float, **cond) -> torch.Tensor:
-        v = self._eval_velocity(x, t, **cond)
+        v = self.velocity(x, t, **cond)
         return x + dt * v
 
-    @torch.no_grad()
     def sample(
         self,
         x: torch.Tensor,
@@ -47,6 +46,7 @@ class EulerSolver(BaseSolver):
                 initial state becomes ``(1 - t_start) * noise + t_start * x_cond``.
             t_start: starting time, used together with ``x_cond``.
             t_end: end time, defaults to ``1.0``.
+            show_progress: display a tqdm progress bar.
             **cond: extra keyword arguments forwarded to the velocity model.
         """
         if x_cond is not None:
@@ -58,7 +58,6 @@ class EulerSolver(BaseSolver):
             t_start=t_start,
             t_end=t_end,
             show_progress=show_progress,
-            progress_desc="EulerSolver",
             **cond,
         )
 

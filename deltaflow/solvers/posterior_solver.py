@@ -12,7 +12,7 @@ pretrained velocity field.
 Per step, given the current state ``x_t`` and the velocity ``v_theta(x_t, t)``,
 the update is::
 
-    x_clean_hat = Tweedie.decompose(x_t, v_t, t).x_clean
+    x_clean_hat, _ = tweedie.decompose(x_t, v_t, t)
     g = grad_{x_t} -log p( y | x_clean_hat )
     x_{t+dt} = BaseSolver.step(x_t, t, dt) - eta * g
 
@@ -88,7 +88,6 @@ class PosteriorSolver(BaseSolver):
         guidance_scale: float = 1.0,
         grad_normalize: bool = False,
     ):
-        # Re-use the base solver's model reference and time_scale.
         super().__init__(model=base_solver.model, time_scale=base_solver.time_scale)
         self.base = base_solver
         self.likelihood = likelihood
@@ -97,9 +96,11 @@ class PosteriorSolver(BaseSolver):
         self.grad_normalize = grad_normalize
 
     def _likelihood_grad(self, x: torch.Tensor, t: float, **cond) -> torch.Tensor:
-        x_grad = x.detach().requires_grad_(True)
+        """Gradient of ``-log p(y | x_clean_hat(x))`` with respect to ``x``."""
+        # `sample` runs under no_grad, so autograd is re-enabled locally here.
         with torch.enable_grad():
-            v = self.base._eval_velocity(x_grad, t, **cond)
+            x_grad = x.detach().requires_grad_(True)
+            v = self.base.velocity(x_grad, t, **cond)
             x_clean_hat, _ = self.tweedie.decompose(x_grad, v, t)
             neg_log_lik = self.likelihood.neg_log_prob(x_clean_hat)
             if neg_log_lik.dim() > 0:

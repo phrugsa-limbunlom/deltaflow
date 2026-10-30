@@ -17,9 +17,10 @@ class BaseSolver(ABC):
     - `sample` drives `step` in a loop from ``t_start`` to
       ``t_end`` and returns the final state.
 
-    Design note: `PosteriorSolver`
-    wraps a `BaseSolver` and hooks the likelihood gradient into every
-    call to `step`, so the base stepping logic is never duplicated.
+    `sample` runs under ``torch.no_grad()``: sampling never needs gradients
+    through the trajectory. Solvers that need autograd inside a step (e.g.
+    `PosteriorSolver`, which wraps a `BaseSolver` and adds a likelihood
+    gradient) enable it locally with ``torch.enable_grad()``.
 
     Args:
         model: callable ``model(x, t, **cond) -> velocity`` with the same
@@ -33,18 +34,17 @@ class BaseSolver(ABC):
         self.model = model
         self.time_scale = time_scale
 
-    def _time_tensor(self, x: torch.Tensor, t: float) -> torch.Tensor:
-        return torch.full((x.shape[0],), t, device=x.device, dtype=x.dtype)
-
-    def _eval_velocity(self, x: torch.Tensor, t: float, **cond) -> torch.Tensor:
-        t_tensor = self._time_tensor(x, t) * self.time_scale
-        return self.model(x, t_tensor, **cond)
+    def velocity(self, x: torch.Tensor, t: float, **cond) -> torch.Tensor:
+        """Evaluate the model at scalar time ``t`` (scaled by ``time_scale``)."""
+        t_batch = torch.full((x.shape[0],), t * self.time_scale, device=x.device, dtype=x.dtype)
+        return self.model(x, t_batch, **cond)
 
     @abstractmethod
     def step(self, x: torch.Tensor, t: float, dt: float, **cond) -> torch.Tensor:
         """Advance the state ``x`` from time ``t`` to ``t + dt``."""
         raise NotImplementedError
 
+    @torch.no_grad()
     def sample(
         self,
         x: torch.Tensor,
