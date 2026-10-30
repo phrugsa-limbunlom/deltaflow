@@ -29,8 +29,9 @@ update is `SignedReplayFlowMatchingLoss`.
 """
 
 import math
+from contextlib import contextmanager
 from dataclasses import dataclass
-from typing import Any, Callable, Dict, List, Optional, Sequence
+from typing import Any, Callable, Dict, Iterator, List, Optional, Sequence
 
 import torch
 import torch.nn as nn
@@ -43,6 +44,17 @@ from ..solvers.posterior_solver import PosteriorSolver
 from .guidance import UncertaintyGuidance
 from .representation import FlowRepresentation
 from .uncertainty import BaseUncertainty, KernelUncertainty
+
+
+@contextmanager
+def _model_mode(model: nn.Module, training: bool) -> Iterator[None]:
+    """Temporarily put ``model`` in train/eval mode, restoring the previous mode."""
+    was_training = model.training
+    model.train(training)
+    try:
+        yield
+    finally:
+        model.train(was_training)
 
 
 @dataclass
@@ -181,11 +193,9 @@ class ActFlow:
         self.feature_batch_size = feature_batch_size
         self.cond = dict(cond or {})
 
-        try:
-            ref = next(model.parameters())
-            self.device, self.dtype = ref.device, ref.dtype
-        except StopIteration:
-            self.device, self.dtype = torch.device("cpu"), torch.get_default_dtype()
+        ref = next(model.parameters(), None)
+        self.device = ref.device if ref is not None else torch.device("cpu")
+        self.dtype = ref.dtype if ref is not None else torch.get_default_dtype()
 
         empty = torch.empty(0, *self.sample_shape, device=self.device, dtype=self.dtype)
         self.queries = empty
@@ -213,12 +223,8 @@ class ActFlow:
 
     def fit_uncertainty(self) -> None:
         """Refit \\(\\sigma_t\\) on the full history with the current features."""
-        was_training = self.model.training
-        self.model.eval()
-        try:
+        with _model_mode(self.model, training=False):
             feats = self.features(self.queries)
-        finally:
-            self.model.train(was_training)
         self.uncertainty.fit(feats, self.labels.to(feats.dtype))
 
     def guidance(self) -> UncertaintyGuidance:
@@ -228,24 +234,18 @@ class ActFlow:
     def self_generate(self, n: int) -> torch.Tensor:
         """Draw ``n`` designs from the uncertainty-tilted model (Eq. 9)."""
         x0 = torch.randn(n, *self.sample_shape, device=self.device, dtype=self.dtype)
-        was_training = self.model.training
-        self.model.eval()
-        try:
-            if math.isinf(self.beta):
-                x = self.base_solver.sample(
-                    x0, n_steps=self.n_steps, show_progress=False, **self.cond
-                )
-            else:
-                solver = PosteriorSolver(
-                    base_solver=self.base_solver,
-                    likelihood=self.guidance(),
-                    tweedie=self.tweedie,
-                    guidance_scale=self.guidance_scale,
-                    grad_normalize=self.grad_normalize,
-                )
-                x = solver.sample(x0, n_steps=self.n_steps, show_progress=False, **self.cond)
-        finally:
-            self.model.train(was_training)
+        if math.isinf(self.beta):
+            solver = self.base_solver  # no tilt: plain self-training baseline
+        else:
+            solver = PosteriorSolver(
+                base_solver=self.base_solver,
+                likelihood=self.guidance(),
+                tweedie=self.tweedie,
+                guidance_scale=self.guidance_scale,
+                grad_normalize=self.grad_normalize,
+            )
+        with _model_mode(self.model, training=False):
+            x = solver.sample(x0, n_steps=self.n_steps, show_progress=False, **self.cond)
         return x.detach()
 
     @torch.no_grad()
@@ -263,10 +263,8 @@ class ActFlow:
         pos, neg = self.accepted, self.rejected
         if pos.shape[0] == 0 or pos.shape[0] < self.min_accepted or self.finetune_steps <= 0:
             return None
-        was_training = self.model.training
-        self.model.train()
         last = None
-        try:
+        with _model_mode(self.model, training=True):
             for _ in range(self.finetune_steps):
                 x_pos = pos[torch.randint(pos.shape[0], (self.batch_size,), device=pos.device)]
                 x_neg = None
@@ -277,8 +275,6 @@ class ActFlow:
                 loss.backward()
                 self.optimizer.step()
                 last = float(loss.detach())
-        finally:
-            self.model.train(was_training)
         return last
 
     def step(self, n_samples: int) -> ActFlowRound:
@@ -286,13 +282,8 @@ class ActFlow:
         self.fit_uncertainty()
         x = self.self_generate(n_samples)
 
-        was_training = self.model.training
-        self.model.eval()
-        try:
-            with torch.no_grad():
-                sigma = self.uncertainty(self.representation(x, **self.cond))
-        finally:
-            self.model.train(was_training)
+        with _model_mode(self.model, training=False), torch.no_grad():
+            sigma = self.uncertainty(self.representation(x, **self.cond))
 
         y = self.query(x)
         self.queries = torch.cat([self.queries, x])
