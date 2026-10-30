@@ -624,3 +624,40 @@ pip install -e ".[dev]" matplotlib
 python examples/90-showcase/11-active-flow-expansion-viz/main.py
 # artifacts are written to outputs/active_flow_expansion_viz/
 ```
+
+## 90 showcase, time-unconditioned flow matching
+
+[`examples/90-showcase/12-time-unconditioned-fm-viz/main.py`](https://github.com/phrugsa-limbunlom/deltaflow/blob/main/examples/90-showcase/12-time-unconditioned-fm-viz/main.py)
+compares a time-conditioned velocity field \(v(x, t)\)
+(`ConditionalFlowMatchingLoss`) with a time-blind one \(v(x)\)
+(`TimeUnconditionedFlowMatchingLoss` + `TimeBlindVelocityField`) on two-moons,
+following [arXiv:2605.08344](https://arxiv.org/abs/2605.08344).
+
+![Training loss, conditioned vs time-blind](assets/time-unconditioned-fm/loss_curves.png)
+
+![Samples from both models](assets/time-unconditioned-fm/samples.png)
+
+![Sampling from noise, conditioned vs time-blind](assets/time-unconditioned-fm/samples.gif)
+
+**Caveat.** In 2D the data fills the whole space, so time is not identifiable
+from \(x_t\) and the time-blind model is visibly worse. The paper's claim is
+about high dimensions.
+
+**Why it works in high dimensions.** When data lies near a \(k\)-dimensional
+subspace of \(\mathbb{R}^d\), the directions orthogonal to the data carry only
+noise scaled by \((1-t)\), so \(t\) can be read off a single \(x_t\) with error
+\(O(1/\sqrt{d-k})\). The
+[Time-Unconditioned Flow Matching](guides/time-unconditioned-fm.md) guide walks
+through this geometry step by step.
+
+![x_t collapsing onto the data plane](assets/time-unconditioned-fm/geometry_3d.gif)
+
+![Time recovered from a single noisy observation](assets/time-unconditioned-fm/time_identifiability.png)
+
+### Reproduce
+
+```bash
+pip install -e ".[dev]" matplotlib
+python examples/90-showcase/12-time-unconditioned-fm-viz/main.py
+# artifacts are written to outputs/time_unconditioned_fm_viz/
+```
